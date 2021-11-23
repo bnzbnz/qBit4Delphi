@@ -18,7 +18,8 @@ from the original source folder :
 to
 	JSON/Sydney.10.4.2 or JSON/Alexandria.11.0
 
-	then go in that folder and execute PatchDelphiUnits.bat: Build and Run the demo, it should work.
+then go in that folder and execute PatchDelphiUnits.bat: Build and Run the demo, it should work.
+	
 	(Remember to always add this patched units to your projects)
 
 qBit4Delphi@ea4d.com
