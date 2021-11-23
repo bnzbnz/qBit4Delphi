@@ -14,12 +14,6 @@ uses classes, uqBitAPI, uqBitAPITypes;
 type
 
   TqBitObject = class(TqBitAPI)
-  private
-    FLastHTTPStatus: integer;
-    FDuration: cardinal;
-    FPassword: string;
-    FHostPath: string;
-    FUsername: string;
   public
     class function Connect(HostPath, Username, Password : string): TqBitObject;
 
