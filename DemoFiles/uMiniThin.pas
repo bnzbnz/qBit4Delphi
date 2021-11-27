@@ -39,6 +39,7 @@ type
     ResumeSelected: TMenuItem;
     ResumeAll: TMenuItem;
     ToggleForceResume: TMenuItem;
+    Warning: TMemo;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TimerTimer(Sender: TObject);
     procedure SGDblClick(Sender: TObject);
@@ -54,6 +55,7 @@ type
     procedure ResumeAllClick(Sender: TObject);
     procedure ForceResumeSelectedClick(Sender: TObject);
     procedure ToggleForceResumeClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
   public
@@ -455,5 +457,10 @@ end;
 
 
 
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  Warning.Visible := False;
+end;
 
 end.

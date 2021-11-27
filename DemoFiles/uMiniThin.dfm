@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
-  ClientHeight = 555
-  ClientWidth = 936
+  Caption = 'MiniThin'
+  ClientHeight = 476
+  ClientWidth = 724
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -12,16 +12,18 @@ object Form1: TForm1
   Font.Style = []
   OldCreateOrder = False
   OnClose = FormClose
+  OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 936
+    Width = 724
     Height = 41
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 936
     object Label1: TLabel
       Left = 16
       Top = 14
@@ -68,24 +70,62 @@ object Form1: TForm1
   object SG: TStringGrid
     Left = 0
     Top = 41
-    Width = 936
-    Height = 514
+    Width = 724
+    Height = 435
     Align = alClient
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goFixedRowDefAlign]
     PopupMenu = PMGrid
     TabOrder = 1
     OnDblClick = SGDblClick
     OnSelectCell = SGSelectCell
+    ExplicitWidth = 936
+    ExplicitHeight = 514
+  end
+  object Warning: TMemo
+    Left = 55
+    Top = 175
+    Width = 618
+    Height = 282
+    Lines.Strings = (
+      'WARNING... WARNING... WARNING... (this is said) :'
+      ''
+      
+        'In order to build and use qBitVCL some Embarcadero units need to' +
+        ' be patched (Fixes and Enhancements)'
+      
+        'This version is tested and patched against Delphi 10.4.2 (Sydney' +
+        ') and Delphi 11 (Alexandria) :'
+      ''
+      'Copy :'
+      #9'REST.Json.pas'
+      #9'REST.Json.Types.pas'
+      #9'REST.JsonReflect.pas'
+      #9'System.JSON.pas'
+      ''
+      'from the original source folder : '
+      
+        #9'C:\Program Files (x86)\Embarcadero\Studio\XX\source\...   (XX b' +
+        'eing 21.0 or 22.0)'#9
+      'to'
+      #9'JSON/Sydney.10.4.2 or JSON/Alexandria.11.0'
+      ''
+      
+        #9'then go in that folder and execute PatchDelphiUnits.bat: Build ' +
+        'and Run this app., it should work.'
+      #9'(Remember to always add this patched units to your projects)'
+      ''
+      'qBit4Delphi@ea4d.com')
+    TabOrder = 2
   end
   object Timer: TTimer
     Enabled = False
     OnTimer = TimerTimer
-    Left = 16
-    Top = 128
+    Left = 8
+    Top = 48
   end
   object PMGrid: TPopupMenu
-    Left = 512
-    Top = 112
+    Left = 8
+    Top = 96
     object Pause: TMenuItem
       Caption = 'Pause'
       object PauseSelected: TMenuItem
