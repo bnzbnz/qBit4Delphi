@@ -271,8 +271,6 @@ type
   end;
 
   TqBitTorrentType = class(TqBitTorrentBaseType)
-    Fhash: variant;
-    Fname: variant;
     Fadded_on: variant;
     Famount_left: variant;
     Fauto_tmm: variant;
@@ -288,10 +286,12 @@ type
     Feta: variant;
     Ff_l_piece_prio: variant;
     Fforce_start: variant;
+    Fhash: variant; // Internal Custom
     Flast_activity: variant;
     Fmagnet_uri: variant;
     Fmax_ratio: variant;
     Fmax_seeding_time: variant;
+    Fname: variant;
     Fnum_complete: variant;
     Fnum_incomplete: variant;
     Fnum_leechs: variant;
