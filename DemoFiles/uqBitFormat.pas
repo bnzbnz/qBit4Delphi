@@ -9,10 +9,12 @@ type
 function VarFormatString(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatDate(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatBKM(v: variant; Obj: TqBitTorrentBaseType): string;
+function VarFormatBKMPerSec(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatPercent(v: variant; Obj: TqBitTorrentBaseType): string;
+function VarFormatFloat2d(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatMulti(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatLimit(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatDetaSec(v: variant; Obj: TqBitTorrentBaseType): string;
+function VarFormatDeltaSec(v: variant; Obj: TqBitTorrentBaseType): string;
 
 implementation
 uses variants, SysUtils, DateUtils;
@@ -54,6 +56,11 @@ begin
     end;
 end;
 
+function VarFormatBKMPerSec(v: variant; Obj: TqBitTorrentBaseType): string;
+begin
+  Result := VarFormatBKM(v, Obj) + '/s';
+end;
+
 function VarFormatPercent(v: variant; Obj: TqBitTorrentBaseType): string;
 var
   x: double;
@@ -62,6 +69,14 @@ begin
     if v < 0 then Exit;
     x := v;
     Result := Format('%.2f', [x * 100] )+ ' %';
+end;
+
+function VarFormatFloat2d(v: variant; Obj: TqBitTorrentBaseType): string;
+var
+  x: double;
+begin
+  x := v;
+  Result := Format('%.2f', [x] );
 end;
 
 function VarFormatMulti(v: variant; Obj: TqBitTorrentBaseType): string;
@@ -80,7 +95,7 @@ begin
   if v > 0 then Result := VarFormatBKM(v, Obj);
 end;
 
-function VarFormatDetaSec(v: variant; Obj: TqBitTorrentBaseType): string;
+function VarFormatDeltaSec(v: variant; Obj: TqBitTorrentBaseType): string;
 begin
   Result := DateTimeToStr(IncSecond(Now, v));
 end;

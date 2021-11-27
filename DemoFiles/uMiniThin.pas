@@ -69,7 +69,7 @@ type
     function GetMasterData: TGridData;
     procedure UpdateUI(Init : Boolean);
     procedure SelRow(Row: integer);
-    procedure AddCol(Index: Integer; Name, Field: string; Width: integer);
+    procedure AddCol(Index: Integer; Name, Field: string; Fmt: TVarDataFormater; Width: integer);
   end;
 
   TMyStringGrid = class(TStringGrid);
@@ -81,13 +81,15 @@ uses System.Generics.Collections,  System.Generics.Defaults, RTTI;
 
 {$R *.dfm}
 
-procedure TForm1.AddCol(Index: Integer; Name, Field: string; Width: integer);
+procedure TForm1.AddCol(Index: Integer; Name, Field: string; Fmt: TVarDataFormater; Width: integer);
 begin
   var CD := GetColData(Index);
   CD.Name := Name;
   CD.Field := Field;
+  CD.Formater := Fmt;
   SG.Cells[Index, 0] := Name;
   SG.ColWidths[Index] := Width;
+  SG.RowHeights[Index] := 24;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
@@ -108,9 +110,9 @@ begin
   SG.FixedRows := 1;
 
   var GD := TGridData.Create;
-  GD.Formater := nil;
+  GD.Formater := VarFormatString;
   GD.SortField := 'Fname';
-  GD.SortReverse := True;
+  GD.SortReverse := False;
 
   GD.Width := -1;
   SG.ColWidths[0] := GD.Width;
@@ -135,23 +137,36 @@ begin
   end;
 
   var Row := 0;
-  Inc(Row); AddCol(Row, 'Name', 'Fname', 164);
-
+  Inc(Row); AddCol(Row, 'Name', 'Fname', VarFormatString, 240);
+  Inc(Row); AddCol(Row, 'Size', 'Fsize', VarFormatBKM, 84);
+  Inc(Row); AddCol(Row, 'Progress', 'Fprogress', VarFormatPercent, 84);
+  Inc(Row); AddCol(Row, 'Status', 'Fstate', VarFormatString, 84);
+  Inc(Row); AddCol(Row, 'Seeds', 'Fnum_seeds', VarFormatString, 84);
+  Inc(Row); AddCol(Row, 'Peers', 'Fnum_leechs', VarFormatString, 84);
+  Inc(Row); AddCol(Row, 'Down Speed', 'Fdlspeed', VarFormatBKMPerSec, 84);
+  Inc(Row); AddCol(Row, 'Upload Speed', 'Fupspeed', VarFormatBKMPerSec, 84);
+  Inc(Row); AddCol(Row, 'ETA', 'Feta', VarFormatDeltaSec, 84);
+  Inc(Row); AddCol(Row, 'Ratio', 'Fratio', VarFormatFloat2d, 84);
+  Inc(Row); AddCol(Row, 'Category', 'Fcategory', VarFormatString, 84);
+  Inc(Row); AddCol(Row, 'Tags', 'Ftags', VarFormatString, 84);
+  Inc(Row); AddCol(Row, 'Added On', 'Fadded_on', VarFormatDate, 84);
+  Inc(Row); AddCol(Row, 'Availability', 'Favailability', VarFormatMulti, 84);
+  {
   var rttictx := TRttiContext.Create();
   var rttitype := rttictx.GetType(TqBitTorrentType);
   for var field in rttitype.GetFields do
   begin
     var Title := Uppercase(Copy(field.Name, 2, 1)) + Copy(field.Name, 3, 9999);
-    Inc(Row); AddCol(Row, Title, field.Name, 96);
+    Inc(Row); AddCol(Row, Title, field.Name, VarFormatString, 64);
   end;
   rttictx.Free;
+  }
 
   UpdateUI(True);
   SelRow(2);
   SelRow(1);
   Timer.Interval := M.Fserver_state.Frefresh_interval;
   Timer.Enabled := True;
-  SG.ColWidths[1] := 192;
 end;
 
 procedure TForm1.PauseSelectedClick(Sender: TObject);
@@ -295,36 +310,19 @@ begin
     var GD := Self.GetColData(Col);
     if assigned(GD) then
     begin
-      GD.Formater := VarFormatString;
-      AssignFormater(GD, VarFormatDate, ['Fadded_on','Fcompletion_on','Flast_activity']);
-      AssignFormater(GD, VarFormatBKM, ['Famount_left','Fcompleted','Fdownloaded','Fdownloaded_session']);
-      AssignFormater(GD, VarFormatMulti, ['Favailability']);
-      AssignFormater(GD, VarFormatPercent, ['Fprogress']);
-      AssignFormater(GD, VarFormatLimit, ['Fdl_limit', 'Fdlspeed','Fmax_ratio']);
-      AssignFormater(GD, VarFormatDetaSec, ['Feta']);
-      // TODO...
       var Row := 1;
       for var T in TL do
       begin
         GetRowData(Row).Hash := T.Fhash;
         if T.Fhash = SelHash then
-        begin
            SelRow(Row);
-        end;
         for var Field in RttiType.GetFields do
-        begin
           if  Field.Name = GD.Field then
           begin
             SG.Cells[Col, Row] := GD.Formater( Field.GetValue(T).asVariant, nil);
             SG.RowHeights[Row] := 24;
-            if Init then
-            begin
-              SG.ColWidths[Col] := 100;
-              SG.RowHeights[Row] := 24;
-            end;
             break;
           end;
-        end;
         Inc(Row);
       end;
     end;
@@ -361,7 +359,7 @@ begin
   RttiCtx.Free;
 
   Timer.Enabled := True;
-  //LockWindowUpdate(0);
+  LockWindowUpdate(0);
 end;
 
 function TForm1.GetColData(Index: Integer): TGridData;

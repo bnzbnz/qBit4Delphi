@@ -90,8 +90,8 @@ object Form1: TForm1
       'WARNING... WARNING... WARNING... (this is said) :'
       ''
       
-        'In order to build and use qBitVCL some Embarcadero units need to' +
-        ' be patched (Fixes and Enhancements)'
+        'In order to build and use qBit4Delphi some Embarcadero units nee' +
+        'd to be patched (Fixes and Enhancements)'
       
         'This version is tested and patched against Delphi 10.4.2 (Sydney' +
         ') and Delphi 11 (Alexandria) :'
