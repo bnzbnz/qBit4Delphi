@@ -112,7 +112,7 @@ end;
 procedure TSelectServerDlg.FormDestroy(Sender: TObject);
 begin
   var SrvLst := TqBitServers.Create;
-  for var i := LBSrv.Items.Count -1 downto 0 do
+  for var i := 0 to LBSrv.Items.Count -1 do
     SrvLst.AddServer(TqBitServer(LBSrv.Items.Objects[i]));
   var Json := TJson.ObjectToJsonString(SrvLst);
   var SS := TStringStream.Create( TJson.ObjectToJsonString(SrvLst) );

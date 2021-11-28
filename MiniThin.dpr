@@ -23,9 +23,9 @@ uses
   Vcl.Themes,
   Vcl.Styles,
   Vcl.Grids,
-  uqBitFormat in 'DemoFiles\uqBitFormat.pas' {$R *.res},
-  uSelectServer in 'DemoFiles\uSelectServer.pas' {Form2},
-  uAddServer in 'DemoFiles\uAddServer.pas' {AddServerDlg};
+  uqBitFormat in 'DemoFiles\uqBitFormat.pas',
+  uSelectServer in 'DemoFiles\uSelectServer.pas',
+  uAddServer in 'DemoFiles\uAddServer.pas';
 
 {$R *.res}
 

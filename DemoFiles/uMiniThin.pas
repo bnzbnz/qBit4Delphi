@@ -1,4 +1,4 @@
-unit uMiniThin;
+﻿unit uMiniThin;
 
 interface
 
@@ -40,6 +40,10 @@ type
     ResumeAll: TMenuItem;
     ToggleForceResume: TMenuItem;
     Warning: TMemo;
+    N1: TMenuItem;
+    Delete1: TMenuItem;
+    DeleteTorrentOnly: TMenuItem;
+    DeleteWithData: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TimerTimer(Sender: TObject);
     procedure SGDblClick(Sender: TObject);
@@ -56,8 +60,12 @@ type
     procedure ForceResumeSelectedClick(Sender: TObject);
     procedure ToggleForceResumeClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure DeleteTorrentOnlyClick(Sender: TObject);
+    procedure DeleteWithDataClick(Sender: TObject);
   private
     { Private declarations }
+  protected
+    procedure WMDropFiles(var Msg: TMessage); message WM_DROPFILES;
   public
     { Public declarations }
     qB: TqBitObject;
@@ -77,7 +85,7 @@ var
   Form1: TForm1;
 
 implementation
-uses System.Generics.Collections,  System.Generics.Defaults, RTTI;
+uses System.Generics.Collections,  System.Generics.Defaults, ShellAPI, RTTI;
 
 {$R *.dfm}
 
@@ -310,10 +318,16 @@ begin
     var GD := Self.GetColData(Col);
     if assigned(GD) then
     begin
+      if GetColData(Col).Field = GetMasterData.SortField then
+        if not GetMasterData.SortReverse then
+          SG.Cells[Col, 0] := GetColData(Col).Name + ' 🡻'
+        else
+          SG.Cells[Col, 0] := GetColData(Col).Name + ' 🡹';
       var Row := 1;
       for var T in TL do
       begin
         GetRowData(Row).Hash := T.Fhash;
+
         if T.Fhash = SelHash then
            SelRow(Row);
         for var Field in RttiType.GetFields do
@@ -327,6 +341,10 @@ begin
       end;
     end;
   end;
+
+  // Caption
+
+  Caption := 'qBitMiniThin : ' + qb.HostPath + ' : ' + IntToStr(M.Ftorrents.Count);
 
   // Categories
   if M.Fcategories_changed or Init then
@@ -360,6 +378,29 @@ begin
 
   Timer.Enabled := True;
   LockWindowUpdate(0);
+end;
+
+procedure TForm1.WMDropFiles(var Msg: TMessage);
+var
+  hDrop: THandle;
+  FileName: string;
+  NewTorrentFile : TqBitNewTorrentFileType;
+begin
+  hDrop:= Msg.wParam;
+  var FileCount := DragQueryFile (hDrop , $FFFFFFFF, nil, 0);
+  NewTorrentFile := TqBitNewTorrentFileType.Create;
+  for var i := 0 to FileCount - 1 do
+  begin
+    var namelen := DragQueryFile(hDrop, I, nil, 0) + 1;
+    SetLength(FileName, namelen);
+    DragQueryFile(hDrop, I, Pointer(FileName), namelen);
+    SetLength(FileName, namelen - 1);
+    NewTorrentFile.Ffilename := FileName;
+    if assigned(qB) then
+      qb.AddNewTorrentFile(NewTorrentFile);
+  end;
+  NewTorrentFile.Free;
+  DragFinish(hDrop);
 end;
 
 function TForm1.GetColData(Index: Integer): TGridData;
@@ -441,6 +482,20 @@ begin
   UpdateUI(False);
 end;
 
+procedure TForm1.DeleteTorrentOnlyClick(Sender: TObject);
+begin
+  var T := GetSelectedTorrent;
+  if assigned(T) then
+    qB.DeleteTorrents(T.Fhash, False);
+end;
+
+procedure TForm1.DeleteWithDataClick(Sender: TObject);
+begin
+  var T := GetSelectedTorrent;
+  if assigned(T) then
+    qB.DeleteTorrents(T.Fhash, True);
+end;
+
 procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SG.Objects[0, 0].Free;
@@ -452,13 +507,10 @@ begin
   qB.Free;
 end;
 
-
-
-
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Warning.Visible := False;
+  DragAcceptFiles ( self.handle, True );
 end;
 
 end.

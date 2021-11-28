@@ -23,7 +23,6 @@ object Form1: TForm1
     Height = 41
     Align = alTop
     TabOrder = 0
-    ExplicitWidth = 936
     object Label1: TLabel
       Left = 16
       Top = 14
@@ -78,8 +77,6 @@ object Form1: TForm1
     TabOrder = 1
     OnDblClick = SGDblClick
     OnSelectCell = SGSelectCell
-    ExplicitWidth = 936
-    ExplicitHeight = 514
   end
   object Warning: TMemo
     Left = 55
@@ -151,6 +148,20 @@ object Form1: TForm1
     object ToggleForceResume: TMenuItem
       Caption = 'Toggle Force Resume'
       OnClick = ToggleForceResumeClick
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object Delete1: TMenuItem
+      Caption = 'Delete'
+      object DeleteTorrentOnly: TMenuItem
+        Caption = 'Torrent Only'
+        OnClick = DeleteTorrentOnlyClick
+      end
+      object DeleteWithData: TMenuItem
+        Caption = 'With Data'
+        OnClick = DeleteWithDataClick
+      end
     end
   end
 end
