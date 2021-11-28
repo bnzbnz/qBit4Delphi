@@ -23,7 +23,7 @@ type
     Hash: string;
   end;
 
-  TForm1 = class(TForm)
+  TMiniThinForm = class(TForm)
     Timer: TTimer;
     Panel1: TPanel;
     CBCat: TComboBox;
@@ -44,6 +44,8 @@ type
     Delete1: TMenuItem;
     DeleteTorrentOnly: TMenuItem;
     DeleteWithData: TMenuItem;
+    N2: TMenuItem;
+    SetLocation1: TMenuItem;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TimerTimer(Sender: TObject);
     procedure SGDblClick(Sender: TObject);
@@ -62,6 +64,8 @@ type
     procedure FormCreate(Sender: TObject);
     procedure DeleteTorrentOnlyClick(Sender: TObject);
     procedure DeleteWithDataClick(Sender: TObject);
+    procedure SGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+    procedure SetLocation1Click(Sender: TObject);
   private
     { Private declarations }
   protected
@@ -81,15 +85,17 @@ type
   end;
 
   TMyStringGrid = class(TStringGrid);
+
 var
-  Form1: TForm1;
+  MiniThinForm: TMiniThinForm;
 
 implementation
-uses System.Generics.Collections,  System.Generics.Defaults, ShellAPI, RTTI;
+uses System.Generics.Collections,  System.Generics.Defaults, ShellAPI, RTTI,
+  uSetLocation;
 
 {$R *.dfm}
 
-procedure TForm1.AddCol(Index: Integer; Name, Field: string; Fmt: TVarDataFormater; Width: integer);
+procedure TMiniThinForm.AddCol(Index: Integer; Name, Field: string; Fmt: TVarDataFormater; Width: integer);
 begin
   var CD := GetColData(Index);
   CD.Name := Name;
@@ -100,7 +106,7 @@ begin
   SG.RowHeights[Index] := 24;
 end;
 
-procedure TForm1.FormShow(Sender: TObject);
+procedure TMiniThinForm.FormShow(Sender: TObject);
 begin
   if SelectServerDlg.ShowModal = mrCancel then
   begin
@@ -177,14 +183,14 @@ begin
   Timer.Enabled := True;
 end;
 
-procedure TForm1.PauseSelectedClick(Sender: TObject);
+procedure TMiniThinForm.PauseSelectedClick(Sender: TObject);
 begin
   var T := GetSelectedTorrent;
   if assigned(T) then
     qB.PauseTorrents(T.Fhash);
 end;
 
-procedure TForm1.SelRow(Row: integer);
+procedure TMiniThinForm.SelRow(Row: integer);
 begin
   if (SG.Row = Row) or (Row < 1) then Exit;
   var R : TGridRect;
@@ -196,14 +202,14 @@ begin
   Invalidate;
 end;
 
-procedure TForm1.SGSelectCell(Sender: TObject; ACol, ARow: Integer;
+procedure TMiniThinForm.SGSelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
 begin
   SelRow(aRow);
   CanSelect := False;
 end;
 
-procedure TForm1.SGDblClick(Sender: TObject);
+procedure TMiniThinForm.SGDblClick(Sender: TObject);
 var
   P : TPoint;
   ACol, ARow : integer;
@@ -223,7 +229,12 @@ begin
   UpdateUI(False);
 end;
 
-procedure TForm1.SGMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TMiniThinForm.SGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+begin
+//
+end;
+
+procedure TMiniThinForm.SGMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 var
   aCol, ARow: integer;
@@ -242,7 +253,7 @@ begin
     end;
 end;
 
-procedure TForm1.UpdateUI(Init: Boolean);
+procedure TMiniThinForm.UpdateUI(Init: Boolean);
 begin
   //LockWindowUpdate(SG.Handle);
   Timer.Enabled := False;
@@ -319,10 +330,13 @@ begin
     if assigned(GD) then
     begin
       if GetColData(Col).Field = GetMasterData.SortField then
+      begin
         if not GetMasterData.SortReverse then
           SG.Cells[Col, 0] := GetColData(Col).Name + ' 🡻'
         else
           SG.Cells[Col, 0] := GetColData(Col).Name + ' 🡹';
+      end else
+        SG.Cells[Col, 0] := GetColData(Col).Name;
       var Row := 1;
       for var T in TL do
       begin
@@ -380,7 +394,7 @@ begin
   LockWindowUpdate(0);
 end;
 
-procedure TForm1.WMDropFiles(var Msg: TMessage);
+procedure TMiniThinForm.WMDropFiles(var Msg: TMessage);
 var
   hDrop: THandle;
   FileName: string;
@@ -403,22 +417,22 @@ begin
   DragFinish(hDrop);
 end;
 
-function TForm1.GetColData(Index: Integer): TGridData;
+function TMiniThinForm.GetColData(Index: Integer): TGridData;
 begin
   Result := TGridData(SG.Objects[Index, 0]);
 end;
 
-function TForm1.GetMasterData: TGridData;
+function TMiniThinForm.GetMasterData: TGridData;
 begin
   Result := TGridData(SG.Objects[0, 0]);
 end;
 
-function TForm1.GetRowData(Index: Integer): TGridData;
+function TMiniThinForm.GetRowData(Index: Integer): TGridData;
 begin
   Result := TGridData(SG.Objects[0, Index]);
 end;
 
-function TForm1.GetSelectedTorrent: TqBitTorrentType;
+function TMiniThinForm.GetSelectedTorrent: TqBitTorrentType;
 var
   Res : TqBitTorrentBaseType;
 begin
@@ -428,32 +442,35 @@ begin
   Result := TqBitTorrentType(Res);
 end;
 
-procedure TForm1.ResumeAllClick(Sender: TObject);
+procedure TMiniThinForm.ResumeAllClick(Sender: TObject);
 begin
   var LS := TStringList.Create;
   for var T in M.Ftorrents do
     LS.Add(T.Key);
   qB.ResumeTorrents(LS);
   LS.Free;
+  UpdateUI(False);
 end;
 
-procedure TForm1.ResumeSelectedClick(Sender: TObject);
+procedure TMiniThinForm.ResumeSelectedClick(Sender: TObject);
 begin
   var T := GetSelectedTorrent;
   if assigned(T) then
     qB.ResumeTorrents(T.Fhash);
+  UpdateUI(False);
 end;
 
-procedure TForm1.ForceResumeSelectedClick(Sender: TObject);
+procedure TMiniThinForm.ForceResumeSelectedClick(Sender: TObject);
 begin
   var LS := TStringList.Create;
   for var T in M.Ftorrents do
     LS.Add(T.Key);
   qB.PauseTorrents(LS);
   LS.Free;
+  UpdateUI(False);
 end;
 
-procedure TForm1.TimerTimer(Sender: TObject);
+procedure TMiniThinForm.TimerTimer(Sender: TObject);
 begin
   var U := qB.GetMainData(M.Frid);
   M.Merge(U);
@@ -461,42 +478,56 @@ begin
   UpdateUI(False);
 end;
 
-procedure TForm1.ToggleForceResumeClick(Sender: TObject);
+procedure TMiniThinForm.ToggleForceResumeClick(Sender: TObject);
 begin
  var T := GetSelectedTorrent;
  if assigned(T) then
-   qB.SetForceStart(T.Fhash, T.Fforce_start and False) ;
+   qB.SetForceStart(T.Fhash, T.Fforce_start and False);
+ UpdateUI(False);
 end;
 
-procedure TForm1.All1Click(Sender: TObject);
+procedure TMiniThinForm.All1Click(Sender: TObject);
 begin
   var LS := TStringList.Create;
   for var T in M.Ftorrents do
     LS.Add(T.Key);
   qB.PauseTorrents(LS);
   LS.Free;
+  UpdateUI(False);
 end;
 
-procedure TForm1.CBCatSelect(Sender: TObject);
+procedure TMiniThinForm.SetLocation1Click(Sender: TObject);
+begin
+  var T := GetSelectedTorrent;
+  if not assigned(T) then Exit;
+
+  SetLocationDlg.Location.Text := T.Fsave_path;
+  if SetLocationDlg.ShowModal = mrOk then
+     qB.SetTorrentLocation(T.Fhash, SetLocationDlg.Location.Text);
+end;
+
+procedure TMiniThinForm.CBCatSelect(Sender: TObject);
 begin
   UpdateUI(False);
 end;
 
-procedure TForm1.DeleteTorrentOnlyClick(Sender: TObject);
+procedure TMiniThinForm.DeleteTorrentOnlyClick(Sender: TObject);
 begin
   var T := GetSelectedTorrent;
   if assigned(T) then
     qB.DeleteTorrents(T.Fhash, False);
+  UpdateUI(False);
 end;
 
-procedure TForm1.DeleteWithDataClick(Sender: TObject);
+procedure TMiniThinForm.DeleteWithDataClick(Sender: TObject);
 begin
   var T := GetSelectedTorrent;
   if assigned(T) then
     qB.DeleteTorrents(T.Fhash, True);
+  UpdateUI(False);
 end;
 
-procedure TForm1.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TMiniThinForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   SG.Objects[0, 0].Free;
   for var i:=1 to SG.ColCount - 1 do
@@ -507,7 +538,7 @@ begin
   qB.Free;
 end;
 
-procedure TForm1.FormCreate(Sender: TObject);
+procedure TMiniThinForm.FormCreate(Sender: TObject);
 begin
   Warning.Visible := False;
   DragAcceptFiles ( self.handle, True );

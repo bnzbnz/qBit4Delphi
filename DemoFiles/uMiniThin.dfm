@@ -1,4 +1,4 @@
-object Form1: TForm1
+object MiniThinForm: TMiniThinForm
   Left = 0
   Top = 0
   Caption = 'MiniThin'
@@ -76,6 +76,7 @@ object Form1: TForm1
     PopupMenu = PMGrid
     TabOrder = 1
     OnDblClick = SGDblClick
+    OnFixedCellClick = SGFixedCellClick
     OnSelectCell = SGSelectCell
   end
   object Warning: TMemo
@@ -162,6 +163,13 @@ object Form1: TForm1
         Caption = 'With Data'
         OnClick = DeleteWithDataClick
       end
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object SetLocation1: TMenuItem
+      Caption = 'Set Location'
+      OnClick = SetLocation1Click
     end
   end
 end

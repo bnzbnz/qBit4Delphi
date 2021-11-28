@@ -108,7 +108,7 @@
         <DCCReference Include="API\uqBitAPI.pas"/>
         <DCCReference Include="API\uqBitObject.pas"/>
         <DCCReference Include="DemoFiles\uMiniThin.pas">
-            <Form>Form1</Form>
+            <Form>MiniThinForm</Form>
         </DCCReference>
         <DCCReference Include="DemoFiles\uqBitFormat.pas">
             <Form>$R *.res</Form>
@@ -118,6 +118,9 @@
         </DCCReference>
         <DCCReference Include="DemoFiles\uAddServer.pas">
             <Form>AddServerDlg</Form>
+        </DCCReference>
+        <DCCReference Include="DemoFiles\uSetLocation.pas">
+            <Form>SetLocationDlg</Form>
         </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>

@@ -1,6 +1,7 @@
 program MiniThin;
 
 uses
+
   {$IFDEF VER340}
     REST.Json.Types in 'JSON\Sydney.10.4.2\REST.Json.Types.pas',
     REST.JsonReflect in 'JSON\Sydney.10.4.2\REST.JsonReflect.pas',
@@ -19,13 +20,14 @@ uses
   uqBitObject in 'API\uqBitObject.pas',
 
   Vcl.Forms,
-  uMiniThin in 'DemoFiles\uMiniThin.pas' {Form1},
   Vcl.Themes,
   Vcl.Styles,
   Vcl.Grids,
+  uMiniThin in 'DemoFiles\uMiniThin.pas' {MiniThinForm},
   uqBitFormat in 'DemoFiles\uqBitFormat.pas',
   uSelectServer in 'DemoFiles\uSelectServer.pas',
-  uAddServer in 'DemoFiles\uAddServer.pas';
+  uAddServer in 'DemoFiles\uAddServer.pas',
+  uSetLocation in 'DemoFiles\uSetLocation.pas' {SetLocationDlg};
 
 {$R *.res}
 
@@ -34,9 +36,10 @@ begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   TStyleManager.TrySetStyle('Iceberg Classico');
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TMiniThinForm, MiniThinForm);
   Application.CreateForm(TAddServerDlg, AddServerDlg);
   Application.CreateForm(TSelectServerDlg, SelectServerDlg);
+  Application.CreateForm(TSetLocationDlg, SetLocationDlg);
   Application.Run;
 end.
 

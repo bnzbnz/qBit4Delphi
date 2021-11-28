@@ -917,7 +917,7 @@ end;
 function TqBitAPI.RenameFile(Hash, OldPath, NewPath: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hash=%s&origUrl=%s&newUrl=%s', [Hash, URLEncode(OldPath), URLEncode(NewPath)]);
+  var Body := Format('hash=%s&origPath=%s&newPath=%s', [Hash, URLEncode(OldPath), URLEncode(NewPath)]);
   Result := qBPost('/torrents/renameFile', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
