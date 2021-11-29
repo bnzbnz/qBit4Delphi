@@ -11,7 +11,7 @@ object SetLocationDlg: TSetLocationDlg
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  Position = poMainFormCenter
+  Position = poDesktopCenter
   PixelsPerInch = 96
   TextHeight = 13
   object Location: TEdit

@@ -2,8 +2,8 @@ object MiniThinForm: TMiniThinForm
   Left = 0
   Top = 0
   Caption = 'MiniThin'
-  ClientHeight = 476
-  ClientWidth = 724
+  ClientHeight = 645
+  ClientWidth = 1014
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,18 +11,105 @@ object MiniThinForm: TMiniThinForm
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poDesktopCenter
   OnClose = FormClose
   OnCreate = FormCreate
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object Panel2: TPanel
+    Left = 0
+    Top = 41
+    Width = 1014
+    Height = 604
+    Align = alClient
+    Caption = 'Panel2'
+    TabOrder = 2
+    ExplicitWidth = 991
+    object Splitter1: TSplitter
+      Left = 1
+      Top = 309
+      Width = 1012
+      Height = 3
+      Cursor = crVSplit
+      Align = alBottom
+      ExplicitTop = 1
+      ExplicitWidth = 511
+    end
+    object Panel3: TPanel
+      Left = 1
+      Top = 312
+      Width = 1012
+      Height = 291
+      Align = alBottom
+      Caption = 'Panel3'
+      TabOrder = 0
+      ExplicitWidth = 989
+      object PageControl1: TPageControl
+        Left = 1
+        Top = 1
+        Width = 1010
+        Height = 289
+        ActivePage = TabSheet1
+        Align = alClient
+        TabOrder = 0
+        ExplicitWidth = 987
+        ExplicitHeight = 225
+        object TabSheet1: TTabSheet
+          Caption = 'General'
+          object SGDetails: TStringGrid
+            Left = 0
+            Top = 0
+            Width = 1002
+            Height = 261
+            Align = alClient
+            Color = clBtnFace
+            ColCount = 10
+            DefaultColWidth = 192
+            DefaultRowHeight = -1
+            FixedCols = 0
+            RowCount = 20
+            FixedRows = 0
+            Options = [goVertLine, goHorzLine]
+            ScrollBars = ssVertical
+            TabOrder = 0
+            OnSelectCell = SGDetailsSelectCell
+            ExplicitWidth = 979
+            ExplicitHeight = 197
+          end
+        end
+      end
+    end
+    object SG: TStringGrid
+      Left = 1
+      Top = 1
+      Width = 1012
+      Height = 308
+      Align = alClient
+      Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goFixedColClick, goFixedRowClick, goFixedRowDefAlign]
+      PopupMenu = PMGrid
+      TabOrder = 1
+      OnDblClick = SGDblClick
+      OnFixedCellClick = SGFixedCellClick
+      OnSelectCell = SGSelectCell
+      ExplicitWidth = 989
+      ExplicitHeight = 372
+      RowHeights = (
+        24
+        24
+        24
+        24
+        24)
+    end
+  end
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 724
+    Width = 1014
     Height = 41
     Align = alTop
     TabOrder = 0
+    ExplicitWidth = 991
     object Label1: TLabel
       Left = 16
       Top = 14
@@ -66,22 +153,9 @@ object MiniThinForm: TMiniThinForm
         'Unassigned')
     end
   end
-  object SG: TStringGrid
-    Left = 0
-    Top = 41
-    Width = 724
-    Height = 435
-    Align = alClient
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goColMoving, goFixedRowDefAlign]
-    PopupMenu = PMGrid
-    TabOrder = 1
-    OnDblClick = SGDblClick
-    OnFixedCellClick = SGFixedCellClick
-    OnSelectCell = SGSelectCell
-  end
   object Warning: TMemo
-    Left = 55
-    Top = 175
+    Left = 183
+    Top = 95
     Width = 618
     Height = 282
     Lines.Strings = (
@@ -112,8 +186,8 @@ object MiniThinForm: TMiniThinForm
         'and Run this app., it should work.'
       #9'(Remember to always add this patched units to your projects)'
       ''
-      'qBit4Delphi@ea4d.com')
-    TabOrder = 2
+      'Any questions : qBit4Delphi@ea4d.com')
+    TabOrder = 1
   end
   object Timer: TTimer
     Enabled = False
@@ -170,6 +244,16 @@ object MiniThinForm: TMiniThinForm
     object SetLocation1: TMenuItem
       Caption = 'Set Location'
       OnClick = SetLocation1Click
+    end
+    object Rename1: TMenuItem
+      Caption = 'Rename'
+      OnClick = Rename1Click
+    end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object oDo1: TMenuItem
+      Caption = 'ToDo...'
     end
   end
 end

@@ -15,6 +15,8 @@ function VarFormatFloat2d(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatMulti(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatLimit(v: variant; Obj: TqBitTorrentBaseType): string;
 function VarFormatDeltaSec(v: variant; Obj: TqBitTorrentBaseType): string;
+function VarFormatDuration(v: variant; Obj: TqBitTorrentBaseType): string;
+
 
 implementation
 uses variants, SysUtils, DateUtils;
@@ -98,6 +100,26 @@ end;
 function VarFormatDeltaSec(v: variant; Obj: TqBitTorrentBaseType): string;
 begin
   Result := DateTimeToStr(IncSecond(Now, v));
+end;
+
+function VarFormatDuration(v: variant; Obj: TqBitTorrentBaseType): string;
+var
+  Days, Hours, Mins, Secs: word;
+begin
+  var totalsecs := Int64(v);
+  days := totalsecs div SecsPerDay;
+  totalsecs := totalsecs mod SecsPerDay;
+  hours := totalsecs div SecsPerHour;
+  totalsecs := totalsecs mod SecsPerHour;
+  mins := totalsecs div SecsPerMin;
+  totalsecs := totalsecs mod SecsPerMin;
+  secs := totalsecs;
+  if days >0 then
+    Result := Result + days.ToString + 'd ';
+  Result := Result + hours.ToString + 'h ';
+  Result := Result + mins.ToString + 'm ';
+  if days = 0 then
+    Result := Result + secs.ToString + 's ';
 end;
 
 end.

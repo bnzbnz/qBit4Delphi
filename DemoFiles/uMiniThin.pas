@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uqBitAPITypes, uqBitAPI, uqBitObject,
-  Vcl.ExtCtrls, Vcl.Grids, Vcl.StdCtrls, uqBitFormat, uSelectServer, Vcl.Menus;
+  Vcl.ExtCtrls, Vcl.Grids, Vcl.StdCtrls, uqBitFormat, uSelectServer, Vcl.Menus,
+  Vcl.ComCtrls;
 
 type
 
@@ -30,7 +31,6 @@ type
     Label1: TLabel;
     Label2: TLabel;
     CBTag: TComboBox;
-    SG: TStringGrid;
     PMGrid: TPopupMenu;
     Pause: TMenuItem;
     Resume1: TMenuItem;
@@ -46,6 +46,16 @@ type
     DeleteWithData: TMenuItem;
     N2: TMenuItem;
     SetLocation1: TMenuItem;
+    Rename1: TMenuItem;
+    N3: TMenuItem;
+    oDo1: TMenuItem;
+    Panel2: TPanel;
+    Panel3: TPanel;
+    SG: TStringGrid;
+    PageControl1: TPageControl;
+    Splitter1: TSplitter;
+    TabSheet1: TTabSheet;
+    SGDetails: TStringGrid;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure TimerTimer(Sender: TObject);
     procedure SGDblClick(Sender: TObject);
@@ -64,8 +74,11 @@ type
     procedure FormCreate(Sender: TObject);
     procedure DeleteTorrentOnlyClick(Sender: TObject);
     procedure DeleteWithDataClick(Sender: TObject);
-    procedure SGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
     procedure SetLocation1Click(Sender: TObject);
+    procedure Rename1Click(Sender: TObject);
+    procedure SGDetailsSelectCell(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
+    procedure SGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
   private
     { Private declarations }
   protected
@@ -74,7 +87,8 @@ type
     { Public declarations }
     qB: TqBitObject;
     M: TqBitMainDataType;
-
+    TI: TqBitTorrentInfoType;
+    P: TqBitPreferencesType;
     function GetColData(Index: Integer): TGridData;
     function GetRowData(Index: Integer): TGridData;
     function GetSelectedTorrent: TqBitTorrentType;
@@ -177,8 +191,12 @@ begin
   }
 
   UpdateUI(True);
-  SelRow(2);
-  SelRow(1);
+
+  //Grid hack
+  SelRow(2); SelRow(1);
+  var CanSelect := False;
+  Self.SGSelectCell(Self, 1,1, CanSelect);
+
   Timer.Interval := M.Fserver_state.Frefresh_interval;
   Timer.Enabled := True;
 end;
@@ -206,6 +224,10 @@ procedure TMiniThinForm.SGSelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
 begin
   SelRow(aRow);
+  TI.Free;
+  if GetSelectedTorrent <> Nil then
+    TI := qB.GetTorrentGenericProperties(Self.GetSelectedTorrent.Fhash);
+  UpdateUI(False);
   CanSelect := False;
 end;
 
@@ -229,9 +251,16 @@ begin
   UpdateUI(False);
 end;
 
+procedure TMiniThinForm.SGDetailsSelectCell(Sender: TObject; ACol,
+  ARow: Integer; var CanSelect: Boolean);
+begin
+  CanSelect := False;
+end;
+
 procedure TMiniThinForm.SGFixedCellClick(Sender: TObject; ACol, ARow: Integer);
 begin
-//
+  var CanSelect := False;
+  Self.SGSelectCell(Sender, ACol, ARow, CanSelect);
 end;
 
 procedure TMiniThinForm.SGMouseDown(Sender: TObject; Button: TMouseButton;
@@ -305,6 +334,7 @@ begin
   TL.Sort(TComparer<TqBitTorrentType>.Construct(
       function (const L, R: TqBitTorrentType): integer
       begin
+        Result := 0;
         var MD := GetMasterData;
         for var Field in RttiType.GetFields do
         begin
@@ -312,7 +342,6 @@ begin
             begin
               var LVal := Field.GetValue(L).asVariant;
               var RVal := Field.GetValue(R).asVariant;
-              Result := 0;
               if LVal > RVal then
                 if MD.SortReverse then Result := -1 else Result := 1;
               if RVal > LVal then
@@ -322,7 +351,7 @@ begin
       end
   ));
 
-  // Displaying
+  // Displaying Grid
 
   for var Col := 1 to SG.RowCount - 1 do
   begin
@@ -341,7 +370,6 @@ begin
       for var T in TL do
       begin
         GetRowData(Row).Hash := T.Fhash;
-
         if T.Fhash = SelHash then
            SelRow(Row);
         for var Field in RttiType.GetFields do
@@ -356,9 +384,86 @@ begin
     end;
   end;
 
+  // General Tab
+
+  var T := GetSelectedTorrent;
+  if assigned(T) then
+  begin
+    SGDetails.ColAlignments[0] := taRightJustify;
+    SGDetails.ColWidths[0] := 128;
+    SGDetails.ColAlignments[1] := taLeftJustify;
+    SGDetails.ColWidths[1] := 200;
+    SGDetails.ColAlignments[2] := taRightJustify;
+    SGDetails.ColWidths[2] := 128;
+    SGDetails.ColAlignments[3] := taLeftJustify;
+    SGDetails.ColWidths[3] := 200;
+    SGDetails.ColAlignments[4] := taRightJustify;
+    SGDetails.ColWidths[4] := 128;
+    SGDetails.ColAlignments[5] := taLeftJustify;
+    SGDetails.ColWidths[5] := 200;
+
+    SGDetails.Cells[0, 1] := 'Time Active : '; SGDetails.RowHeights[1] := 20;
+    SGDetails.Cells[0, 2] := 'Downloaded : '; SGDetails.RowHeights[2] := 20;
+    SGDetails.Cells[0, 3] := 'Download Speed : '; SGDetails.RowHeights[3] := 20;
+    SGDetails.Cells[0, 4] := 'Download Limit : '; SGDetails.RowHeights[4] := 20;
+    SGDetails.Cells[0, 5] := 'Share Ratio : '; SGDetails.RowHeights[5] := 20;
+    SGDetails.RowHeights[6] := 20;
+    SGDetails.Cells[0, 7] := 'Total Size : '; SGDetails.RowHeights[7] := 20;
+    SGDetails.Cells[0, 8] := 'Added On : '; SGDetails.RowHeights[8] := 20;
+    SGDetails.Cells[0, 9] := 'Hash : '; SGDetails.RowHeights[9] := 20;
+    SGDetails.Cells[0, 10] := 'Save Path : '; SGDetails.RowHeights[10] := 20;
+    SGDetails.Cells[0, 11] := 'Comment : '; SGDetails.RowHeights[11] := 20;
+
+    SGDetails.Cells[2, 1] := 'ETA : ';
+    SGDetails.Cells[2, 2] := 'Uploded : ';
+    SGDetails.Cells[2, 3] := 'Upload Speed : ';
+    SGDetails.Cells[2, 4] := 'Upload Limit : ';
+    SGDetails.Cells[2, 5] := 'Reannounce In : ';
+    SGDetails.Cells[2, 7] := 'Pieces :';
+    SGDetails.Cells[2, 8] := 'Completed On :';
+
+    SGDetails.Cells[4, 1] := 'Connections : ';
+    SGDetails.Cells[4, 2] := 'Seeds : ';
+    SGDetails.Cells[4, 3] := 'Peers : ';
+    SGDetails.Cells[4, 4] := 'Wasted : ';
+    SGDetails.Cells[4, 5] := 'Last Seen Complete : ';
+
+    SGDetails.Cells[1, 1] := VarFormatDuration(T.Ftime_active, T);
+    SGDetails.Cells[1, 2] := Format('%s (%s this session)',
+      [VarFormatBKM(T.Fdownloaded, T), VarFormatBKM(T.Fdownloaded_session, T)]);
+    SGDetails.Cells[1, 3] := VarFormatBKMPerSec(T.Fdlspeed, T);
+    SGDetails.Cells[1, 4] := VarFormatLimit(T.Fdl_limit, T);
+    SGDetails.Cells[1, 5] := VarFormatFloat2d(T.Fratio, T);
+    SGDetails.Cells[1, 7] := VarFormatBKM(T.Fsize, T);
+    SGDetails.Cells[1, 8] := VarFormatDate(T.Fadded_on, T);
+    SGDetails.Cells[1, 9] := VarFormatString(T.Fhash, T);
+    SGDetails.Cells[1, 10] := VarFormatString(T.Fsave_path, T);
+    if assigned(TI) then SGDetails.Cells[1, 11] := VarFormatString(TI.Fcomment, TI);
+
+    SGDetails.Cells[3, 1] := VarFormatDeltaSec(T.Feta, T);
+    SGDetails.Cells[3, 2] := Format('%s (%s this session)',
+      [VarFormatBKM(T.Fuploaded, T), VarFormatBKM(T.Fuploaded_session, T)]);
+    SGDetails.Cells[3, 3] := VarFormatBKMPerSec(T.Fupspeed, T);
+    SGDetails.Cells[3, 4] := VarFormatLimit(T.Fup_limit, T);
+    if assigned(TI) then
+      SGDetails.Cells[3, 5] := VarFormatDuration(TI.Freannounce, TI);
+    if assigned(TI) then  SGDetails.Cells[3, 7] :=
+      Format('%s x %s (have %s )', [VarToStr(TI.Fpieces_num), VarFormatBKM(TI.Fpiece_size, TI), VarToStr(TI.Fpieces_have)]);
+    SGDetails.Cells[3, 8] := VarFormatDate(T.Fcompletion_on, T);
+
+    if assigned(TI) then
+    begin
+      SGDetails.Cells[5, 1] := Format('%s (%s max)', [VarToStr(TI.Fnb_connections), VarFormatLimit(TI.Fnb_connections_limit, TI)]);
+      SGDetails.Cells[5, 2] := Format('%s (%s total)', [VarToStr(T.Fnum_seeds), TI.Fseeds_total]);
+      SGDetails.Cells[5, 3] := Format('%s (%s total)', [VarToStr(T.Fnum_leechs), TI.Fpeers_total]);
+      SGDetails.Cells[5, 4] := VarFormatBKM(TI.Ftotal_wasted, TI);
+      SGDetails.Cells[5, 5] := VarFormatDate(TI.Flast_seen, TI);
+    end;
+  end;
+
   // Caption
 
-  Caption := 'qBitMiniThin : ' + qb.HostPath + ' : ' + IntToStr(M.Ftorrents.Count);
+  Caption := Format('qBitMiniThin : %s : %d Torrents', [qB.HostPath, M.Ftorrents.Count]);
 
   // Categories
   if M.Fcategories_changed or Init then
@@ -382,16 +487,17 @@ begin
       CBTag.Items.Add(C);
     CBTag.ItemIndex := 0;
   end;
-  // Row Cleaning
 
-  for var i := TL.count+1 to SG.ColCount - 1  do
+  // Row Resizing
+
+  for var i := TL.count+1 to SG.RowCount - 1  do
     if SG.RowHeights[i] > -1 then SG.RowHeights[i] := -1;
 
   TL.Free;
   RttiCtx.Free;
 
   Timer.Enabled := True;
-  LockWindowUpdate(0);
+  //LockWindowUpdate(0);
 end;
 
 procedure TMiniThinForm.WMDropFiles(var Msg: TMessage);
@@ -440,6 +546,15 @@ begin
   if SG.Row <1 then Exit;
   M.Ftorrents.TryGetValue(GetRowData(SG.Row).Hash, Res);
   Result := TqBitTorrentType(Res);
+end;
+
+procedure TMiniThinForm.Rename1Click(Sender: TObject);
+begin
+  var T := GetSelectedTorrent;
+  if not assigned(T) then Exit;
+  var NewName := InputBox('Set New Name :', 'Name :', T.Fname);
+  if  NewName <> '' then
+    qB.SetTorrentName(T.Fhash, NewName);
 end;
 
 procedure TMiniThinForm.ResumeAllClick(Sender: TObject);
@@ -534,6 +649,7 @@ begin
     SG.Objects[i, 0].Free;
   for var i:=1 to SG.RowCount - 1 do
      SG.Objects[0, i].Free;
+  TI.Free;
   M.Free;
   qB.Free;
 end;

@@ -21,7 +21,7 @@ type
     function qBitAPIVersion: string;
     class function TStoDT(Timestamp: int64): TDatetime;
     class function TSmsToDT(Timestamp: int64): TDatetime;
-    class procedure TSDurationToNow(Timestamp: int64; var Days,Hours, Mins, Secs: word);
+    class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
 
     // API Helpers
     function PauseTorrents(Hashes: TStringList): boolean; overload; virtual;
