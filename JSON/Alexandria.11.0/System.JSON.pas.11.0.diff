@@ -1,5 +1,5 @@
---- \\NAS\gDrive\Laurent\DelphiDev\Units\JSONOriginal\11\System.JSON.pas	Tue Aug 31 08:00:24 2021
-+++ \\NAS\gDrive\Laurent\DelphiDev\Units\JSONCustom\11\System.JSON.pas	Thu Oct 28 07:25:42 2021
+--- System.JSON.pas	Tue Aug 31 07:00:24 2021
++++ System.JSON.pas	Thu Oct 28 06:25:42 2021
 @@ -1379,7 +1379,9 @@
    SetLength(FCharData, CInitialLen);
    FCharLen := CInitialLen;

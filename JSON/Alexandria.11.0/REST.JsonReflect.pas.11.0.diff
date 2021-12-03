@@ -1,5 +1,5 @@
---- \\NAS\gDrive\Laurent\DelphiDev\Units\JSONOriginal\11\REST.JsonReflect.pas	Tue Aug 31 07:58:22 2021
-+++ \\NAS\gDrive\Laurent\DelphiDev\Units\JSONCustom\11\REST.JsonReflect.pas	Fri Oct 22 17:47:50 2021
+--- REST.JsonReflect.pas	Tue Aug 31 06:58:22 2021
++++ REST.JsonReflect.pas	Fri Dec 03 13:56:18 2021
 @@ -1222,8 +1222,9 @@
    LFieldName := ConvertFieldNameToJson(Field);
    if (Current is TJSONPair) and (TJSONPair(Current).JsonString.Value = LFieldName) then
@@ -12,18 +12,20 @@
      FStack.Pop;
    end
    else
-@@ -1823,7 +1824,9 @@
+@@ -1823,7 +1824,11 @@
        TTypeKind.tkMethod:
          raise EConversionError.Create(Format(STypeNotSupported, ['tkMethod']));
        TTypeKind.tkVariant:
 -        raise EConversionError.Create(Format(STypeNotSupported, ['tkVariant']));
 +      begin
-+        //raise EConversionError.Create(Format(STypeNotSupported, ['tkVariant']));
++         // LMR:
++         FConverter.OnNull;
++      	// raise EConversionError.Create(Format(STypeNotSupported, ['tkVariant']));
 +      end;
        TTypeKind.tkInterface:
          raise EConversionError.Create(Format(STypeNotSupported, ['tkInterface']));
        TTypeKind.tkClassRef:
-@@ -1885,6 +1888,8 @@
+@@ -1885,6 +1890,8 @@
            Continue;
          if not ShouldMarshal(Data, rttiField) then
            Continue;
@@ -32,7 +34,7 @@
          LFieldName := rttiField.Name;
          if HasConverter(Data.ClassType, LFieldName) then
          begin
-@@ -1989,6 +1994,10 @@
+@@ -1989,6 +1996,10 @@
    LLenField: TRttiField;
    LItemsField: TRttiField;
  begin
@@ -43,7 +45,7 @@
    if rttiField.FieldType = nil then
      Exit(False);
    case rttiField.FieldType.TypeKind of
-@@ -3102,7 +3111,9 @@
+@@ -3102,7 +3113,9 @@
                  else if jsonFieldVal is TJSONNull then
                    revAttr.ObjectsReverter(Data, LDlpFieldName, nil)
                  else
@@ -54,7 +56,7 @@
                end
            else
              raise EConversionError.Create(Format(SNoConversionForType,
-@@ -3828,7 +3839,8 @@
+@@ -3828,7 +3841,8 @@
  begin
    Assert(Data <> nil);
    // Under ARC there is always a refCount field which we DO NOT WANT serialized
