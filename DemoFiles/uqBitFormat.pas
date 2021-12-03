@@ -6,17 +6,19 @@ uses uqBitAPITypes, uqBitObject;
 type
    TVarDataFormater = function(v: variant; Obj: TqBitTorrentBaseType): string;
 
-function VarFormatString(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatDate(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatBKM(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatBKMPerSec(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatPercent(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatFloat2d(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatMulti(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatLimit(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatDeltaSec(v: variant; Obj: TqBitTorrentBaseType): string;
-function VarFormatDuration(v: variant; Obj: TqBitTorrentBaseType): string;
+function VarFormatString(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatDate(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatBKM(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatBKMPerSec(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatPercent(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatFloat2d(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatMulti(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatLimit(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatDeltaSec(v: variant; Obj: TqBitTorrentBaseType = nil): string;
+function VarFormatDuration(v: variant; Obj: TqBitTorrentBaseType = nil): string;
 
+ // Other
+function TitleCase(const S: string): string;
 
 implementation
 uses variants, SysUtils, DateUtils;
@@ -36,10 +38,16 @@ end;
 
 function VarFormatBKM(v: variant; Obj: TqBitTorrentBaseType): string;
 var
-  x: double;
+  x: Double;
 begin
     x := v;
     Result := '0 B';
+    if (x / 1099511627776 >= 1) then
+    begin
+      Result := Format('%.2f', [x / 1099511627776 ])+ ' TiB';
+      Exit;
+    end else
+
     if (x / (1024 * 1024 * 1024) >= 1) then
     begin
       Result := Format('%.2f', [x /(1024 * 1024 * 1024)] )+ ' GiB';
@@ -121,5 +129,24 @@ begin
   if days = 0 then
     Result := Result + secs.ToString + 's ';
 end;
+
+function TitleCase(const S: string): string;
+var
+  IsUpper: boolean;
+  i : Byte;
+begin
+  IsUpper := true;
+  Result := '';
+  for i := 1 to Length(S) do
+  begin
+    if IsUpper then
+       Result := Result + UpperCase(S[i])
+    else
+       Result := Result + S[i];
+    IsUpper := (S[i] = ' ')
+  end;
+end;
+
+
 
 end.

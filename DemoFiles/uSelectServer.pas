@@ -122,7 +122,10 @@ begin
 end;
 
 procedure TSelectServerDlg.FormShow(Sender: TObject);
+const
+  NoSelection: TGridRect = (Left: 0; Top: -1; Right: 0; Bottom: -1);
 begin
+  SGInfo.Selection:= NoSelection;
   SGInfo.Cells[0, 0] := 'Server Version :';
   SGInfo.Cells[0, 1] := 'API Version :';
   SGInfo.Cells[0, 2] := 'libtorrent';
