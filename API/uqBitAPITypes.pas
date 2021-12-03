@@ -1402,7 +1402,9 @@ procedure TqBitMainDataType.Merge(From: TqBitTorrentBaseType);
 var
   M: TqBitMainDataType;
 begin
+  if From = Nil then Exit;
   inherited Merge(From);
+  Self.Ffull_update := False; //Hack;
   M := TqBitMainDataType(From);
 
   if M.Fserver_state <> nil then
