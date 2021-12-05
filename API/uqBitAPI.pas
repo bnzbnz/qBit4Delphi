@@ -15,11 +15,6 @@ type
 
   TqBitAPI = class(TObject)
   private
-
-    function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
-    function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
-    function qBPost(MethodPath: string): integer; overload; virtual;
-
   protected
     FSID: string;
     FHostPath: string;
@@ -27,9 +22,13 @@ type
     FPassword: string;
     FDuration: cardinal;
     FLastHTTPStatus: integer;
+
   public
 
     constructor Create(HostPath: string); overload;
+    function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
+    function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
+    function qBPost(MethodPath: string): integer; overload; virtual;
 
         ///////////////////////////////////////////////////////////////////////////////////////
         // FROM: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
@@ -427,7 +426,7 @@ end;
 function TqBitAPI.SetPreferences(Prefs: TqBitPreferencesType): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := 'json='+Prefs.ToJson;
+  var Body := 'json='+URLEncode(Prefs.ToJson);
   Result := qBPost('/app/setPreferences', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;

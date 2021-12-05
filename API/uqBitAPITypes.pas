@@ -6,7 +6,7 @@
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
-///  ToDo : RSS & Search
+///  ToDo : Search
 
 interface
 uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types,
@@ -235,7 +235,8 @@ type
     Fscheduler_days: variant;
     Fweb_ui_password: variant;
     [JsonReflect(ctstring, rtString, TqBitObjectDictionaryInterceptor)]
-    Fscan_dirs: TDictionary<variant, string>;
+    Fscan_dirs: TObjectDictionary<variant, string>;
+    function Clone: TqBitTorrentBaseType; override;
     destructor Destroy; override;
   end;
 
@@ -1134,7 +1135,7 @@ end;
 function TqBitTorrentBaseType.toJSON: string;
 begin
   _RawJsonData.Clear;
-  Result := TJson.ObjectToJsonString(Self);
+  Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
   Result := RawJsonDecode(Result);
 end;
 
@@ -1222,6 +1223,19 @@ begin
 end;
 
 { TqBitPreferencesType }
+
+function TqBitPreferencesType.Clone: TqBitTorrentBaseType;
+begin
+  var P := TqBitPreferencesType.Create;
+  P.Merge(Self);
+  if assigned(Self.Fscan_dirs) then
+  begin
+    P.Fscan_dirs :=  TObjectDictionary<variant, string>.Create;
+    for var v in Self.Fscan_dirs do
+      P.Fscan_dirs.Add(v.Key, v.Value);
+  end;
+  Result := P;
+end;
 
 destructor TqBitPreferencesType.Destroy;
 begin
@@ -1508,6 +1522,7 @@ function TqBitCategoryType.Clone: TqBitTorrentBaseType;
 begin
   var o := TqBitCategoryType.Create;
   o.Merge(Self);
+
   Result := o;
 end;
 

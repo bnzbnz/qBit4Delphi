@@ -254,13 +254,13 @@ end;
 function TqBitObject.AddTorrentTags(Hashes: string; Tags: TStringList): boolean;
 begin
   Tags.Delimiter := ',';
-  Result := SetTorrentCategory(Hashes, Tags.DelimitedText);
+  Result := AddTorrentTags(Hashes, Tags.DelimitedText);
 end;
 
 function TqBitObject.AddTorrentTags(Hashes: TStringList; Tags: string): boolean;
 begin
   Hashes.Delimiter := ',';
-  Result := SetTorrentCategory(Hashes.DelimitedText, Tags);
+  Result := AddTorrentTags(Hashes.DelimitedText, Tags);
 end;
 
 function TqBitObject.AddTorrentTags(Hashes, Tags: TStringList): boolean;
