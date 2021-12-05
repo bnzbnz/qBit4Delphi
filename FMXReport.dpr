@@ -18,7 +18,7 @@ uses
   uqBitObject in 'API\uqBitObject.pas',
   System.StartUpCopy,
   FMX.Forms,
-  uFMXReport in 'DemoFiles\uFMXReport.pas' {Form1};
+  uFMXReport in 'Units\uFMXReport.pas' {Form1};
 
 {Form1}
 
