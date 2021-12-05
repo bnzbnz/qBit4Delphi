@@ -108,7 +108,7 @@
         <DCCReference Include="API\uqBitAPITypes.pas"/>
         <DCCReference Include="API\uqBitAPI.pas"/>
         <DCCReference Include="API\uqBitObject.pas"/>
-        <DCCReference Include="DemoFiles\uNOXMonitor.pas">
+        <DCCReference Include="Units\uNOXMonitor.pas">
             <Form>MonForm</Form>
         </DCCReference>
         <BuildConfiguration Include="Release">

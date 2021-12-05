@@ -13,22 +13,24 @@ uses
     System.JSON in 'JSON\Alexandria.11.0\System.JSON.pas',
     REST.Json in 'JSON\Alexandria.11.0\REST.Json.pas',
   {$ENDIF}
+  
+  
+  uqBitAPITypes in 'API\uqBitAPITypes.pas',
+  uqBitAPI in 'API\uqBitAPI.pas',
+  uqBitObject in 'API\uqBitObject.pas',
 
   Vcl.Forms,
   Vcl.Themes,
   Vcl.Styles,
 
-  uqBitAPITypes in 'API\uqBitAPITypes.pas',
-  uqBitAPI in 'API\uqBitAPI.pas',
-  uqBitObject in 'API\uqBitObject.pas',
-  uqNOXify in 'DemoFiles\uqNOXify.pas' {qNOXifyFrm},
-  uqBitFormat in 'DemoFiles\uqBitFormat.pas',
-  uSelectServer in 'DemoFiles\uSelectServer.pas',
-  uAddServer in 'DemoFiles\uAddServer.pas',
-  uSetLocation in 'DemoFiles\uSetLocation.pas',
-  uSpeedLimitsDlg in 'DemoFiles\uSpeedLimitsDlg.pas',
-  uAppTrackMenus in 'DemoFiles\uAppTrackMenus.pas',
-  uAddEditCat in 'DemoFiles\uAddEditCat.pas';
+  uqNOXify in 'Units\uqNOXify.pas' {qNOXifyFrm},
+  uqBitFormat in 'Units\uqBitFormat.pas',
+  uSelectServer in 'Units\uSelectServer.pas',
+  uAddServer in 'Units\uAddServer.pas',
+  uSetLocation in 'Units\uSetLocation.pas',
+  uSpeedLimitsDlg in 'Units\uSpeedLimitsDlg.pas',
+  uAppTrackMenus in 'Units\uAppTrackMenus.pas',
+  uAddEditCat in 'Units\uAddEditCat.pas';
 
 {$R *.res}
 

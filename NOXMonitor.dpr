@@ -19,7 +19,7 @@ uses
   uqBitObject in 'API\uqBitObject.pas',
 
   Vcl.Forms,
-  uNOXMonitor in 'DemoFiles\uNOXMonitor.pas' {MonForm},
+  uNOXMonitor in 'Units\uNOXMonitor.pas' {MonForm},
   Vcl.Themes,
   Vcl.Styles;
 
