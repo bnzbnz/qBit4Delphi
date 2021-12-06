@@ -267,7 +267,7 @@ function TqBitObject.AddTorrentTags(Hashes, Tags: TStringList): boolean;
 begin
   Hashes.Delimiter := '|';
   Tags.Delimiter := ',';
-  Result := SetTorrentCategory(Hashes.DelimitedText, Tags.DelimitedText);
+  Result := AddTorrentTags(Hashes.DelimitedText, Tags.DelimitedText);
 end;
 
 
