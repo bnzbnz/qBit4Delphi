@@ -381,7 +381,6 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object PMIEditTrackers: TMenuItem
       Caption = 'Edit Trackers'
-      OnClick = TODO
     end
     object N6: TMenuItem
       Caption = '-'
@@ -418,7 +417,17 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object PMITags: TMenuItem
       Caption = 'Tags'
-      OnClick = TODO
+      object New2: TMenuItem
+        Caption = 'New...'
+        OnClick = New2Click
+      end
+      object PMICatReset: TMenuItem
+        Caption = 'Reset'
+        OnClick = PMICatResetClick
+      end
+      object N8: TMenuItem
+        Caption = '-'
+      end
     end
   end
   object PMStatus: TPopupMenu

@@ -78,6 +78,9 @@ type
     Assign1: TMenuItem;
     Delete1: TMenuItem;
     Warning: TMemo;
+    PMICatReset: TMenuItem;
+    N8: TMenuItem;
+    New2: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure SGDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
@@ -114,7 +117,8 @@ type
     procedure New1Click(Sender: TObject);
     procedure PMIResumeClick(Sender: TObject);
     procedure PMIPauseClick(Sender: TObject);
-    procedure TODO(Sender: TObject);
+    procedure PMICatResetClick(Sender: TObject);
+    procedure New2Click(Sender: TObject);
   private
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
     //function GetLastGridHashe: string;
@@ -143,6 +147,7 @@ type
     procedure ShowAllCol;
     procedure UpdateUI;
     procedure ShowHideItemClicked(Sender: TObject);
+    procedure CatItemClicked(Sender: TObject);
     procedure SetCategoryClicked(Sender : TObject);
     procedure DeleteCategoryClicked(Sender : TObject);
     procedure ToggleSortCol(ACol: integer);
@@ -236,9 +241,10 @@ begin
     qB.AddNewCategory(AddEditCatDlg.EDName.Text, AddEditCatDlg.EDPath.Text);
 end;
 
-procedure TqNOXifyFrm.TODO(Sender: TObject);
+procedure TqNOXifyFrm.New2Click(Sender: TObject);
 begin
-  ShowMessage('... ToDo ...');
+  var IMsg := InputBox('Add Tags (comma separated)', 'Tags','');
+  if IMsg <> '' then qb.CreateTags(IMsg);
 end;
 
 procedure TqNOXifyFrm.PMIToggleSpeedLimitsClick(Sender: TObject);
@@ -259,6 +265,14 @@ begin
   var SH := GetSelectedGridHashes;
   qB.SetTorrentCategory(SH, '');
   SH.Free;
+end;
+
+procedure TqNOXifyFrm.PMICatResetClick(Sender: TObject);
+begin
+  var SH := GetSelectedGridHashes;
+  for var i := 0 to SH.Count - 1 do
+    qB.RemoveTorrentTags(SH,'');
+  SH.Free
 end;
 
 procedure TqNOXifyFrm.PMIDeleteDataClick(Sender: TObject);
@@ -300,6 +314,19 @@ begin
     HideCol(TMenuItem(Sender).Tag)
   else
     ShowCol(TMenuItem(Sender).Tag);
+end;
+
+procedure TqNOXifyFrm.CatItemClicked(Sender: TObject);
+begin
+  var HL := GetSelectedGridHashes;
+  if HL.Count > 0 then
+    if TMenuItem(Sender).Checked then
+    begin
+      qB.AddTorrentTags(HL, TMenuItem(Sender).Caption);
+    end else begin
+      qB.RemoveTorrentTags(HL, TMenuItem(Sender).Caption);
+    end;
+  HL.Free;
 end;
 
 procedure TqNOXifyFrm.StatusBarClick(Sender: TObject);
@@ -387,20 +414,17 @@ end;
 
 procedure TqNOXifyFrm.PMColPopup(Sender: TObject);
 begin
+
+    // Categories
+
     for var i := PMICategory.Count -1 downto 3 do
       PMICategory.Items[i].Free;
 
     for var C in qBMain.Fcategories do
       begin
        var NewItem := TMenuItem.Create(PMHdrCol);
-      //NewItem.AutoCheck := True;
       NewItem.Caption := C.Key;
-
-      //NewItem.Checked := GetColData(i).Visible;
       NewItem.Tag := 0;
-
-      NewItem.GroupIndex := 0;
-      //NewItem.OnClick := SetCategoryClicked;
       PMICategory.Add(NewItem);
 
 
@@ -414,6 +438,22 @@ begin
       NewItem3.OnClick := DeleteCategoryClicked;;
       NewItem.Add(NewItem3);
     end;
+
+    // Tags
+    for var i := PMITags.Count -1 downto 3 do
+      PMITags.Items[i].Free;
+
+    for var i := 0 to qBMain.Ftags.Count - 1  do
+    begin
+      var NewItem := TMenuItem.Create(PMHdrCol);
+      NewItem.AutoCheck := True;
+      NewItem.Caption := qBMain.Ftags.Items[i];
+      NewItem.Tag := i + 1;
+      NewItem.GroupIndex := 0;
+      NewItem.OnClick := CatItemClicked;
+      PMITags.Add(NewItem);
+    end;
+
 end;
 
 procedure TqNOXifyFrm.PMHdrColPopup(Sender: TObject);
@@ -517,6 +557,9 @@ begin
   Warning.Visible := False;
   PMHdrCol.TrackMenu := True;
   PMHdrCol.OnTrackMenuNotify := TrackMenuNotifyHandler;
+  PMCol.TrackMenu := True;
+  PMCol.OnTrackMenuNotify := TrackMenuNotifyHandler;
+
 
   SG.RowCount := MAXROW;
   SG.ColCount := MAXCOL;
@@ -606,7 +649,6 @@ begin
       PMCol.Tag := ACol;
       PMCol.Popup(SG.ClientToScreen(P).X - 8, SG.ClientToScreen(P).Y - 2);
     end;
-    Exit;
   end;
 
   if Button <> mbLeft then Exit;

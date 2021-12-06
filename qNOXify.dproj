@@ -107,18 +107,16 @@
         <DCCReference Include="API\uqBitAPITypes.pas"/>
         <DCCReference Include="API\uqBitAPI.pas"/>
         <DCCReference Include="API\uqBitObject.pas"/>
-        <DCCReference Include="DemoFiles\uqNOXify.pas">
+        <DCCReference Include="Units\uqNOXify.pas">
             <Form>qNOXifyFrm</Form>
         </DCCReference>
-        <DCCReference Include="DemoFiles\uqBitFormat.pas"/>
-        <DCCReference Include="DemoFiles\uSelectServer.pas"/>
-        <DCCReference Include="DemoFiles\uAddServer.pas"/>
-        <DCCReference Include="DemoFiles\uSetLocation.pas"/>
-        <DCCReference Include="DemoFiles\uSpeedLimitsDlg.pas"/>
-        <DCCReference Include="DemoFiles\uAppTrackMenus.pas"/>
-        <DCCReference Include="DemoFiles\uAddEditCat.pas">
-            <Form>AddEditCatDlg</Form>
-        </DCCReference>
+        <DCCReference Include="Units\uqBitFormat.pas"/>
+        <DCCReference Include="Units\uSelectServer.pas"/>
+        <DCCReference Include="Units\uAddServer.pas"/>
+        <DCCReference Include="Units\uSetLocation.pas"/>
+        <DCCReference Include="Units\uSpeedLimitsDlg.pas"/>
+        <DCCReference Include="Units\uAppTrackMenus.pas"/>
+        <DCCReference Include="Units\uAddEditCat.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
