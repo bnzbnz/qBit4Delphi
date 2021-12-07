@@ -75,9 +75,9 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object SG: TStringGrid
       Left = 9
-      Top = 41
+      Top = 57
       Width = 952
-      Height = 420
+      Height = 404
       Align = alClient
       Color = clCream
       ColCount = 100
@@ -198,9 +198,9 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object Panel2: TPanel
       Left = 0
-      Top = 41
+      Top = 57
       Width = 9
-      Height = 420
+      Height = 404
       Align = alLeft
       BevelOuter = bvNone
       TabOrder = 1
@@ -209,10 +209,100 @@ object qNOXifyFrm: TqNOXifyFrm
       Left = 0
       Top = 0
       Width = 961
-      Height = 41
+      Height = 57
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 2
+      object Label1: TLabel
+        Left = 9
+        Top = 8
+        Width = 59
+        Height = 13
+        Caption = 'String Filter:'
+      end
+      object Label2: TLabel
+        Left = 192
+        Top = 9
+        Width = 38
+        Height = 13
+        Caption = 'Status :'
+      end
+      object Label3: TLabel
+        Left = 359
+        Top = 10
+        Width = 52
+        Height = 13
+        Caption = 'Category :'
+      end
+      object Label4: TLabel
+        Left = 526
+        Top = 12
+        Width = 25
+        Height = 13
+        Caption = 'Tag :'
+      end
+      object EditSearch: TEdit
+        Left = 9
+        Top = 28
+        Width = 145
+        Height = 21
+        TabOrder = 0
+      end
+      object CBTag: TComboBox
+        Left = 526
+        Top = 31
+        Width = 145
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 1
+        Text = 'All'
+        OnSelect = CBStatusSelect
+        Items.Strings = (
+          'All')
+      end
+      object CBCat: TComboBox
+        Left = 359
+        Top = 29
+        Width = 145
+        Height = 21
+        Style = csDropDownList
+        ItemIndex = 0
+        TabOrder = 2
+        Text = 'All'
+        OnSelect = CBStatusSelect
+        Items.Strings = (
+          'All')
+      end
+      object CBStatus: TComboBox
+        Left = 192
+        Top = 28
+        Width = 145
+        Height = 21
+        Style = csDropDownList
+        DropDownCount = 16
+        ItemIndex = 0
+        TabOrder = 3
+        Text = 'All'
+        OnSelect = CBStatusSelect
+        Items.Strings = (
+          'All'
+          'Downloading'
+          'Seeding'
+          'Completed'
+          'Paused'
+          'Stalled'
+          'Errored')
+      end
+      object BitBtn1: TBitBtn
+        Left = 145
+        Top = 27
+        Width = 32
+        Height = 24
+        Caption = 'X'
+        TabOrder = 4
+        OnClick = BitBtn1Click
+      end
     end
     object Panel4: TPanel
       Left = 0
@@ -224,56 +314,10 @@ object qNOXifyFrm: TqNOXifyFrm
       TabOrder = 3
     end
   end
-  object CBTag: TComboBox
-    Left = 310
-    Top = 8
-    Width = 145
-    Height = 21
-    Style = csDropDownList
-    ItemIndex = 0
-    TabOrder = 2
-    Text = 'All'
-    OnSelect = CBStatusSelect
-    Items.Strings = (
-      'All')
-  end
-  object CBCat: TComboBox
-    Left = 159
-    Top = 8
-    Width = 145
-    Height = 21
-    Style = csDropDownList
-    ItemIndex = 0
-    TabOrder = 3
-    Text = 'All'
-    OnSelect = CBStatusSelect
-    Items.Strings = (
-      'All')
-  end
-  object CBStatus: TComboBox
-    Left = 8
-    Top = 8
-    Width = 145
-    Height = 21
-    Style = csDropDownList
-    DropDownCount = 16
-    ItemIndex = 0
-    TabOrder = 4
-    Text = 'All'
-    OnSelect = CBStatusSelect
-    Items.Strings = (
-      'All'
-      'Downloading'
-      'Seeding'
-      'Completed'
-      'Paused'
-      'Stalled'
-      'Errored')
-  end
   object Warning: TMemo
-    Left = 64
-    Top = 111
-    Width = 841
+    Left = 80
+    Top = 119
+    Width = 809
     Height = 298
     Lines.Strings = (
       
@@ -307,7 +351,7 @@ object qNOXifyFrm: TqNOXifyFrm
       ''
       'Any questions : qBit4Delphi@ea4d.com'
       'Laurent Meyer.')
-    TabOrder = 5
+    TabOrder = 2
   end
   object Timer: TTimer
     Enabled = False
@@ -428,6 +472,31 @@ object qNOXifyFrm: TqNOXifyFrm
       object N8: TMenuItem
         Caption = '-'
       end
+    end
+    object N9: TMenuItem
+      Caption = '-'
+    end
+    object orrentManagement1: TMenuItem
+      Caption = 'Torrent Management'
+      object Enable1: TMenuItem
+        Caption = 'Enable'
+        OnClick = Enable1Click
+      end
+      object Disable1: TMenuItem
+        Caption = 'Disable'
+        OnClick = Disable1Click
+      end
+    end
+    object N10: TMenuItem
+      Caption = '-'
+    end
+    object ForceRecheck1: TMenuItem
+      Caption = 'Force Recheck'
+      OnClick = ForceRecheck1Click
+    end
+    object ForceReannounce1: TMenuItem
+      Caption = 'Force Reannounce'
+      OnClick = ForceReannounce1Click
     end
   end
   object PMStatus: TPopupMenu

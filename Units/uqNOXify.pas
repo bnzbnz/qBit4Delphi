@@ -7,7 +7,8 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uqBitAPITypes, uqBitAPI, uqBitObject,
   Vcl.ExtCtrls, Vcl.Grids, Vcl.StdCtrls, uqBitFormat, uSelectServer, Vcl.Menus,
   Vcl.ComCtrls, System.UITypes, Vcl.CheckLst, uAppTrackMenus,
-  System.Generics.Collections,  System.Generics.Defaults, uAddEditCat;
+  System.Generics.Collections,  System.Generics.Defaults, uAddEditCat,
+  Vcl.Buttons;
 
 const
   MAXCOL = 100;
@@ -61,9 +62,6 @@ type
     N5: TMenuItem;
     SetLocation1: TMenuItem;
     Rename1: TMenuItem;
-    CBTag: TComboBox;
-    CBCat: TComboBox;
-    CBStatus: TComboBox;
     PMIEditTrackers: TMenuItem;
     N6: TMenuItem;
     PMICategory: TMenuItem;
@@ -81,6 +79,22 @@ type
     PMICatReset: TMenuItem;
     N8: TMenuItem;
     New2: TMenuItem;
+    N9: TMenuItem;
+    orrentManagement1: TMenuItem;
+    Enable1: TMenuItem;
+    Disable1: TMenuItem;
+    EditSearch: TEdit;
+    Label1: TLabel;
+    CBTag: TComboBox;
+    CBCat: TComboBox;
+    CBStatus: TComboBox;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    BitBtn1: TBitBtn;
+    N10: TMenuItem;
+    ForceRecheck1: TMenuItem;
+    ForceReannounce1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure SGDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
@@ -119,6 +133,11 @@ type
     procedure PMIPauseClick(Sender: TObject);
     procedure PMICatResetClick(Sender: TObject);
     procedure New2Click(Sender: TObject);
+    procedure Enable1Click(Sender: TObject);
+    procedure Disable1Click(Sender: TObject);
+    procedure BitBtn1Click(Sender: TObject);
+    procedure ForceRecheck1Click(Sender: TObject);
+    procedure ForceReannounce1Click(Sender: TObject);
   private
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
     //function GetLastGridHashe: string;
@@ -401,6 +420,20 @@ begin
   SH.Free;
 end;
 
+procedure TqNOXifyFrm.Disable1Click(Sender: TObject);
+begin
+  var HL := GetSelectedGridHashes;
+  qB.SetAutomaticTorrentManagement(HL, False);
+  HL.Free;
+end;
+
+procedure TqNOXifyFrm.Enable1Click(Sender: TObject);
+begin
+  var HL := GetSelectedGridHashes;
+  qB.SetAutomaticTorrentManagement(HL, True);
+  HL.Free
+end;
+
 procedure TqNOXifyFrm.SetCategoryClicked(Sender : TObject);
 var
   Cat: string;
@@ -542,9 +575,28 @@ begin
   PMIShowHide.Add(NewItem);
 end;
 
+procedure TqNOXifyFrm.BitBtn1Click(Sender: TObject);
+begin
+  Self.EditSearch.Clear;
+end;
+
 procedure TqNOXifyFrm.CBStatusSelect(Sender: TObject);
 begin
   UpdateUI;
+end;
+
+procedure TqNOXifyFrm.ForceReannounce1Click(Sender: TObject);
+begin
+  var HL := GetSelectedGridHashes;
+  qB.ReannounceTorrents(HL);
+  HL.Free
+end;
+
+procedure TqNOXifyFrm.ForceRecheck1Click(Sender: TObject);
+begin
+  var HL := GetSelectedGridHashes;
+  qB.RecheckTorrents(HL);
+  HL.Free
 end;
 
 procedure TqNOXifyFrm.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -752,8 +804,11 @@ end;
 procedure TqNOXifyFrm.SetLocation1Click(Sender: TObject);
 begin
   var SH := GetSelectedGridHashes;
-  SetLocationDlg.Location.Text := qBPrefs.Fsave_path;
-  if (SH.Count > 0) and (SetLocationDlg.ShowModal = mrOk) then
+  if SH.Count = 1 then
+    SetLocationDlg.Location.Text := Self.GetLastSelectedTorrent.Fsave_path
+  else
+    SetLocationDlg.Location.Text := qBPrefs.Fsave_path;
+  if (SetLocationDlg.ShowModal = mrOk) then
      qB.SetTorrentLocation(SH, SetLocationDlg.Location.Text);
   SH.Free;
 end;
@@ -916,6 +971,14 @@ begin
      end;
      if ToDelete then TL.Delete(i);
   end;
+
+  // Filtering String
+  if EditSearch.Text <> '' then
+    for var i := TL.Count - 1 downto 0 do
+    begin
+      if Pos(EditSearch.Text, TqBitTorrentType(TL[i]).Fname) = 0 then
+        TL.Delete(i);
+    end;
 
   // Sorting
   TL.Sort(TComparer<TqBitTorrentType>.Construct(
