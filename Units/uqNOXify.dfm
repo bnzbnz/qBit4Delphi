@@ -2,8 +2,8 @@ object qNOXifyFrm: TqNOXifyFrm
   Left = 0
   Top = 0
   Caption = 'qNOXifyFrm'
-  ClientHeight = 524
-  ClientWidth = 961
+  ClientHeight = 614
+  ClientWidth = 1110
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,8 +20,8 @@ object qNOXifyFrm: TqNOXifyFrm
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 505
-    Width = 961
+    Top = 595
+    Width = 1110
     Height = 19
     Panels = <
       item
@@ -52,20 +52,24 @@ object qNOXifyFrm: TqNOXifyFrm
     ShowHint = False
     OnClick = StatusBarClick
     OnContextPopup = StatusBarContextPopup
+    ExplicitTop = 505
+    ExplicitWidth = 961
   end
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 961
-    Height = 505
+    Width = 1110
+    Height = 595
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 1
+    ExplicitWidth = 961
+    ExplicitHeight = 505
     object Splitter1: TSplitter
       Left = 0
-      Top = 461
-      Width = 961
+      Top = 309
+      Width = 1110
       Height = 3
       Cursor = crVSplit
       Align = alBottom
@@ -76,8 +80,8 @@ object qNOXifyFrm: TqNOXifyFrm
     object SG: TStringGrid
       Left = 9
       Top = 57
-      Width = 952
-      Height = 404
+      Width = 1101
+      Height = 252
       Align = alClient
       Color = clCream
       ColCount = 100
@@ -94,6 +98,8 @@ object qNOXifyFrm: TqNOXifyFrm
       OnMouseMove = SGMouseMove
       OnMouseWheelDown = SGMouseWheelDown
       OnMouseWheelUp = SGMouseWheelUp
+      ExplicitWidth = 952
+      ExplicitHeight = 168
       RowHeights = (
         18
         18
@@ -200,19 +206,21 @@ object qNOXifyFrm: TqNOXifyFrm
       Left = 0
       Top = 57
       Width = 9
-      Height = 404
+      Height = 252
       Align = alLeft
       BevelOuter = bvNone
       TabOrder = 1
+      ExplicitHeight = 236
     end
     object Panel3: TPanel
       Left = 0
       Top = 0
-      Width = 961
+      Width = 1110
       Height = 57
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 2
+      ExplicitWidth = 961
       object Label1: TLabel
         Left = 9
         Top = 8
@@ -306,17 +314,53 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object Panel4: TPanel
       Left = 0
-      Top = 464
-      Width = 961
-      Height = 41
+      Top = 312
+      Width = 1110
+      Height = 283
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 3
+      object PageControl1: TPageControl
+        Left = 0
+        Top = 0
+        Width = 1110
+        Height = 283
+        ActivePage = TabSheet1
+        Align = alClient
+        TabOrder = 0
+        object TabSheet1: TTabSheet
+          Caption = 'General'
+          object SGDetails: TStringGrid
+            Left = 0
+            Top = 0
+            Width = 1102
+            Height = 255
+            Align = alClient
+            Color = clBtnFace
+            ColCount = 10
+            DefaultColWidth = 192
+            DefaultRowHeight = 18
+            FixedCols = 0
+            RowCount = 20
+            FixedRows = 0
+            Options = []
+            ScrollBars = ssVertical
+            TabOrder = 0
+            OnSelectCell = SGDetailsSelectCell
+            ExplicitWidth = 953
+            ExplicitHeight = 181
+          end
+        end
+        object TabSheet2: TTabSheet
+          Caption = 'TabSheet2'
+          ImageIndex = 1
+        end
+      end
     end
   end
   object Warning: TMemo
-    Left = 80
-    Top = 119
+    Left = 240
+    Top = 407
     Width = 809
     Height = 298
     Lines.Strings = (
@@ -502,7 +546,7 @@ object qNOXifyFrm: TqNOXifyFrm
   object PMStatus: TPopupMenu
     TrackButton = tbLeftButton
     Left = 16
-    Top = 408
+    Top = 232
     object PMIToggleSpeedLimits: TMenuItem
       Caption = 'Toggle Speed Limits'
       OnClick = PMIToggleSpeedLimitsClick

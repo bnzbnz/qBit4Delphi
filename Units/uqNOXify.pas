@@ -14,6 +14,7 @@ const
   MAXCOL = 100;
   MAXROW = 2000;
   ROWHEIGHT = 18;
+  NoSelection: TGridRect = (Left: 0; Top: -1; Right: 0; Bottom: -1);
 
 type
   TGridData = class
@@ -95,6 +96,10 @@ type
     N10: TMenuItem;
     ForceRecheck1: TMenuItem;
     ForceReannounce1: TMenuItem;
+    PageControl1: TPageControl;
+    TabSheet1: TTabSheet;
+    SGDetails: TStringGrid;
+    TabSheet2: TTabSheet;
     procedure FormCreate(Sender: TObject);
     procedure SGDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
@@ -138,6 +143,8 @@ type
     procedure BitBtn1Click(Sender: TObject);
     procedure ForceRecheck1Click(Sender: TObject);
     procedure ForceReannounce1Click(Sender: TObject);
+    procedure SGDetailsSelectCell(Sender: TObject; ACol, ARow: Integer;
+      var CanSelect: Boolean);
   private
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
     //function GetLastGridHashe: string;
@@ -607,6 +614,9 @@ end;
 procedure TqNOXifyFrm.FormCreate(Sender: TObject);
 begin
   Warning.Visible := False;
+
+  SGDetails.Selection:= NoSelection;
+
   PMHdrCol.TrackMenu := True;
   PMHdrCol.OnTrackMenuNotify := TrackMenuNotifyHandler;
   PMCol.TrackMenu := True;
@@ -751,7 +761,6 @@ end;
 
 procedure TqNOXifyFrm.ShowAllCol;
 begin
-
 end;
 
 procedure TqNOXifyFrm.TimerTimer(Sender: TObject);
@@ -821,6 +830,12 @@ begin
   GetCursorPos(P) ;
   SG.MouseToCell(SG.ScreenToClient(P).X, SG.ScreenToClient(P).Y, ACol, ARow);
   ToggleSortCol(ACol);
+end;
+
+procedure TqNOXifyFrm.SGDetailsSelectCell(Sender: TObject; ACol, ARow: Integer;
+  var CanSelect: Boolean);
+begin
+  CanSelect := False;
 end;
 
 procedure TqNOXifyFrm.SGDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
@@ -976,7 +991,7 @@ begin
   if EditSearch.Text <> '' then
     for var i := TL.Count - 1 downto 0 do
     begin
-      if Pos(EditSearch.Text, TqBitTorrentType(TL[i]).Fname) = 0 then
+      if Pos(LowerCase(Trim(EditSearch.Text)), LowerCase(TqBitTorrentType(TL[i]).Fname)) = 0 then
         TL.Delete(i);
     end;
 
@@ -1112,13 +1127,81 @@ begin
          VarFormatBKMPerSec(qBMain.Fserver_state.Fup_info_speed)
       ]);
 
-
   // Selecting First Row
 
   if qBMain.Ffull_update and TL.count > 0 then
   begin
     GetRowData(1).Selected := True;
     GetColData(0).LastSelected := 1;
+  end;
+
+
+  if (GetLastSelectedTorrent <> Nil) and (PageControl1.ActivePageIndex = 0) then
+  begin
+    var T := GetLastSelectedTorrent;
+    qBTInfo.Free;
+    qBTInfo := qB.GetTorrentGenericProperties(T.Fhash);
+
+    SGDetails.ColAlignments[0] := taRightJustify;
+    SGDetails.ColWidths[0] := 128;
+    SGDetails.ColAlignments[1] := taLeftJustify;
+    SGDetails.ColWidths[1] := 200;
+    SGDetails.ColAlignments[2] := taRightJustify;
+    SGDetails.ColWidths[2] := 128;
+    SGDetails.ColAlignments[3] := taLeftJustify;
+    SGDetails.ColWidths[3] := 200;
+    SGDetails.ColAlignments[4] := taRightJustify;
+    SGDetails.ColWidths[4] := 128;
+    SGDetails.ColAlignments[5] := taLeftJustify;
+    SGDetails.ColWidths[5] := 200;
+
+    SGDetails.Cells[0, 1] := 'Time Active : '; SGDetails.RowHeights[1] := 20;
+    SGDetails.Cells[0, 2] := 'Downloaded : '; SGDetails.RowHeights[2] := 20;
+    SGDetails.Cells[0, 3] := 'Download Speed : '; SGDetails.RowHeights[3] := 20;
+    SGDetails.Cells[0, 4] := 'Download Limit : '; SGDetails.RowHeights[4] := 20;
+    SGDetails.Cells[0, 5] := 'Share Ratio : '; SGDetails.RowHeights[5] := 20;
+    SGDetails.RowHeights[6] := 20;
+    SGDetails.Cells[0, 7] := 'Total Size : '; SGDetails.RowHeights[7] := 20;
+    SGDetails.Cells[0, 8] := 'Added On : '; SGDetails.RowHeights[8] := 20;
+    SGDetails.Cells[0, 9] := 'Hash : '; SGDetails.RowHeights[9] := 20;
+    SGDetails.Cells[0, 10] := 'Save Path : '; SGDetails.RowHeights[10] := 20;
+    SGDetails.Cells[0, 11] := 'Comment : '; SGDetails.RowHeights[11] := 20;
+
+    SGDetails.Cells[2, 1] := 'ETA : ';
+    SGDetails.Cells[2, 2] := 'Uploded : ';
+    SGDetails.Cells[2, 3] := 'Upload Speed : ';
+    SGDetails.Cells[2, 4] := 'Upload Limit : ';
+    SGDetails.Cells[2, 5] := 'Reannounce In : ';
+    SGDetails.Cells[2, 7] := 'Pieces :';
+    SGDetails.Cells[2, 8] := 'Completed On :';
+
+    SGDetails.Cells[4, 1] := 'Connections : ';
+    SGDetails.Cells[4, 2] := 'Seeds : ';
+    SGDetails.Cells[4, 3] := 'Peers : ';
+    SGDetails.Cells[4, 4] := 'Wasted : ';
+    SGDetails.Cells[4, 5] := 'Last Seen Complete : ';
+
+    SGDetails.Cells[1, 1] := VarFormatDuration(T.Ftime_active, T);
+    SGDetails.Cells[1, 2] := Format('%s (%s this session)',
+      [VarFormatBKM(T.Fdownloaded, T), VarFormatBKM(T.Fdownloaded_session, T)]);
+    SGDetails.Cells[1, 3] := VarFormatBKMPerSec(T.Fdlspeed, T);
+    SGDetails.Cells[1, 4] := VarFormatLimit(T.Fdl_limit, T);
+    SGDetails.Cells[1, 5] := VarFormatFloat2d(T.Fratio, T);
+    SGDetails.Cells[1, 7] := VarFormatBKM(T.Fsize, T);
+    SGDetails.Cells[1, 8] := VarFormatDate(T.Fadded_on, T);
+    SGDetails.Cells[1, 9] := VarFormatString(T.Fhash, T);
+    SGDetails.Cells[1, 10] := VarFormatString(T.Fsave_path, T);
+    SGDetails.Cells[1, 11] := VarFormatString(qBTInfo.Fcomment, qBTInfo);
+
+    SGDetails.Cells[3, 1] := VarFormatDeltaSec(T.Feta, T);
+    SGDetails.Cells[3, 2] := Format('%s (%s this session)',
+      [VarFormatBKM(T.Fuploaded, T), VarFormatBKM(T.Fuploaded_session, T)]);
+    SGDetails.Cells[3, 3] := VarFormatBKMPerSec(T.Fupspeed, T);
+    SGDetails.Cells[3, 4] := VarFormatLimit(T.Fup_limit, T);
+      SGDetails.Cells[3, 5] := VarFormatDuration(qBTInfo.Freannounce, T);
+    SGDetails.Cells[3, 7] :=
+      Format('%s x %s (have %s )', [VarToStr(qBTInfo.Fpieces_num), VarFormatBKM(qBTInfo.Fpiece_size, T), VarToStr(qBTInfo.Fpieces_have)]);
+    SGDetails.Cells[3, 8] := VarFormatDate(T.Fcompletion_on, T)
   end;
 
   SH.Free;
