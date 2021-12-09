@@ -18,6 +18,7 @@ type
     class function Connect(HostPath, Username, Password : string): TqBitObject;
 
      // Helpers
+    function Clone: TqBitObject;
     function qBitAPIVersion: string;
     class function TStoDT(Timestamp: int64): TDatetime;
     class function TSmsToDT(Timestamp: int64): TDatetime;
@@ -77,6 +78,14 @@ begin
   Result := TqBitObject.Create(HostPath);
   if not Result.Login(Username, Password) then
     FreeAndNil(Result);
+end;
+
+function TqBitObject.Clone: TqBitObject;
+begin
+  Result := TqBitObject.Create(FHostPath);
+  Result.FSID := FSID;
+  Result.FUsername := FUsername;
+  Result.FPassword := FPassword;
 end;
 
 class function TqBitObject.TSmsToDT(Timestamp: int64): TDatetime;

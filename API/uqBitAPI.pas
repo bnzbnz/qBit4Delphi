@@ -985,7 +985,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentUrls.Frename));
+    SS.WriteString(NewTorrentUrls.Frename);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -993,7 +993,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentUrls.Fcategory));
+    SS.WriteString(NewTorrentUrls.Fcategory);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1115,7 +1115,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentFile.Frename));
+    SS.WriteString(NewTorrentFile.Frename);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1123,7 +1123,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentFile.Fcategory));
+    SS.WriteString(NewTorrentFile.Fcategory);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1147,7 +1147,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode((NewTorrentFile.FcontentLayout)));
+    SS.WriteString((NewTorrentFile.FcontentLayout));
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1174,8 +1174,11 @@ begin
     SS.WriteString(NewTorrentFile.FdlLimit.ToString);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
+    SS.WriteString(#$D#$A);
     SS.WriteString('Content-Disposition: form-data; name="upLimit"');
+    SS.WriteString(#$D#$A);
     SS.WriteString('');
+    SS.WriteString(#$D#$A);
     SS.WriteString(NewTorrentFile.FupLimit.ToString);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary+'--');
