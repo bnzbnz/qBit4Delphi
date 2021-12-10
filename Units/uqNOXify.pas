@@ -28,7 +28,8 @@ type
     Selected: Boolean;
     Hash: string;
     // Global
-    LastSelected: integer;
+    LastRowSelected: integer;
+    LastHashSelected: string;
     SortField: string;
     SortReverse: Boolean;
     HintX: integer;
@@ -100,6 +101,12 @@ type
     TabSheet1: TTabSheet;
     SGDetails: TStringGrid;
     TabSheet2: TTabSheet;
+    N11: TMenuItem;
+    SelectAll1: TMenuItem;
+    Add1: TMenuItem;
+    PMIAddFile: TMenuItem;
+    AddMagnet: TMenuItem;
+    OpenTorrent: TFileOpenDialog;
     procedure FormCreate(Sender: TObject);
     procedure SGDrawCell(Sender: TObject; ACol, ARow: Integer; Rect: TRect;
       State: TGridDrawState);
@@ -145,6 +152,9 @@ type
     procedure ForceReannounce1Click(Sender: TObject);
     procedure SGDetailsSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
+    procedure SelectAll1Click(Sender: TObject);
+    procedure PMIAddFileClick(Sender: TObject);
+    procedure AddMagnetClick(Sender: TObject);
   private
     procedure TrackMenuNotifyHandler(Sender: TMenu; Item: TMenuItem; var CanClose: Boolean);
     //function GetLastGridHashe: string;
@@ -183,7 +193,7 @@ var
   qNOXifyFrm: TqNOXifyFrm;
 
 implementation
-uses Math, ShellAPI, RTTI, uSetLocation, uSpeedLimitsDlg;
+uses Math, ShellAPI, RTTI, uSetLocation, uSpeedLimitsDlg, uAddTorrent;
 
 {$R *.dfm}
 
@@ -238,7 +248,7 @@ end;
 
 function TqNOXifyFrm.GetLastGridHash: string;
 begin
-  Result := GetRowData( GetColData(0).LastSelected ).Hash;
+  Result := GetColData(0).LastHashSelected;
 end;
 
 function TqNOXifyFrm.GetLastSelectedTorrent: TqBitTorrentType;
@@ -291,6 +301,19 @@ begin
   var SH := GetSelectedGridHashes;
   qB.SetTorrentCategory(SH, '');
   SH.Free;
+end;
+
+procedure TqNOXifyFrm.PMIAddFileClick(Sender: TObject);
+begin
+  if OpenTorrent.Execute then
+  begin
+    var LF := TStringList.Create;
+    LF.Add(OpenTorrent.FileName);
+    AddTorrentDlg.qB := qB;
+    AddTorrentDlg.FileList := LF;
+    AddTorrentDlg.ShowModal;
+    LF.Free;
+  end;
 end;
 
 procedure TqNOXifyFrm.PMICatResetClick(Sender: TObject);
@@ -441,6 +464,13 @@ begin
   HL.Free
 end;
 
+procedure TqNOXifyFrm.SelectAll1Click(Sender: TObject);
+begin
+  for var i:= 1 to SG.RowCount  - 1 do
+    if assigned(GetRowData(i)) then
+      GetRowData(i).Selected := True;
+end;
+
 procedure TqNOXifyFrm.SetCategoryClicked(Sender : TObject);
 var
   Cat: string;
@@ -580,6 +610,12 @@ begin
   var NewItem := TMenuItem.Create(PMHdrCol);
   NewItem.Caption := Name;
   PMIShowHide.Add(NewItem);
+end;
+
+procedure TqNOXifyFrm.AddMagnetClick(Sender: TObject);
+begin
+  var URI := InputBox('Magnet URI Download :', 'URI : ', '');
+  if URI <> '' then qB.AddNewTorrentUrl(URI);
 end;
 
 procedure TqNOXifyFrm.BitBtn1Click(Sender: TObject);
@@ -724,20 +760,22 @@ begin
   if GetKeyState(VK_CONTROL) < 0 then
   begin
     GD.Selected :=  not GD.Selected;
-    GetColData(0).LastSelected := ARow;
+    GetColData(0).LastRowSelected := ARow;
+    GetColData(0).LastHashSelected := GetRowData(ARow).Hash;
     qBTInfo.Free;
-    qBTInfo := qB.GetTorrentGenericProperties(GetRowData(ARow).Hash);
+    qBTInfo := qB.GetTorrentGenericProperties(GetColData(0).LastHashSelected);
   end else
   if GetKeyState(VK_SHIFT) < 0 then
   begin
-   for var i := Min(Arow, GetColData(0).LastSelected) to  Max(Arow, GetColData(0).LastSelected) do
+   for var i := Min(Arow, GetColData(0).LastRowSelected) to  Max(Arow, GetColData(0).LastRowSelected) do
      GetRowData(i).Selected := True;
   end else begin
     for var i := 0 to SG.RowCount - 1 do
       GetRowData(i).Selected := False;
-    GetColData(0).LastSelected := ARow;
+    GetColData(0).LastRowSelected := ARow;
+    GetColData(0).LastHashSelected := GetRowData(ARow).Hash;
     qBTInfo.Free;
-    qBTInfo := qB.GetTorrentGenericProperties(GetRowData(ARow).Hash);
+    qBTInfo := qB.GetTorrentGenericProperties(GetColData(0).LastHashSelected);
     GD.Selected := True;
   end;
   SG.Invalidate;
@@ -776,23 +814,26 @@ end;
 procedure TqNOXifyFrm.WMDropFiles(var Msg: TMessage);
 var
   hDrop: THandle;
-  FileName: string;
-  NewTorrentFile : TqBitNewTorrentFileType;
+  FileNAme: string;
 begin
+  var FL := TStringList.Create;
   hDrop:= Msg.wParam;
   var FileCount := DragQueryFile (hDrop , $FFFFFFFF, nil, 0);
-  NewTorrentFile := TqBitNewTorrentFileType.Create;
   for var i := 0 to FileCount - 1 do
   begin
     var namelen := DragQueryFile(hDrop, I, nil, 0) + 1;
     SetLength(FileName, namelen);
     DragQueryFile(hDrop, I, Pointer(FileName), namelen);
     SetLength(FileName, namelen - 1);
-    NewTorrentFile.Ffilename := FileName;
-    if assigned(qB) then
-      qB.AddNewTorrentFile(NewTorrentFile);
+    FL.Add(FileName);
   end;
-  NewTorrentFile.Free;
+  if FL.Count > 0 then
+  begin
+    AddTorrentDlg.qB := qB;
+    AddTorrentDlg.FileList := FL;
+    AddTorrentDlg.ShowModal;
+  end;
+  FL.Free;
   DragFinish(hDrop);
 end;
 
@@ -1132,7 +1173,8 @@ begin
   if qBMain.Ffull_update and TL.count > 0 then
   begin
     GetRowData(1).Selected := True;
-    GetColData(0).LastSelected := 1;
+    GetColData(0).LastRowSelected := 1;
+    GetColData(0).LastHashSelected := GetRowData(1).Hash;
   end;
 
 
@@ -1191,7 +1233,7 @@ begin
     SGDetails.Cells[1, 8] := VarFormatDate(T.Fadded_on, T);
     SGDetails.Cells[1, 9] := VarFormatString(T.Fhash, T);
     SGDetails.Cells[1, 10] := VarFormatString(T.Fsave_path, T);
-    SGDetails.Cells[1, 11] := VarFormatString(qBTInfo.Fcomment, qBTInfo);
+    SGDetails.Cells[1, 11] := VarFormatString(qbTInfo.Fcomment, qBTInfo);
 
     SGDetails.Cells[3, 1] := VarFormatDeltaSec(T.Feta, T);
     SGDetails.Cells[3, 2] := Format('%s (%s this session)',
@@ -1201,7 +1243,13 @@ begin
       SGDetails.Cells[3, 5] := VarFormatDuration(qBTInfo.Freannounce, T);
     SGDetails.Cells[3, 7] :=
       Format('%s x %s (have %s )', [VarToStr(qBTInfo.Fpieces_num), VarFormatBKM(qBTInfo.Fpiece_size, T), VarToStr(qBTInfo.Fpieces_have)]);
-    SGDetails.Cells[3, 8] := VarFormatDate(T.Fcompletion_on, T)
+    SGDetails.Cells[3, 8] := VarFormatDate(T.Fcompletion_on, T);
+
+    SGDetails.Cells[5, 1] := Format('%s (%s max)', [VarToStr(qBTInfo.Fnb_connections), VarFormatLimit(qBTInfo.Fnb_connections_limit, qBTInfo)]);
+    SGDetails.Cells[5, 2] := Format('%s (%s total)', [VarToStr(T.Fnum_seeds), qBTInfo.Fseeds_total]);
+    SGDetails.Cells[5, 3] := Format('%s (%s total)', [VarToStr(T.Fnum_leechs), qBTInfo.Fpeers_total]);
+    SGDetails.Cells[5, 4] := VarFormatBKM(qBTInfo.Ftotal_wasted, qBTInfo);
+    SGDetails.Cells[5, 5] := VarFormatDate(qBTInfo.Flast_seen, qBTInfo);
   end;
 
   SH.Free;

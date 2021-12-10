@@ -2,8 +2,8 @@ object qNOXifyFrm: TqNOXifyFrm
   Left = 0
   Top = 0
   Caption = 'qNOXifyFrm'
-  ClientHeight = 614
-  ClientWidth = 1110
+  ClientHeight = 469
+  ClientWidth = 742
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -20,8 +20,8 @@ object qNOXifyFrm: TqNOXifyFrm
   TextHeight = 13
   object StatusBar: TStatusBar
     Left = 0
-    Top = 595
-    Width = 1110
+    Top = 450
+    Width = 742
     Height = 19
     Panels = <
       item
@@ -52,24 +52,24 @@ object qNOXifyFrm: TqNOXifyFrm
     ShowHint = False
     OnClick = StatusBarClick
     OnContextPopup = StatusBarContextPopup
-    ExplicitTop = 505
-    ExplicitWidth = 961
+    ExplicitTop = 595
+    ExplicitWidth = 1110
   end
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 1110
-    Height = 595
+    Width = 742
+    Height = 450
     Align = alClient
     BevelOuter = bvNone
     Caption = 'Panel1'
     TabOrder = 1
-    ExplicitWidth = 961
-    ExplicitHeight = 505
+    ExplicitWidth = 1110
+    ExplicitHeight = 595
     object Splitter1: TSplitter
       Left = 0
-      Top = 309
-      Width = 1110
+      Top = 164
+      Width = 742
       Height = 3
       Cursor = crVSplit
       Align = alBottom
@@ -80,8 +80,8 @@ object qNOXifyFrm: TqNOXifyFrm
     object SG: TStringGrid
       Left = 9
       Top = 57
-      Width = 1101
-      Height = 252
+      Width = 733
+      Height = 107
       Align = alClient
       Color = clCream
       ColCount = 100
@@ -98,8 +98,8 @@ object qNOXifyFrm: TqNOXifyFrm
       OnMouseMove = SGMouseMove
       OnMouseWheelDown = SGMouseWheelDown
       OnMouseWheelUp = SGMouseWheelUp
-      ExplicitWidth = 952
-      ExplicitHeight = 168
+      ExplicitWidth = 1101
+      ExplicitHeight = 252
       RowHeights = (
         18
         18
@@ -206,21 +206,21 @@ object qNOXifyFrm: TqNOXifyFrm
       Left = 0
       Top = 57
       Width = 9
-      Height = 252
+      Height = 107
       Align = alLeft
       BevelOuter = bvNone
       TabOrder = 1
-      ExplicitHeight = 236
+      ExplicitHeight = 252
     end
     object Panel3: TPanel
       Left = 0
       Top = 0
-      Width = 1110
+      Width = 742
       Height = 57
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 2
-      ExplicitWidth = 961
+      ExplicitWidth = 1110
       object Label1: TLabel
         Left = 9
         Top = 8
@@ -314,26 +314,29 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object Panel4: TPanel
       Left = 0
-      Top = 312
-      Width = 1110
+      Top = 167
+      Width = 742
       Height = 283
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 3
+      ExplicitTop = 312
+      ExplicitWidth = 1110
       object PageControl1: TPageControl
         Left = 0
         Top = 0
-        Width = 1110
+        Width = 742
         Height = 283
         ActivePage = TabSheet1
         Align = alClient
         TabOrder = 0
+        ExplicitWidth = 1110
         object TabSheet1: TTabSheet
           Caption = 'General'
           object SGDetails: TStringGrid
             Left = 0
             Top = 0
-            Width = 1102
+            Width = 734
             Height = 255
             Align = alClient
             Color = clBtnFace
@@ -347,8 +350,7 @@ object qNOXifyFrm: TqNOXifyFrm
             ScrollBars = ssVertical
             TabOrder = 0
             OnSelectCell = SGDetailsSelectCell
-            ExplicitWidth = 953
-            ExplicitHeight = 181
+            ExplicitWidth = 1102
           end
         end
         object TabSheet2: TTabSheet
@@ -359,9 +361,9 @@ object qNOXifyFrm: TqNOXifyFrm
     end
   end
   object Warning: TMemo
-    Left = 240
-    Top = 407
-    Width = 809
+    Left = 102
+    Top = 85
+    Width = 569
     Height = 298
     Lines.Strings = (
       
@@ -434,6 +436,13 @@ object qNOXifyFrm: TqNOXifyFrm
     OnPopup = PMColPopup
     Left = 328
     Top = 48
+    object SelectAll1: TMenuItem
+      Caption = 'Select All'
+      OnClick = SelectAll1Click
+    end
+    object N11: TMenuItem
+      Caption = '-'
+    end
     object PMIPause: TMenuItem
       Caption = 'Pause'
       OnClick = PMIPauseClick
@@ -444,6 +453,17 @@ object qNOXifyFrm: TqNOXifyFrm
     end
     object N3: TMenuItem
       Caption = '-'
+    end
+    object Add1: TMenuItem
+      Caption = 'Add'
+      object PMIAddFile: TMenuItem
+        Caption = 'Torrent File'
+        OnClick = PMIAddFileClick
+      end
+      object AddMagnet: TMenuItem
+        Caption = 'Magnet URI'
+        OnClick = AddMagnetClick
+      end
     end
     object N4: TMenuItem
       Caption = 'Delete'
@@ -558,5 +578,17 @@ object qNOXifyFrm: TqNOXifyFrm
       Caption = 'Set Speed Limits'
       OnClick = PMISpeedLimitsClick
     end
+  end
+  object OpenTorrent: TFileOpenDialog
+    DefaultExtension = '.torrent'
+    FavoriteLinks = <>
+    FileTypes = <
+      item
+        DisplayName = 'Torrent'
+        FileMask = '*.torrent'
+      end>
+    Options = []
+    Left = 392
+    Top = 56
   end
 end

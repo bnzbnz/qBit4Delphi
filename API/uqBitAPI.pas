@@ -969,7 +969,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentUrls.Fsavepath));
+    SS.WriteString(NewTorrentUrls.Fsavepath);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -977,7 +977,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentUrls.Fcookie));
+    SS.WriteString(NewTorrentUrls.Fcookie);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1107,7 +1107,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(URLEncode(NewTorrentFile.Fsavepath));
+    SS.WriteString(NewTorrentFile.Fsavepath);
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
