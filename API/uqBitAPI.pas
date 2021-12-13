@@ -322,7 +322,7 @@ begin
     ReqST.Position := 0;
     ResST.Position := 0;
     Http := THTTPClient.Create;
-    Http.UserAgent := 'qBittorrent Web API for Delphi - L.Meyer - qBit4Delphi@ea4d.com';
+    Http.UserAgent := 'qBittorrent WebAPI for Delphi (qBit4Delphi) - Laurent Meyer - qBit4Delphi@ea4d.com';
     Http.CustomHeaders['Content-type'] := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
     Http.CookieManager.Clear;
