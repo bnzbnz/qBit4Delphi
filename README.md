@@ -8,16 +8,11 @@ This API is developed with Delphi Community Edition 10.4 but also tested with Sy
 
 Alternatively, qNOXify is a thin client for qBittorent/NOX, it is a work in progress... so be gentle... Build as you wish, add features... contribute if you can... :)
 
-
 ## Installation in Delphi
 * Download qBit4Delphi. Click on the green "Code" button and then click on "Download ZIP".
 * Decompress the ZIP package in your projects directory.
-* COPY FROM : the original Delphi source folder : C:\Program Files (x86)\Embarcadero\Studio\XX\source\...   (XX being 21.0 or 22.0) :
-* "REST.Json.pas", "REST.Json.Types.pas", "REST.JsonReflect.pas" and "System.JSON.pas"
-* TO : JSON/Sydney.10.4.2 or JSON/Alexandria.11.0
-* Execute PatchDelphiUnits.bat to patch the files.
-* You can build and run the demos...
-
+* Execute : Patcher.exe in the main directory
+* The patched units will be located in JSON/21 and/or JSON/22. Please add these units in you project.
 * If you need help, open a ticket or contact me at : qBit4Delphi@ea4d.com
 
 ## Support
