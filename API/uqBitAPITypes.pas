@@ -18,6 +18,23 @@ const
 
 type
 
+  TqBitTorrentBaseType = class
+  private
+    [JsonMarshalled(false)]
+    _RawJsonData: TDictionary<string, string>;
+    function RawJsonEncode(Header, Value, Footer: string): string;
+    function RawJsonDecode(RawJson: string): string;
+  public
+    procedure Merge(From: TqBitTorrentBaseType); virtual;
+    function Clone: TqBitTorrentBaseType; virtual;
+    function ToJSON: string; virtual;
+    function ToParams: string; virtual;
+    constructor Create; overload;
+    destructor Destroy; override;
+  end;
+
+  {$REGION 'JSON Interceptor Types'}
+
   TqBitObjectListInterceptor = class(TJSONInterceptor)
   public
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
@@ -48,7 +65,9 @@ type
     function StringConverter(Data: TObject; Field: string): string; override;
   end;
 
-  TqBitTorrentBaseType = class;
+  {$ENDREGION}
+
+  {$REGION 'qBit Generic Types'}
 
   TqBitList<A> = class(TList<variant>)
     function Merge(From: TqBitList<A>; var  Added: TqBitList<variant>): variant; overload;
@@ -70,20 +89,9 @@ type
     function Merge(From: TqBitObjectList<A>): variant; overload;
   end;
 
-  TqBitTorrentBaseType = class
-  private
-    [JsonMarshalled(false)]
-    _RawJsonData: TDictionary<string, string>;
-    function RawJsonEncode(Header, Value, Footer: string): string;
-    function RawJsonDecode(RawJson: string): string;
-  public
-    procedure Merge(From: TqBitTorrentBaseType); virtual;
-    function Clone: TqBitTorrentBaseType; virtual;
-    function ToJSON: string; virtual;
-    function ToParams: string; virtual;
-    constructor Create; overload;
-    destructor Destroy; override;
-  end;
+  {$ENDREGION}
+
+  {$REGION 'qBittorent JSON Types'}
 
   TqBitBuildInfoType = class(TqBitTorrentBaseType)
     Fqt : variant;
@@ -686,8 +694,10 @@ type
     destructor Destroy; override;
    end;
 
+  {$ENDREGION}
+
 implementation
-uses SysUtils, REST.Json, System.RegularExpressions, NetEncoding, Variants, RTTI;
+uses SysUtils, REST.Json, NetEncoding, Variants, RTTI;
 
 const
   bstr: array[boolean] of string = ('false','true');
@@ -1267,6 +1277,28 @@ begin
   end;
 end;
 
+{ TqBitObjectList<A> }
+
+function TqBitObjectList<A>.Merge(From: TqBitObjectList<A>; var Added: TqBitObjectList<A>): variant;
+begin
+  Result := False;
+  if not assigned(From) then exit;
+  for var v in From do
+  begin
+    Self.Add(v.Clone);
+    if not assigned(Added) then Added := TqBitObjectList<A>.Create;
+    Added.Add(v.Clone);
+    Result := True;
+  end;;
+end;
+
+function TqBitObjectList<A>.Merge(From: TqBitObjectList<A>): variant;
+begin
+  var dummy := TqBitObjectList<A>.Create;
+  Result := Self.Merge(From, dummy);
+  dummy.Free;
+end;
+
 procedure TqBitLogsType.Merge(From: TqBitTorrentBaseType);
 begin
   if not (From is TqBitLogsType) then Exit;
@@ -1643,28 +1675,6 @@ destructor TqBitAutoDownloadingRulesType.Destroy;
 begin
   Frules.Free;
   inherited;
-end;
-
-{ TqBitObjectList<A> }
-
-function TqBitObjectList<A>.Merge(From: TqBitObjectList<A>; var Added: TqBitObjectList<A>): variant;
-begin
-  Result := False;
-  if not assigned(From) then exit;
-  for var v in From do
-  begin
-    Self.Add(v.Clone);
-    if not assigned(Added) then Added := TqBitObjectList<A>.Create;
-    Added.Add(v.Clone);
-    Result := True;
-  end;;
-end;
-
-function TqBitObjectList<A>.Merge(From: TqBitObjectList<A>): variant;
-begin
-  var dummy := TqBitObjectList<A>.Create;
-  Result := Self.Merge(From, dummy);
-  dummy.Free;
 end;
 
 { TqBitLogType }
