@@ -1,4 +1,4 @@
-program FMXReport;
+program Simple;
 
 uses
   {$IFDEF VER340}
@@ -18,20 +18,21 @@ uses
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
 
-  System.StartUpCopy,
-  FMX.Forms,
-  uFMXReport in 'uFMXReport.pas' {Form1},
+  Vcl.Forms,
+  uSimple in 'uSimple.pas' {Form2},
+  uAddServer in '..\common\uAddServer.pas' {AddServerDlg},
+  uSelectServer in '..\common\uSelectServer.pas' {SelectServerDlg},
   uPatcherChecker in '..\common\uPatcherChecker.pas';
-
-{Form1}
-
 
 {$R *.res}
 
 begin
   ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;
-  Application.CreateForm(TForm1, Form1);
+  Application.MainFormOnTaskbar := True;
+  Application.CreateForm(TForm2, Form2);
+  Application.CreateForm(TAddServerDlg, AddServerDlg);
+  Application.CreateForm(TSelectServerDlg, SelectServerDlg);
   Application.Run;
 end.
 
@@ -51,6 +52,5 @@ end.
 
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
-  uqBitObject in '..\..\API\uqBitObject.pas',
+  uqBitObject in '..\..\API\uqBitObject.pas',,
 *)
-
