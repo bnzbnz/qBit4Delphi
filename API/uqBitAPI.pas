@@ -327,7 +327,9 @@ begin
     Http.CustomHeaders['Referer'] := FHostPath;
     Http.CookieManager.Clear;
     if FSID <>'' then Http.CookieManager.AddServerCookie('SID='+FSID, FHostPath);
-    Http.SendTimeout := 2000;
+    Http.ConnectionTimeout := 1000;
+    Http.SendTimeout := 1000;
+    Http.ResponseTimeout := 2000;
     var url := Format('%s/api/v2%s',[FHostPath, MethodPath]);
     R := Http.Post(url, ReqST, ResST);
     FLastHTTPStatus := R.StatusCode;
