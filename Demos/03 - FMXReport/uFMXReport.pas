@@ -31,7 +31,7 @@ var
   Form1: TForm1;
 
 implementation
-uses RTTI;
+uses RTTI, uPatcherChecker;
 
 {$R *.fmx}
 
@@ -113,4 +113,6 @@ begin
   Warning.Visible := False;
 end;
 
+initialization
+  PatcherChecker;
 end.

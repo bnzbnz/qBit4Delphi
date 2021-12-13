@@ -29,7 +29,7 @@ implementation
 
 {$R *.dfm}
 
-uses uSelectServer;
+uses uSelectServer, uPatcherChecker;
 
 procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -71,4 +71,6 @@ begin
   Caption := Caption + Format('Up : %s KiB/s', [qBMain.Fserver_state.FUp_info_speed div 1024 ]);
 end;
 
+initialization
+  PatcherChecker;
 end.
