@@ -49,6 +49,9 @@ begin
 end.
 
 (*
+
+  ReportMemoryLeaksOnShutdown := True;
+
   {$IFDEF VER340}
     REST.Json.Types in 'JSON\Sydney.10.4.2\REST.Json.Types.pas',
     REST.JsonReflect in 'JSON\Sydney.10.4.2\REST.JsonReflect.pas',

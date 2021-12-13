@@ -37,6 +37,8 @@ begin
 end.
 
 (*
+
+  ReportMemoryLeaksOnShutdown := True;
   {$IFDEF VER340}
     REST.Json.Types in '..\..\JSON\21\REST.Json.Types.pas',
     REST.JsonReflect in '..\..\JSON\21\REST.JsonReflect.pas',
