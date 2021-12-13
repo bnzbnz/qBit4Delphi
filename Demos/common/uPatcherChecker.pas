@@ -5,7 +5,13 @@ interface
  procedure PatcherChecker;
 
 implementation
-uses REST.Json, Dialogs;
+uses REST.Json,
+{$IF DECLARED(FireMonkeyVersion)}
+  FMX.Dialogs;
+{$ELSE}
+  VCL.Dialogs;
+{$IFEND}
+
 
 type
   TPatcherCheckedType = class
@@ -26,4 +32,6 @@ begin
   Checker.Free;
 end;
 
+initialization
+  PatcherChecker;
 end.
