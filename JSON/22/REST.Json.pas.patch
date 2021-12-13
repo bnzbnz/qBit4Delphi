@@ -1,0 +1,17 @@
+--- REST.Json.pas	Tue Aug 31 06:58:22 2021
++++ REST.Json.pas	Fri Dec 03 17:13:40 2021
+@@ -239,6 +239,14 @@
+   LItem: TObject;
+   i: Integer;
+ begin
++  // LMR:
++  for i := AJsonObject.Count - 1 downto 0 do
++  begin
++    LPair := TJSONPair(AJsonObject.Pairs[i]);
++    if LPair.JsonValue is TJSONNull then
++       AJsonObject.RemovePair(LPair.JsonString.Value).DisposeOf
++  end;
++  //
+   if not Assigned(AJsonObject) or (AOptions * [joIgnoreEmptyStrings, joIgnoreEmptyArrays] = []) then
+     Exit;
+ 

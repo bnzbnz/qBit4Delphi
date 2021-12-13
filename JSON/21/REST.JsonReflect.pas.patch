@@ -1,0 +1,46 @@
+--- REST.JsonReflect.pas	Sat Feb 20 05:58:20 2021
++++ REST.JsonReflect.pas	Fri Dec 03 13:56:20 2021
+@@ -1200,8 +1200,9 @@
+   LFieldName := ConvertFieldNameToJson(Field);
+   if (Current is TJSONPair) and (TJSONPair(Current).JsonString.Value = LFieldName) then
+   begin
+-    if TJSONPair(Current).JsonValue = nil then
+-      raise EConversionError.Create(Format(SFieldValueMissing, [LFieldName]));
++	// LMR:
++    //if TJSONPair(Current).JsonValue = nil then
++    // raise EConversionError.Create(Format(SFieldValueMissing, [LFieldName]));
+     FStack.Pop;
+   end
+   else
+@@ -1801,7 +1802,9 @@
+       TTypeKind.tkMethod:
+         raise EConversionError.Create(Format(STypeNotSupported, ['tkMethod']));
+       TTypeKind.tkVariant:
+-        raise EConversionError.Create(Format(STypeNotSupported, ['tkVariant']));
++         // LMR:
++         FConverter.OnNull;
++         // raise EConversionError.Create(Format(STypeNotSupported, ['tkVariant']));
+       TTypeKind.tkInterface:
+         raise EConversionError.Create(Format(STypeNotSupported, ['tkInterface']));
+       TTypeKind.tkClassRef:
+@@ -3069,7 +3072,9 @@
+                 else if jsonFieldVal is TJSONNull then
+                   revAttr.ObjectsReverter(Data, LDlpFieldName, nil)
+                 else
+-                  raise EConversionError.Create(Format(SObjectExpectedForField, [FieldName, jsonFieldVal.ToString]));
++				  // LMR:
++                  revAttr.StringReverter(Data, LDlpFieldName, jsonFieldVal.ToString);
++                  //raise EConversionError.Create(Format(SObjectExpectedForField, [FieldName, jsonFieldVal.ToString]));
+               end
+           else
+             raise EConversionError.Create(Format(SNoConversionForType,
+@@ -3797,7 +3802,8 @@
+ begin
+   Assert(Data <> nil);
+   // Under ARC there is always a refCount field which we DO NOT WANT serialized
+-  if rttiField.Name = 'FRefCount' then
++  // LMR:
++  if (rttiField.Name = 'FRefCount') or (rttiField.Name.StartsWith('_'))  then
+   begin
+     Result := false;
+   end
