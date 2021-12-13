@@ -5,11 +5,12 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uqBitObject, uqBitAPI, uqBitAPITypes,
-  Vcl.ExtCtrls;
+  Vcl.ExtCtrls, Vcl.StdCtrls;
 
 type
   TForm2 = class(TForm)
     Timer1: TTimer;
+    Warning: TMemo;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Timer1Timer(Sender: TObject);
@@ -38,6 +39,7 @@ end;
 
 procedure TForm2.FormShow(Sender: TObject);
 begin
+  Warning.Visible := False;
  if SelectServerDlg.ShowModal = mrOk then
  begin
   var Server := SelectServerDlg.GetServer;

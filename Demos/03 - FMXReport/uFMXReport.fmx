@@ -9,6 +9,7 @@ object Form1: TForm1
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnShow = FormShow
   DesignerMasterStyle = 0
   object Edit1: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -24,13 +25,13 @@ object Form1: TForm1
     Position.X = 8.000000000000000000
     Position.Y = 8.000000000000000000
     Text = 'HostPah :'
-    TabOrder = 6
+    TabOrder = 7
   end
   object Label2: TLabel
     Position.X = 200.000000000000000000
     Position.Y = 8.000000000000000000
     Text = 'Username :'
-    TabOrder = 5
+    TabOrder = 6
   end
   object Edit2: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
@@ -45,11 +46,11 @@ object Form1: TForm1
     Position.X = 320.000000000000000000
     Position.Y = 8.000000000000000000
     Text = 'Password:'
-    TabOrder = 4
+    TabOrder = 5
   end
   object Edit3: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
-    TabOrder = 2
+    TabOrder = 3
     Position.X = 320.000000000000000000
     Position.Y = 24.000000000000000000
     Size.Width = 105.000000000000000000
@@ -62,7 +63,7 @@ object Form1: TForm1
     Size.Width = 417.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
+    TabOrder = 4
     Text = 'qBittorent/NOX Report'
     OnClick = Button1Click
   end
@@ -74,8 +75,40 @@ object Form1: TForm1
     Size.Width = 417.000000000000000000
     Size.Height = 433.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 7
+    TabOrder = 8
     Viewport.Width = 413.000000000000000000
     Viewport.Height = 429.000000000000000000
+  end
+  object Warning: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    Lines.Strings = (
+      
+        'WARNING... WARNING... WARNING... (this is said) : THIS A WORK IN' +
+        ' PROGRESS'
+      ''
+      
+        'In order to build and use qBit4Delphi some Embarcadero units nee' +
+        'd to be patched (Fixes and Enhancements)'
+      
+        'This version is tested and patched against Delphi 10.4.2 (Sydney' +
+        '/Community Edition) and Delphi 11 (Alexandria) :'
+      ''
+      'TO DO SO EXECUTE : Patcher.exe in the main directory'
+      'The patched units will be located in JSON/21 and/or JSON/22'
+      'Please add these units in you project.'
+      ''
+      'Any questions : qBit4Delphi@ea4d.com'
+      'Laurent Meyer.')
+    Position.X = 24.000000000000000000
+    Position.Y = 104.000000000000000000
+    Size.Width = 385.000000000000000000
+    Size.Height = 281.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Left = 102
+    Top = 170
+    Viewport.Width = 381.000000000000000000
+    Viewport.Height = 261.000000000000000000
   end
 end
