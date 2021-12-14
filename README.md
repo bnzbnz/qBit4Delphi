@@ -6,7 +6,7 @@ Officiel API Docmentation: https://github.com/qbittorrent/qBittorrent/wiki/WebUI
 It requires no DLL, nor third-party extension. This is pure Pascal VCL/FMX. BUT before you try to compile qBit4Delphi, some embarcadero JSON .pas units need to be patched (bugs / features). The procedure to do so is provided below. 
 This API is developed with Delphi Community Edition 10.4 but also tested with Sydney 10.4.2 and Alexandria 11.0 (JSON patches provided) 
 
-Alternatively, qNOXify is a thin client for qBittorent/NOX, it is a work in progress... so be gentle... Build as you wish, add features... contribute if you can... :)
+Alternatively, qNOXify is a thin client for qBittorent/NOX, it is a work in progress and has now its own repository : [qNOXify](https://github.com/bnzbnz/qNOXify)
 
 ## Installation in Delphi
 * Download qBit4Delphi. Click on the green "Code" button and then click on "Download ZIP".
