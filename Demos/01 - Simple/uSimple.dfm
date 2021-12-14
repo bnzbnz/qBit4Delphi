@@ -23,10 +23,6 @@ object Form2: TForm2
     Align = alClient
     ItemHeight = 13
     TabOrder = 1
-    ExplicitLeft = 248
-    ExplicitTop = 136
-    ExplicitWidth = 121
-    ExplicitHeight = 97
   end
   object Warning: TMemo
     Left = 8
