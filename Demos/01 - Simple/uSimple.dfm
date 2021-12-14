@@ -15,6 +15,19 @@ object Form2: TForm2
   OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
+  object LBTorrents: TListBox
+    Left = 0
+    Top = 0
+    Width = 635
+    Height = 299
+    Align = alClient
+    ItemHeight = 13
+    TabOrder = 1
+    ExplicitLeft = 248
+    ExplicitTop = 136
+    ExplicitWidth = 121
+    ExplicitHeight = 97
+  end
   object Warning: TMemo
     Left = 8
     Top = 8
