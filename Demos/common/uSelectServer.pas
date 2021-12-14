@@ -155,6 +155,7 @@ end;
 
 function TSelectServerDlg.GetMultiServers: TObjectList<TqBitServer>;
 begin
+  Result := Nil;
   if not Self.MultiSelect then Exit;
   Result := TObjectList<tqBitServer>.Create(False);
   for var i := 0 to LBSrv.Count-1 do
