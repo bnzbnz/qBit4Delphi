@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uqBitAPITypes, uqBitAPI, uqBitObject,
-  Vcl.ExtCtrls, Vcl.Grids, Vcl.ComCtrls;
+  Vcl.ExtCtrls, Vcl.Grids, Vcl.ComCtrls, System.Generics.Collections;
 
 type
   TqBitServer = class
@@ -45,8 +45,10 @@ type
     { Private declarations }
   public
     { Public declarations }
+    MultiSelect: Boolean;
     CfgFileName: string;
     function GetServer: TqBitServer;
+    function GetMultiServers: TObjectList<TqBitServer>;
   end;
 
 var
@@ -125,6 +127,7 @@ procedure TSelectServerDlg.FormShow(Sender: TObject);
 const
   NoSelection: TGridRect = (Left: 0; Top: -1; Right: 0; Bottom: -1);
 begin
+  Self.LBSrv.MultiSelect := MultiSelect;
   SGInfo.Selection:= NoSelection;
   SGInfo.Cells[0, 0] := 'Server Version :';
   SGInfo.Cells[0, 1] := 'API Version :';
@@ -148,6 +151,14 @@ begin
      var Srv := TqBitServer.Create('http://127.0.0.1:8080', '', '');
      LBSrv.Items.AddObject(Srv.FUN + '@' + Srv.FHP, Srv);
   end;
+end;
+
+function TSelectServerDlg.GetMultiServers: TObjectList<TqBitServer>;
+begin
+  if not Self.MultiSelect then Exit;
+  Result := TObjectList<tqBitServer>.Create(False);
+  for var i := 0 to LBSrv.Count-1 do
+    if LBSrv.Selected[i] then Result.Add(TqBitServer(LBSrv.Items.Objects[i]));
 end;
 
 function TSelectServerDlg.GetServer: TqBitServer;
