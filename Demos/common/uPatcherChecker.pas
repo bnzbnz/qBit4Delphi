@@ -5,6 +5,7 @@ interface
  procedure PatcherChecker;
 
 implementation
+
 uses REST.Json,
 {$IF DECLARED(FireMonkeyVersion)}
   FMX.Dialogs;
@@ -15,7 +16,7 @@ uses REST.Json,
 
 type
   TPatcherCheckedType = class
-    _DummyVariant: string;
+    _DummyInteger: string;
   end;
 
 procedure PatcherChecker;
@@ -24,9 +25,10 @@ var
 begin
   Checker := TPatcherCheckedType.Create;
   var s := TJson.ObjectToJsonString(Checker);
-  if pos('_DummyVariant', s)>0  then  // Properties starting by '_' shouldn't be serialized...
+  if pos('_DummyInteger', s)>0  then  // Properties starting by '_' shouldn't be serialized...
   begin
-    ShowMessage('JSON/REST Files are not patched !! Please use Patcher.exe or include the patched files (see Demo''s source project file)');
+    ShowMessage('JSON/REST Files are not patched  or Delphi may have messsed up your project source file !!');
+    ShowMessage('Please use Patcher.exe or include/check the patched files (see Demo''s source project file)');
     Halt;
   end;
   Checker.Free;

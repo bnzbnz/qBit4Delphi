@@ -40,7 +40,7 @@ function VarFormatBKM(v: variant; Obj: TqBitTorrentBaseType): string;
 var
   x: Double;
 begin
-    x := v;
+    x := Abs(v);
     Result := '0 B';
     if (x / 1099511627776 >= 1) then
     begin
@@ -75,7 +75,7 @@ function VarFormatPercent(v: variant; Obj: TqBitTorrentBaseType): string;
 var
   x: double;
 begin
-    Result := '';
+    Result := '0 %';
     if v < 0 then Exit;
     x := v;
     Result := Format('%.2f', [x * 100] )+ ' %';

@@ -128,6 +128,7 @@ const
   NoSelection: TGridRect = (Left: 0; Top: -1; Right: 0; Bottom: -1);
 begin
   Self.LBSrv.MultiSelect := MultiSelect;
+  if MultiSelect then Caption :='Select multiple servers (Shift/Ctrl+Click) :';
   SGInfo.Selection:= NoSelection;
   SGInfo.Cells[0, 0] := 'Server Version :';
   SGInfo.Cells[0, 1] := 'API Version :';
