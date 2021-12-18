@@ -1556,7 +1556,7 @@ begin
   FreeAndNil(Self.Fcategories_modified);
   if M.Fcategories <> nil then
   begin
-    if Self.Fcategories = nil then Self.Fcategories := TqBitObjectDictionary<variant, TqBitCategoryType>.Create;
+    if Self.Fcategories = nil then Self.Fcategories := TqBitObjectDictionary<variant, TqBitCategoryType>.Create([doOwnsValues]);
     Self.Fcategories.Merge(M.Fcategories, Self.Fcategories_added, Self.Fcategories_modified);
   end;
   FreeAndNil(Self.Fcategories_removed);
@@ -1596,7 +1596,7 @@ begin
   FreeAndNil(Self.Ftorrents_modified);
   if M.Ftorrents <> nil then
   begin
-    if Self.Ftorrents = nil then Self.Ftorrents := TqBitObjectDictionary<variant, TqBittorrentType>.Create;
+    if Self.Ftorrents = nil then Self.Ftorrents := TqBitObjectDictionary<variant, TqBittorrentType>.Create([doOwnsValues]);
     Self.Ftorrents.Merge(M.Ftorrents, Self.Ftorrents_added, Self.Ftorrents_modified);
   end;
   FreeAndNil(Self.Ftorrents_removed);
