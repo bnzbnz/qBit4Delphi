@@ -132,7 +132,7 @@ begin
   while not Terminated do
   begin
     var tme := GetTickCount;
-    var U := qB.GetMainData(qBMainTh.Frid); // get differebtial data from last call
+    var U := qB.GetMainData(qBMainTh.Frid); // get differential data from last call
     qBMainTh.Merge(U); // Merge to qBMain to be uodated to date
     U.Free;
     Synchronize(
@@ -145,7 +145,7 @@ begin
       (GetTickCount - Tme < qBMainTh.Fserver_state.Frefresh_interval)
       and (not Terminated)
     do
-      Sleep(100);
+      Sleep(250);
   end;
   qBMainTh.Free;
   qB.Free;

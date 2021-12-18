@@ -25,7 +25,5 @@ object NOXMonDlg: TNOXMonDlg
     RowCount = 10
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goColSizing, goColMoving, goFixedRowDefAlign]
     TabOrder = 0
-    ExplicitWidth = 635
-    ExplicitHeight = 299
   end
 end
