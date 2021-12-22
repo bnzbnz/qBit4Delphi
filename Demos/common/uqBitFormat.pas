@@ -17,6 +17,9 @@ function VarFormatLimit(v: variant): string;
 function VarFormatDeltaSec(v: variant): string;
 function VarFormatDuration(v: variant): string;
 
+// Specific
+function VarFormatTrackerStatus(v: variant): string;
+
  // Other
 function TitleCase(const S: string): string;
 
@@ -147,6 +150,17 @@ begin
   end;
 end;
 
-
+function VarFormatTrackerStatus(v: variant): string;
+begin
+  case v of
+    0: Result := 'Disabled';
+    1: Result := 'Not Contacted';
+    2: Result := 'Working';
+    3: Result := 'Updating';
+    4: Result := 'Error';
+  else
+    Result := 'Unknown';
+  end;
+end;
 
 end.
