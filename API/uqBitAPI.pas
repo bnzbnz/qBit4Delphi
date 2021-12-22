@@ -293,7 +293,7 @@ type
 implementation
 
 uses REST.Json, NetEncoding, SysUtils, wininet, zLib, System.Net.URLClient,
-     System.Net.HttpClient, System.Net.HttpClientComponent;
+     System.Net.HttpClient, System.Net.HttpClientComponent, System.Hash;
 
 const
   bstr: array[boolean] of string = ('false','true');
@@ -319,19 +319,27 @@ begin
   Http := nil;
   try
   try
-    ReqST.Position := 0;
-    ResST.Position := 0;
     Http := THTTPClient.Create;
-    Http.UserAgent := 'qBittorrent WebAPI for Delphi (qBit4Delphi) - Laurent Meyer - qBit4Delphi@ea4d.com';
+    Http.UserAgent :=
+      Format(
+        'qBittorrent WebAPI for Delphi (qBit4Delphi) %s - Laurent Meyer - qBit4Delphi@ea4d.com',
+        [Const_qBitAPI_Implemented_Version]
+      );
     Http.CustomHeaders['Content-type'] := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
     Http.CookieManager.Clear;
     if FSID <>'' then Http.CookieManager.AddServerCookie('SID='+FSID, FHostPath);
     Http.ConnectionTimeout := 1000;
-    Http.SendTimeout := 1000;
-    Http.ResponseTimeout := 2000;
-    var url := Format('%s/api/v2%s',[FHostPath, MethodPath]);
-    R := Http.Post(url, ReqST, ResST);
+    Http.SendTimeout := 2000;
+    Http.ResponseTimeout := 5000;
+    var Retries := 3;
+    repeat
+      Dec(Retries);
+      var url := Format('%s/api/v2%s?%s',[FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
+      ReqST.Position := 0;
+      ResST.Position := 0;
+      R := Http.Post(url, ReqST, ResST);
+    until ( R.StatusCode <> 502) or (Retries = 0); // Server did not respond...
     FLastHTTPStatus := R.StatusCode;
     if R.StatusCode <> 200 then Exit;
     for var Cookie in  Http.CookieManager.Cookies do
