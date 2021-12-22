@@ -13,7 +13,7 @@ uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types
      System.Generics.Defaults, Classes;
 
 const
-  Const_qBitAPI_Implemented_Version = 'v2.8.3';
+  Const_qBitAPI_Implemented_Version = 'v2.8.3.dev.001';
   Const_qBitAPI_Developer = 'Laurent Meyer, qBit4Delphi@ea4d.com';
 
 type
@@ -25,6 +25,8 @@ type
     function RawJsonEncode(Header, Value, Footer: string): string;
     function RawJsonDecode(RawJson: string): string;
   public
+    [JsonMarshalled(false)]
+    _FKey: variant;
     procedure Merge(From: TqBitTorrentBaseType); virtual;
     function Clone: TqBitTorrentBaseType; virtual;
     function ToJSON: string; virtual;
@@ -309,7 +311,6 @@ type
     Feta: variant;
     Ff_l_piece_prio: variant;
     Fforce_start: variant;
-    Fhash: variant; // Internal Custom
     Flast_activity: variant;
     Fmagnet_uri: variant;
     Fmax_ratio: variant;
@@ -403,19 +404,27 @@ type
     Ftorrents: TqBitObjectDictionary<variant, TqBitTorrentType>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
     Ftorrents_removed: TqBitList<variant>;
-    Ftorrents_added: TqBitList<variant>;  // Custom Internal
-    Ftorrents_modified: TqBitList<variant>;  // Custom Internal
-    Ftorrents_changed: boolean; // Custom Internal
-    Ftorrents_count_changed: boolean; // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftorrents_added: TqBitList<variant>;  // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftorrents_modified: TqBitList<variant>;  // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftorrents_changed: boolean; // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftorrents_count_changed: boolean; // Custom Internal
 
     [JsonReflect(ctString, rtString, TqBitObjectDictionaryInterceptor)]
     Ftrackers: TqBitStringListDictionary<variant, TStringList>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
     Ftrackers_removed: TqBitList<variant>;
-    Ftrackers_added: TqBitList<variant>;  // Custom Internal
-    Ftrackers_modified: TqBitList<variant>;  // Custom Internal
-    Ftrackers_changed: boolean; // Custom Internal
-    Ftrackers_count_changed: boolean; // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftrackers_added: TqBitList<variant>;  // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftrackers_modified: TqBitList<variant>;  // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftrackers_changed: boolean; // Custom Internal
+    [JsonMarshalled(false)]
+    _Ftrackers_count_changed: boolean; // Custom Internal
 
     destructor Destroy; override;
     procedure Merge(From: TqBitTorrentBaseType); override;
@@ -438,6 +447,7 @@ type
     Frelevance: variant;
     Fup_speed: variant;
     Fuploaded: variant;
+    function Clone: TqBitTorrentBaseType; override;
   end;
 
   TqBitTorrentPeersDataType = class(TqBitTorrentBaseType)
@@ -525,6 +535,7 @@ type
     Ftotal_size: variant;
     Fup_speed_avg: variant;
     Fup_speed: variant;
+    function Clone: TqBitTorrentBaseType;
   end;
 
   TqBitTrackerType  = class(TqBitTorrentBaseType)
@@ -536,11 +547,14 @@ type
     Fnum_leeches: variant;
     Fnum_downloaded: variant;
     Fmsg: variant;
+    function Clone: TqBitTorrentBaseType; override;
   end;
 
   TqBitTrackersType  = class(TqBitTorrentBaseType)
     [JsonReflect(ctstring, rtString, TqBitObjectListInterceptor)]
     Ftrackers: TqBitObjectList<TqBitTrackerType>;
+    procedure Merge(From: TqBitTorrentBaseType); override;
+    function Clone: TqBitTorrentBaseType; override;
     destructor Destroy; override;
   end;
 
@@ -1224,11 +1238,9 @@ end;
 
 function TqBitList<A>.Merge(From: TqBitList<A>): variant;
 begin
-  var dum1 :=  TqBitList<Variant>.Create;
-  var dum2 :=  TqBitList<Variant>.Create;
-  Result := Merge(From, dum1);
-  dum2.Free;
-  dum1.Free;
+  var dum :=  TqBitList<Variant>.Create;
+  Result := Merge(From, dum);
+  dum.Free;
 end;
 
 { TqBitObjectDictionary }
@@ -1338,13 +1350,13 @@ end;
 
 destructor TqBitMainDataType.Destroy;
 begin
-  Self.Ftrackers_added.Free;
-  Self.Ftrackers_modified.Free;
+  Self._Ftrackers_added.Free;
+  Self._Ftrackers_modified.Free;
   Self.Ftrackers_Removed.Free;
   Self.Ftrackers.Free;
 
-  Self.Ftorrents_added.Free;
-  Self.Ftorrents_modified.Free;
+  Self._Ftorrents_added.Free;
+  Self._Ftorrents_modified.Free;
   Self.Ftorrents_removed.Free;
   Self.Ftorrents.Free;
 
@@ -1406,8 +1418,6 @@ begin
   Self.Ftorrents.Free;
   inherited Destroy;
 end;
-
-{ TqBitTorrentTrackersType }
 
 destructor TqBitTrackersType.Destroy;
 begin
@@ -1519,7 +1529,7 @@ begin
   FreeAndNil(Self.Fpeers_modified);
   if P.Fpeers <> nil then
   begin
-    if Self.Fpeers = nil then Self.Fpeers := TqBitObjectDictionary<variant, TqBitTorrentPeerDataType>.Create;
+    if Self.Fpeers = nil then Self.Fpeers := TqBitObjectDictionary<variant, TqBitTorrentPeerDataType>.Create([doOwnsValues]);
     Self.Fpeers.Merge(P.Fpeers, Self.Fpeers_added, Self.Fpeers_modified);
   end;
   FreeAndNil(Self.Fpeers_removed);
@@ -1538,6 +1548,7 @@ procedure TqBitMainDataType.Merge(From: TqBitTorrentBaseType);
 var
   M: TqBitMainDataType;
 begin
+
   if From = Nil then Exit;
   inherited Merge(From);
   M := TqBitMainDataType(From);
@@ -1592,12 +1603,12 @@ begin
 
    //// Ftorrents
   ///
-  FreeAndNil(Self.Ftorrents_added);
-  FreeAndNil(Self.Ftorrents_modified);
+  FreeAndNil(Self._Ftorrents_added);
+  FreeAndNil(Self._Ftorrents_modified);
   if M.Ftorrents <> nil then
   begin
     if Self.Ftorrents = nil then Self.Ftorrents := TqBitObjectDictionary<variant, TqBittorrentType>.Create([doOwnsValues]);
-    Self.Ftorrents.Merge(M.Ftorrents, Self.Ftorrents_added, Self.Ftorrents_modified);
+    Self.Ftorrents.Merge(M.Ftorrents, Self._Ftorrents_added, Self._Ftorrents_modified);
   end;
   FreeAndNil(Self.Ftorrents_removed);
   if M.Ftorrents_removed <> Nil then
@@ -1607,8 +1618,28 @@ begin
     for var v in M.Ftorrents_removed do
       Self.Ftorrents.Remove(v);
   end;
-  Ftorrents_count_changed := assigned(Self.Ftorrents_added) or assigned(Self.Ftorrents_removed);
-  Ftorrents_changed :=  Ftorrents_count_changed or assigned(Self.Ftorrents_modified);
+  _Ftorrents_count_changed := assigned(Self._Ftorrents_added) or assigned(Self.Ftorrents_removed);
+  _Ftorrents_changed :=  _Ftorrents_count_changed or assigned(Self._Ftorrents_modified);
+
+  //// Ftrackers
+  ///
+  FreeAndNil(Self._Ftrackers_added);
+  FreeAndNil(Self._Ftrackers_modified);
+  if M.FTrackers <> nil then
+  begin
+    if Self.FTrackers = nil then Self.Ftrackers := TqBitStringListDictionary<variant, TStringList>.Create([doOwnsValues]);
+    Self.FTrackers.Merge(M.FTrackers, Self._FTrackers_added, Self._FTrackers_modified);
+  end;
+  if M.Ftrackers_removed <> Nil then
+  begin
+    if Self.Ftrackers_removed = nil then Self.Ftrackers_removed := TqBitList<variant>.Create;
+    Self.Ftrackers_removed.Merge(M.Ftorrents_removed);
+    for var v in M.Ftorrents_removed do
+      Self.Ftorrents.Remove(v);
+  end;
+   _Ftrackers_count_changed := assigned(Self._Ftrackers_added) or assigned(Self.Ftrackers_removed);
+  _Ftorrents_changed :=  _Ftrackers_count_changed or assigned(Self._Ftrackers_modified);
+
 end;
 
 { TqBitserver_stateType }
@@ -1682,6 +1713,49 @@ end;
 function TqBitLogType.Clone: TqBitTorrentBaseType;
 begin
   Result := TqBitLogType.Create;
+  Result.Merge(Self);
+end;
+
+{ TqBitTorrentInfoType }
+
+function TqBitTorrentInfoType.Clone: TqBitTorrentBaseType;
+begin
+  Result := TqBitTorrentInfoType.Create;
+  Result.Merge(Self);
+end;
+
+{ TqBitTorrentPeerDataType }
+
+function TqBitTorrentPeerDataType.Clone: TqBitTorrentBaseType;
+begin
+  Result := TqBitTorrentPeerDataType.Create;
+  Result.Merge(Self);
+end;
+
+{ TqBitTorrentTrackersType }
+
+procedure TqBitTrackersType.Merge(From: TqBitTorrentBaseType);
+begin
+  if From = nil then Exit;
+  var T := TqBitTrackersType(From);
+  if T.FTrackers <> nil then
+  begin
+    if Self.FTrackers = nil then Self.Ftrackers := TqBitObjectList<TqBitTrackerType>.Create(True);
+    Self.FTrackers.Merge(T.FTrackers);
+  end;
+end;
+
+function TqBitTrackersType.Clone: TqBitTorrentBaseType;
+begin
+  Result := TqBitTrackersType.Create;
+  Result.Merge(Self);
+end;
+
+{ TqBitTrackerType }
+
+function TqBitTrackerType.Clone: TqBitTorrentBaseType;
+begin
+  Result := TqBitTrackerType.Create;
   Result.Merge(Self);
 end;
 
