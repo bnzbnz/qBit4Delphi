@@ -1633,12 +1633,12 @@ begin
   if M.Ftrackers_removed <> Nil then
   begin
     if Self.Ftrackers_removed = nil then Self.Ftrackers_removed := TqBitList<variant>.Create;
-    Self.Ftrackers_removed.Merge(M.Ftorrents_removed);
-    for var v in M.Ftorrents_removed do
-      Self.Ftorrents.Remove(v);
+    Self.Ftrackers_removed.Merge(M.Ftrackers_removed);
+    for var v in M.Ftrackers_removed do
+      Self.Ftrackers.Remove(v)
   end;
    _Ftrackers_count_changed := assigned(Self._Ftrackers_added) or assigned(Self.Ftrackers_removed);
-  _Ftorrents_changed :=  _Ftrackers_count_changed or assigned(Self._Ftrackers_modified);
+  _Ftrackers_changed :=  _Ftrackers_count_changed or assigned(Self._Ftrackers_modified);
 
 end;
 
