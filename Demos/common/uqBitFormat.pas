@@ -29,7 +29,6 @@ uses variants, SysUtils, DateUtils;
 function VarFormatString(v: variant): string;
 begin
   Result := VarToStr(v);
-
 end;
 
 function VarFormatDate(v: variant): string;
@@ -43,8 +42,14 @@ function VarFormatBKM(v: variant): string;
 var
   x: Double;
 begin
-    x := Abs(v);
+    //x := Abs(v);
     Result := '0 B';
+    x := v;
+    if x < 0 then
+    begin
+      Result := 'N/A';
+      Exit;
+    end else
     if (x / 1099511627776 >= 1) then
     begin
       Result := Format('%.2f', [x / 1099511627776 ])+ ' TiB';
