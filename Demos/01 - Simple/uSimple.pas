@@ -51,7 +51,8 @@ begin
   UpdateUI;
   Timer1.Interval := qBMain.Fserver_state.Frefresh_interval; // The update interval is defined by the server
   Timer1.Enabled := True;
- end;
+ end else
+  close;
 end;
 
 procedure TForm2.UpdateUI;

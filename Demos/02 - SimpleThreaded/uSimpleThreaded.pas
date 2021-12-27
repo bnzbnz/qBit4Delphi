@@ -82,11 +82,13 @@ begin
     qB := TqBitObject.Connect( Server.FHP, Server.FUN, Server.FPW);
     Th := TqBitThread.Create;
     Th.qB := qB.Clone; // We clone qB for the Thread, in this demo this is not necessary
-  end;
+  end else
+    Close;
 end;
 
 procedure TSimpleThreadedDlg.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  if not Assigned(qB) then Exit;
   Th.Terminate;
   Th.WaitFor;
   Th.Free;

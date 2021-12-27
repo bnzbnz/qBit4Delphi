@@ -59,11 +59,13 @@ begin
       Th.Resume;
     end;
     Srvs.Free;
-  end;
+  end else
+    Close;
 end;
 
 procedure TNOXMonDlg.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
+  if not Assigned(ThList) then Exit;
   for var Th in ThList do
   begin
     TH.Terminate;
