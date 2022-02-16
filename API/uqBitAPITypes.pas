@@ -1146,7 +1146,7 @@ begin
       for var v in TqBitPreferencesType(Data).Fscan_dirs do
       begin
         SetLength(Arr, Length(Arr) + 1);
-        var p := TJSONPair.Create(v.Key, v.Value);
+        var p := TJSONPair.Create(v.Key, String(v.Value));
         Arr[ Length(Arr) - 1 ] := p.ToString;
         p.Free;
       end;
