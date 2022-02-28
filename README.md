@@ -12,7 +12,7 @@ Alternatively, qNOXify is a thin client for qBittorent/NOX, it is a work in prog
 * Download qBit4Delphi. Click on the green "Code" button and then click on "Download ZIP".
 * Decompress the ZIP package in your projects directory.
 * Execute : Patcher.exe in the main directory
-* The patched units will be located in JSON/21 and/or JSON/22. Please add these units to you project.
+* The patched units will be located in JSON/21 and/or JSON/22. Please add these units to your project.
 * If you need help, open a ticket or contact me at : qBit4Delphi@ea4d.com
 
 ## Support
