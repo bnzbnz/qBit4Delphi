@@ -3,7 +3,7 @@ unit uqBitObject;
 interface
 
 ///  Author: Laurent Meyer
-///  Contact: qBitVCL@ea4d.com
+///  Contact: qBit4Delphi@ea4d.com
 ///  API v2.8.3 + Hidden/Missing Fields
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
@@ -20,8 +20,8 @@ type
      // Helpers
     function Clone: TqBitObject;
     function qBitAPIVersion: string;
-    class function TStoDT(Timestamp: int64): TDatetime;
-    class function TSmsToDT(Timestamp: int64): TDatetime;
+    class function UTimestampToDateTime(Timestamp: int64): TDatetime;
+    class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
     class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
 
     // API Helpers
@@ -66,7 +66,11 @@ type
     property Username: string read FUsername;
     property Password: string read FPassword;
     property Duration: cardinal read FDuration;
-    property LastHTTPStatus: integer read FLastHTTPStatus;
+    property HTTPStatus: integer read FHTTPStatus;
+    property HTTPConnectionTimeout: integer read FHTTPConnectionTimeout;
+    property HTTPSendTimeout: integer read FHTTPSendTimeout;
+    property HTTPResponseTimeout: integer read FHTTPResponseTimeout;
+    property HTTPRetries: integer read FHTTPRetries;
   end;
 
 implementation
@@ -88,19 +92,19 @@ begin
   Result.FPassword := FPassword;
 end;
 
-class function TqBitObject.TSmsToDT(Timestamp: int64): TDatetime;
+class function TqBitObject.UTimestampMsToDateTime(Timestamp: int64): TDatetime;
 begin
   result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp div 1000));
 end;
 
-class function TqBitObject.TStoDT(Timestamp: int64): TDatetime;
+class function TqBitObject.UTimestampToDateTime(Timestamp: int64): TDatetime;
 begin
   result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp));
 end;
 
 class procedure TqBitObject.TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
 begin
-  var Dte := TStoDT(Timestamp);
+  var Dte := UTimestampToDateTime(Timestamp);
   var diff := SecondsBetween(Now, Dte);
   days := diff div SecsPerDay;
   diff := diff mod SecsPerDay;

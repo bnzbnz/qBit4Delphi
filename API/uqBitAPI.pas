@@ -1,7 +1,7 @@
 unit uqBitAPI;
 
 ///  Author: Laurent Meyer
-///  Contact: qBitVCL@ea4d.com
+///  Contact: qBit4Delphi@ea4d.com
 ///  API v2.8.3 + Hidden/Missing Fields
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
@@ -21,10 +21,12 @@ type
     FUsername: string;
     FPassword: string;
     FDuration: cardinal;
-    FLastHTTPStatus: integer;
-
+    FHTTPStatus: integer;
+    FHTTPConnectionTimeout: integer;
+    FHTTPSendTimeout: integer;
+    FHTTPResponseTimeout: integer;
+    FHTTPRetries: integer;
   public
-
     constructor Create(HostPath: string); overload;
     function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
     function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
@@ -283,7 +285,7 @@ type
     function RSSGetAllAutoDownloadingRules: TqBitAutoDownloadingRulesType;
 
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-articles-matching-a-rule
-    function RSSGetMathingArticles(RuleName: string): TqBitRSSArticles;
+    function RSSGetMatchingArticles(RuleName: string): TqBitRSSArticles;
 
   // Search :
   // Will be implemented later
@@ -308,11 +310,15 @@ begin
   inherited Create;
   FSID := '';
   FHostPath := HostPath;
+  FHTTPConnectionTimeout := 1000;
+  FHTTPSendTimeout := 2000;
+  FHTTPResponseTimeout := 4000;
+  FHTTPRetries := 3;
 end;
 
 function TqBitAPI.qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer;
 var
-  R: IHTTPResponse;
+  Res: IHTTPResponse;
   Http: THTTPClient;
 begin
   Result := -1;
@@ -329,22 +335,22 @@ begin
     Http.CustomHeaders['Referer'] := FHostPath;
     Http.CookieManager.Clear;
     if FSID <>'' then Http.CookieManager.AddServerCookie('SID='+FSID, FHostPath);
-    Http.ConnectionTimeout := 1000;
-    Http.SendTimeout := 2000;
-    Http.ResponseTimeout := 5000;
-    var Retries := 3;
+    Http.ConnectionTimeout := FHTTPConnectionTimeout;
+    Http.SendTimeout := FHTTPSendTimeout;
+    Http.ResponseTimeout := FHTTPResponseTimeout;
+    var Retries := FHTTPRetries;
     repeat
       Dec(Retries);
       var url := Format('%s/api/v2%s?%s',[FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
       ReqST.Position := 0;
       ResST.Position := 0;
-      R := Http.Post(url, ReqST, ResST);
-    until ( R.StatusCode <> 502) or (Retries = 0); // Server did not respond...
-    FLastHTTPStatus := R.StatusCode;
-    if R.StatusCode <> 200 then Exit;
+      Res := Http.Post(url, ReqST, ResST);
+    until (Res.StatusCode <> 502) or (Retries = 0); // Server did not respond...
+    FHTTPStatus := Res.StatusCode;
+    if Res.StatusCode <> 200 then Exit;
     for var Cookie in  Http.CookieManager.Cookies do
       if Cookie.Name = 'SID' then FSID := Cookie.Value;
-    Result := FLastHTTPStatus;
+    Result := FHTTPStatus;
   except
     Result := -1;
   end;
@@ -1303,7 +1309,7 @@ begin
   FDuration := GetTickcount - FDuration;
 end;
 
-function TqBitAPI.RSSGetMathingArticles(RuleName: string): TqBitRSSArticles;
+function TqBitAPI.RSSGetMatchingArticles(RuleName: string): TqBitRSSArticles;
 begin
   FDuration := GetTickCount;
   Result := nil;

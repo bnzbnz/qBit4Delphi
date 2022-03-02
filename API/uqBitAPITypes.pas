@@ -1,7 +1,7 @@
 ﻿unit uqBitAPITypes;
 
 ///  Author: Laurent Meyer
-///  Contact: qBitVCL@ea4d.com
+///  Contact: qBit4Delphi@ea4d.com
 ///  API v2.8.3 + Hidden/Missing Fields
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
@@ -13,7 +13,7 @@ uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types
      System.Generics.Defaults, Classes;
 
 const
-  Const_qBitAPI_Implemented_Version = 'v2.8.3.dev.023';
+  Const_qBitAPI_Implemented_Version = 'v2.8.3.dev.024';
   Const_qBitAPI_Developer = 'Laurent Meyer, qBit4Delphi@ea4d.com';
 
 type
@@ -118,6 +118,7 @@ type
     function Merge(From: TqBitList<A>): variant; overload;
     function Merge(From: TqBitList<A>; var  Added: TqBitList<variant>): variant; overload;
   end;
+
 
   TqBitObjectDictionary<A, B>= class(TObjectDictionary<variant, TqBitTorrentBaseType>)
     function Clone: TqBitObjectDictionary<A, B>;
@@ -1146,7 +1147,7 @@ begin
       for var v in TqBitPreferencesType(Data).Fscan_dirs do
       begin
         SetLength(Arr, Length(Arr) + 1);
-        var p := TJSONPair.Create(v.Key, String(v.Value));
+        var p := TJSONPair.Create(v.Key, string(v.Value));
         Arr[ Length(Arr) - 1 ] := p.ToString;
         p.Free;
       end;
