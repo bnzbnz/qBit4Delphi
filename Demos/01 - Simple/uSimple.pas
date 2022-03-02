@@ -42,7 +42,7 @@ end;
 procedure TForm2.FormShow(Sender: TObject);
 begin
  Warning.Visible := False;
- ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know whar to do...');
+ ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know what to do...');
  if SelectServerDlg.ShowModal = mrOk then
  begin
   var Server := SelectServerDlg.GetServer;
