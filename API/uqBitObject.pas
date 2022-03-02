@@ -77,6 +77,7 @@ implementation
 uses SysUtils, DateUtils;
 
 { TqBitObject }
+
 class function TqBitObject.Connect(HostPath, Username, Password : string): TqBitObject;
 begin
   Result := TqBitObject.Create(HostPath);
@@ -88,6 +89,9 @@ function TqBitObject.Clone: TqBitObject;
 begin
   Result := TqBitObject.Create(FHostPath);
   Result.FSID := FSID;
+  Result.FHTTPConnectionTimeout := FHTTPConnectionTimeout;
+  Result.FHTTPSendTimeout := FHTTPSendTimeout;
+  Result.FHTTPResponseTimeout := FHTTPResponseTimeout;
   Result.FUsername := FUsername;
   Result.FPassword := FPassword;
 end;

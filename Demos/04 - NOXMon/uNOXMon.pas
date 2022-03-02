@@ -59,13 +59,11 @@ begin
       Th.Resume;
     end;
     Srvs.Free;
-  end else
-    Close;
+  end;
 end;
 
 procedure TNOXMonDlg.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  if not Assigned(ThList) then Exit;
   for var Th in ThList do
   begin
     TH.Terminate;
@@ -105,7 +103,7 @@ begin
 
   var Traffic := M.Fserver_state.Fdl_info_data + M.Fserver_state.Fup_info_data;
   var Delta := Abs( M.Fserver_state.Fup_info_data - M.Fserver_state.Fdl_info_data);
-  var Efficiency := Delta / Traffic; ;
+  var Efficiency := 0; if Traffic >0 then Efficiency := Delta / Traffic;
 
   var C := -1;
   Inc(C); SG.Cells[C, Thread.RowIndex] := Q.HostPath;
@@ -134,7 +132,7 @@ begin
   while not Terminated do
   begin
     var tme := GetTickCount;
-    var U := qB.GetMainData(qBMainTh.Frid); // get differential data from last call
+    var U := qB.GetMainData(qBMainTh.Frid); // get differebtial data from last call
     qBMainTh.Merge(U); // Merge to qBMain to be uodated to date
     U.Free;
     Synchronize(
@@ -147,7 +145,7 @@ begin
       (GetTickCount - Tme < qBMainTh.Fserver_state.Frefresh_interval)
       and (not Terminated)
     do
-      Sleep(250);
+      Sleep(100);
   end;
   qBMainTh.Free;
   qB.Free;

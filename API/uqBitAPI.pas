@@ -345,7 +345,7 @@ begin
       ReqST.Position := 0;
       ResST.Position := 0;
       Res := Http.Post(url, ReqST, ResST);
-    until (Res.StatusCode <> 502) or (Retries = 0); // Server did not respond...
+    until (Res.StatusCode <> 502) or (Retries <= 0); // Server did not respond...
     FHTTPStatus := Res.StatusCode;
     if Res.StatusCode <> 200 then Exit;
     for var Cookie in  Http.CookieManager.Cookies do
