@@ -64,12 +64,13 @@ end;
 
 procedure TNOXMonDlg.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  for var Th in ThList do
-  begin
-    TH.Terminate;
-    Th.WaitFor;
-    Th.Free;
-  end;
+  if ThList <> nil then
+    for var Th in ThList do
+    begin
+      TH.Terminate;
+      Th.WaitFor;
+      Th.Free;
+    end;
   ThList.Free;
 end;
 
