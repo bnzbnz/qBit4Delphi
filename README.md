@@ -1,5 +1,5 @@
 # qBit4Delphi
-qBit4Delphi is an open-source project created by Laurent Meyer to embed qBittorent WEBui API in applications developed with [Delphi VCL/FMX](https://www.embarcadero.com/products/delphi/starter).
+qBit4Delphi is an open-source project created by Laurent Meyer to embed qBittorent WEBui API in applications developed with [Delphi VCL/FMX](https://www.embarcadero.com/products/delphi/starter). Contains also TTorrentReader, a torrent file parser (UTF8 BEncode, V1 & V2 compatible).
 
 Official API Documentation: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 
