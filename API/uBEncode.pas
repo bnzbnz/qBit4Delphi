@@ -97,7 +97,6 @@ constructor TBEncoded.Create(Stream: TStream);
         if Length(Buffer) > 8 then
           raise Exception.Create('');
         SetLength(Result, StrToInt(String(Buffer)));
-
         if Length(Result)>0 then
           if Stream.Read(Result[1], Length(Result)) <> Length(Result) then
             raise Exception.Create('');
@@ -224,24 +223,24 @@ begin
           Output.Append('e');
         end;
       befList:
-      begin
-        Output.Append('l');
-        for var i := 0 to ListData.Count - 1 do
-          Encode(TBEncoded(ListData[i].Data), Output);
-        Output.Append('e');
-      end;
-      befDictionary:
-      begin
-        Output.Append( 'd');
-        for var i := 0 to ListData.Count - 1 do
         begin
-          Output.Append(Length(ListData[i].Header));
-          Output.Append(':');
-          Output.Append(ListData[i].Header);
-          Encode(TBEncoded(ListData[i].Data), Output);
+          Output.Append('l');
+          for var i := 0 to ListData.Count - 1 do
+            Encode(TBEncoded(ListData[i].Data), Output);
+          Output.Append('e');
         end;
-        Output.Append( 'e');
-      end;
+      befDictionary:
+        begin
+          Output.Append( 'd');
+          for var i := 0 to ListData.Count - 1 do
+          begin
+            Output.Append(Length(ListData[i].Header));
+            Output.Append(':');
+            Output.Append(ListData[i].Header);
+            Encode(TBEncoded(ListData[i].Data), Output);
+          end;
+          Output.Append( 'e');
+        end;
     end;
   end;
 end;
