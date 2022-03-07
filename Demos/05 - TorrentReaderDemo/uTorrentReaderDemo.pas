@@ -5,8 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uTorrentReader,
-
-  uBEncode, DateUtils, System.Gnerics.Collections, System.Generics.Defaults,
+  uBEncode, DateUtils, System.Generics.Defaults, System.Generics.Collections,
   Vcl.ExtCtrls;
 
 type
