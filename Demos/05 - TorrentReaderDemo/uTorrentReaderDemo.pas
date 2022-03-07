@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uTorrentReader,
 
-  uBEncode, DateUtils, System.Generics.Collections, System.Generics.Defaults,
+  uBEncode, DateUtils, System.Gnerics.Collections, System.Generics.Defaults,
   Vcl.ExtCtrls;
 
 type
@@ -19,7 +19,7 @@ type
     { Private declarations }
   public
     { Public declarations }
-  end;
+  end; 
 
 var
   Form2: TForm2;

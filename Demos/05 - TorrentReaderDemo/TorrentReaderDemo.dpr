@@ -6,7 +6,7 @@ uses
   uTorrentReader in '..\..\API\uTorrentReader.pas',
   uBEncode in '..\..\API\uBEncode.pas';
 
-{$R *.res}
+{$R *.res} 
 
 begin
   ReportMemoryLeaksOnShutdown := True;

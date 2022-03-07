@@ -21,6 +21,7 @@ object Form2: TForm2
     Caption = 'Parse Torrent File'
     TabOrder = 0
     OnClick = Button1Click
+    ExplicitTop = -6
   end
   object Memo1: TMemo
     Left = 0
