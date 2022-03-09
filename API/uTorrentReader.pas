@@ -120,14 +120,15 @@ end;
 
 class function TTorrentReader.LoadFromFile(Filename: string): TTorrentReader;
 var
-  FileStream: TFileStream;
+  MemStream: TMemoryStream;
 begin
-  FileStream := nil;
+  MemStream := nil;
   try
-    FileStream:=TFileStream.Create(Filename, fmShareDenyNone);
-    Result := LoadFromStream(FileStream);
+    MemStream := TStringStream.Create;
+    MemStream.LoadFromFile(Filename);
+    Result := LoadFromStream(MemStream);
   finally
-    FileStream.Free;
+    MemStream.Free;
   end;
 end;
 
