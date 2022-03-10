@@ -76,8 +76,13 @@ begin
   try
     var Tme := GetTickCount64;
     Torrent := TTorrentReader.LoadFromFile(FileOpenDialog1.FileName);
+    if Torrent = nil then
+    begin
+      Memo1.Text := 'Invalid File Format';
+      Exit;
+    end;
     Tme := GetTickCount64 - Tme;
-    Memo1.Lines.add( 'Filename : ' + FileOpenDialog1.FileName + ' (' + Tme.ToString + 'ms)');
+    Memo1.Lines.add( 'Filename : ' + FileOpenDialog1.FileName + ' (Parsing Duration: ' + Tme.ToString + 'ms)');
     Memo1.Lines.add( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
     Memo1.Lines.add( 'Hash : ' + Torrent.Data.Hash );
     Memo1.Lines.add( 'Announce: ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
@@ -93,7 +98,7 @@ begin
     for var Url in Torrent.Data.UrlList do Memo1.Lines.Add(Url);
     Memo1.Lines.Add( '' );
     Memo1.Lines.add( 'Root Folder : ' + Torrent.Data.Info.Name );
-    Memo1.Lines.add( 'Files :' );
+    Memo1.Lines.add( 'Files :' + Torrent.Data.Info.FileList.Count.ToString);
     for var FileData in Torrent.Data.Info.FileList do
     begin
       Memo1.Lines.add( '   -> ' + FileData.FullPath );

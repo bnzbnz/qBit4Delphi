@@ -60,6 +60,11 @@ type
 implementation
 uses System.Types;
 
+procedure FormatException;
+begin
+  raise Exception.Create('BEncode: Invalid Format');
+end;
+
 destructor TBEncodedData.Destroy;
 begin
   Data.Free;
@@ -87,19 +92,19 @@ constructor TBEncoded.Create(Stream: TStream);
     // loop until we come across it
     repeat
       if Stream.Read(X, 1) <> 1 then
-        raise Exception.Create('');
+        FormatException;
       if not ((X in ['0'..'9']) or (x = ':')) then
-        raise Exception.Create('');
+        FormatException;
       if X = ':' then
       begin
         if Buffer = '' then
-          raise Exception.Create('');
+          FormatException;
         if Length(Buffer) > 8 then
-          raise Exception.Create('');
+          FormatException;
         SetLength(Result, StrToInt(String(Buffer)));
         if Length(Result)>0 then
           if Stream.Read(Result[1], Length(Result)) <> Length(Result) then
-            raise Exception.Create('');
+            FormatException;
         Break;
       end
       else
@@ -117,7 +122,7 @@ begin
 
   // get first character to determine the format of the proceeding data
   if Stream.Read(X, 1) <> 1 then
-    raise Exception.Create('');
+    FormatException;
 
   // is it an integer?
   if X = 'i' then
@@ -126,13 +131,13 @@ begin
     Buffer := '';
     repeat
       if Stream.Read(X, 1) <> 1 then
-        raise Exception.Create('');
+        FormatException;
       if not ((X in ['0'..'9']) or (X = 'e')) then
-        raise Exception.Create('');
+        FormatException;
       if X = 'e' then
       begin
         if Buffer = '' then
-          raise Exception.Create('')
+          raise Exception.Create('Invalid Format')
         else
         begin
           Format := befInteger;
@@ -154,7 +159,7 @@ begin
     repeat
       // have a peek around and see if theres an e
       if Stream.Read(X, 1) <> 1 then
-        raise Exception.Create('');
+        FormatException;
       // is it an e?
       if X = 'e' then
         Break;
@@ -176,13 +181,13 @@ begin
     repeat
       // have a peek around and see if theres an e
       if Stream.Read(X, 1) <> 1 then
-        raise Exception.Create('');
+        FormatException;
       // is it an e?
       if X = 'e' then
         Break;
       // if it isnt an e it has to be numerical!
       if not (X in ['0'..'9']) then
-        raise Exception.Create('');
+        FormatException;
       // now read the string data
       Buffer := GetString(X);
       // create the element
@@ -201,7 +206,7 @@ begin
     Format := befString;
   end
   else
-    raise Exception.Create('');
+    FormatException;
 end;
 
 class procedure TBEncoded.Encode(Encoded: TBEncoded; var Output: TStringBuilder);
