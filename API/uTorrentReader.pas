@@ -124,7 +124,7 @@ var
 begin
   MemStream := nil;
   try
-    MemStream := TStringStream.Create;
+    MemStream := TMemoryStream.Create;
     MemStream.LoadFromFile(Filename);
     Result := LoadFromStream(MemStream);
   finally
