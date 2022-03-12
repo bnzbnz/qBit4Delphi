@@ -31,7 +31,7 @@ implementation
 const
   BoolToStr: array[boolean] of string = ('False','True');
 
-function VarFormatBKM(v: variant): string;
+function Int64FormatBKM(v: Int64): string;
 var
   x: Double;
 begin
@@ -81,10 +81,13 @@ begin
       Memo1.Text := 'Invalid File Format';
       Exit;
     end;
+    Self.Memo1.LockDrawing;
     Tme := GetTickCount64 - Tme;
     Memo1.Lines.add( 'Filename : ' + FileOpenDialog1.FileName + ' (Parsing Duration: ' + Tme.ToString + 'ms)');
     Memo1.Lines.add( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
-    Memo1.Lines.add( 'Hash : ' + Torrent.Data.Hash );
+    Memo1.Lines.add( 'Hybrid: ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
+    Memo1.Lines.add( 'HashV1 : ' + Torrent.Data.HashV1 );
+    Memo1.Lines.add( 'HashV2 : ' + Torrent.Data.HashV2 );
     Memo1.Lines.add( 'Announce: ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
     Memo1.Lines.add( 'Created By: ' + Torrent.Data.CreatedBy);
     Memo1.Lines.add( 'Creation Date: ' + DateTimeToStr(Torrent.Data.CreationDate));
@@ -102,8 +105,9 @@ begin
     for var FileData in Torrent.Data.Info.FileList do
     begin
       Memo1.Lines.add( '   -> ' + FileData.FullPath );
-      Memo1.Lines.add( '       Size :' + VarFormatBKM(FileData.Length));
+      Memo1.Lines.add( '       Size :' + Int64FormatBKM(FileData.Length));
     end;
+    Self.Memo1.UnlockDrawing;
   finally
     Torrent.Free;
   end;

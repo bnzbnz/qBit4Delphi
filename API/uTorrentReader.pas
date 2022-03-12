@@ -37,6 +37,7 @@ type
     PieceLength: Int64;
     Pieces: AnsiString; // V1 Only
     IsPrivate: Boolean;
+    IsHybrid: Boolean;
     constructor Create; overload;
     destructor Destroy; override;
   end;
@@ -48,7 +49,8 @@ type
     Comment: string;
     CreatedBy: string;
     CreationDate: TDateTime;
-    Hash: string;
+    HashV1: string;
+    HashV2: string;
     Info: TTorrentDataInfo;
     UrlList: TStringList;
     constructor Create; overload;
@@ -216,14 +218,25 @@ begin
   Enc := Be.ListData.FindElement('creation date');
   if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
+
+   // IsHybrid
+  FData.Info.IsHybrid :=
+    (FData.Info.MetaVersion > 1)
+    and (Info.ListData.FindElement('files') <> nil)
+    and (Info.ListData.FindElement('file tree') <> nil);
+
   // Hash
   var stringBuilder := TStringBuilder.Create;
   TBencoded.Encode(Info, stringBuilder);
   var Ss := TStringStream.Create(StringBuilder.ToString);
   if FData.Info.MetaVersion = 1 then
-    FData.Hash := THashSHA1.GetHashString(Ss) // SHA1
+    FData.HashV1 := THashSHA1.GetHashString(Ss)
   else
-    FData.Hash := THashSHA2.GetHashString(Ss); //SHA256
+  begin
+    if FData.Info.IsHybrid then
+       FData.HashV1 := THashSHA1.GetHashString(Ss);
+    FData.HashV2 := THashSHA2.GetHashString(Ss);
+  end;
   stringBuilder.Free;
   Ss.Free;
 
@@ -251,8 +264,11 @@ begin
   //UrlList:
   Enc := Be.ListData.FindElement('url-list') as TBencoded;
   if assigned(Enc) then
-    for var i := 0 to Enc.ListData.Count - 1 do
-      FData.UrlList.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
+    if Enc.ListData = nil then
+      FData.UrlList.Add(Enc.StringData)
+    else
+      for var i := 0 to Enc.ListData.Count - 1 do
+        FData.UrlList.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
 
   // files :
   if FData.Info.MetaVersion = 1 then
