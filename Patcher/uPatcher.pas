@@ -38,7 +38,7 @@ begin
       if not R then begin Memo1.Lines.add(Format('Edition %d.0 not found.', [Version])); continue; end;
       Memo1.Lines.add(Format('Edition %d.0 found, processing...', [Version]));
       var RootDir := Reg.ReadString('RootDir');
-      var DestDir := Format('JSON\%d\', [Version]);
+      var DestDir := Format('API\JSON\%d\', [Version]);
       var F := CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.pas'), PWideChar(DestDir + 'REST.Json.pas'), False);
       F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.Types.pas'),  PWideChar(DestDir + 'REST.Json.Types.pas'), False);
       F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.JsonReflect.pas'),  PWideChar(DestDir + 'REST.JsonReflect.pas'), False);

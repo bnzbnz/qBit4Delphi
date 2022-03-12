@@ -10,7 +10,6 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poDesktopCenter
   PixelsPerInch = 96
   TextHeight = 13
@@ -23,9 +22,6 @@ object Form2: TForm2
     Caption = 'Patch NOW'
     TabOrder = 0
     OnClick = Button1Click
-    ExplicitLeft = 176
-    ExplicitTop = 40
-    ExplicitWidth = 75
   end
   object Memo1: TMemo
     Left = 0
@@ -53,9 +49,5 @@ object Form2: TForm2
       'Laurent Meyer / qBit4Delphi@ea4d.com'
       '')
     TabOrder = 1
-    ExplicitLeft = 48
-    ExplicitTop = 71
-    ExplicitWidth = 553
-    ExplicitHeight = 210
   end
 end
