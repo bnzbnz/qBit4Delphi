@@ -235,6 +235,7 @@ begin
   begin
     if FData.Info.IsHybrid then
        FData.HashV1 := THashSHA1.GetHashString(Ss);
+    Ss.Position:=0;
     FData.HashV2 := THashSHA2.GetHashString(Ss);
   end;
   stringBuilder.Free;
