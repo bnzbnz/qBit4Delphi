@@ -19,6 +19,11 @@ const
 
 type
 
+  TTorrentReaderOptions = set of (
+    trRaiseException,     // Will raise Exception on error (Default), silent otherwise
+    trGetHashV1FromV2     // Always calculate HashV1 for V2 Torrents
+  );
+
   TFileData = class(TObject)
     Length: Int64;
     PathList: TStringList;
@@ -61,11 +66,11 @@ type
   private
     FData: TTorrentData;
     FBe: TBEncoded;
-    procedure Parse(Be: TBencoded);
+    procedure Parse(Be: TBencoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromStream(Stream: TStream): TTorrentReader;
-    class function LoadFromFile(Filename: string): TTorrentReader;
-    class function LoadFromString(Str: string): TTorrentReader;
+    class function LoadFromStream(Stream: TStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     constructor Create; overload;
     destructor Destroy; override;
     property Data: TTorrentData read FData;
@@ -109,18 +114,23 @@ begin
   inherited;
 end;
 
-class function TTorrentReader.LoadFromStream(Stream: TStream): TTorrentReader;
+class function TTorrentReader.LoadFromStream(Stream: TStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   Result := TTorrentReader.Create;
   try
     Result.FBe := TBEncoded.Create(Stream);
-    Result.Parse(Result.FBe);
+    Result.Parse(Result.FBe, Options);
   except
-    FreeAndNil(Result);
+    on E : Exception do
+    begin
+      FreeAndNil(Result);
+      if trRaiseException in Options then raise;
+    end;
+
   end;
 end;
 
-class function TTorrentReader.LoadFromFile(Filename: string): TTorrentReader;
+class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 var
   MemStream: TMemoryStream;
 begin
@@ -128,26 +138,26 @@ begin
   try
     MemStream := TMemoryStream.Create;
     MemStream.LoadFromFile(Filename);
-    Result := LoadFromStream(MemStream);
+    Result := LoadFromStream(MemStream, Options);
   finally
     MemStream.Free;
   end;
 end;
 
-class function TTorrentReader.LoadFromString(Str: string): TTorrentReader;
+class function TTorrentReader.LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 var
   stringStream: TStringStream;
 begin
   stringStream := nil;
   try
     stringStream:=TStringStream.Create(Str);
-    Result := LoadFromStream(StringStream);
+    Result := LoadFromStream(StringStream, Options);
   finally
     stringStream.Free;
   end;
 end;
 
-procedure TTorrentReader.Parse(Be: TBencoded);
+procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
 
   procedure ParseFileListV2(Dic: TBencoded; Path: string; FileData: TFileData);
   begin
@@ -218,7 +228,6 @@ begin
   Enc := Be.ListData.FindElement('creation date');
   if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
-
    // IsHybrid
   FData.Info.IsHybrid :=
     (FData.Info.MetaVersion > 1)
@@ -233,7 +242,7 @@ begin
     FData.HashV1 := THashSHA1.GetHashString(Ss)
   else
   begin
-    if FData.Info.IsHybrid then
+    if (FData.Info.IsHybrid) or (trGetHashV1FromV2 in Options) then
        FData.HashV1 := THashSHA1.GetHashString(Ss);
     Ss.Position:=0;
     FData.HashV2 := THashSHA2.GetHashString(Ss);
