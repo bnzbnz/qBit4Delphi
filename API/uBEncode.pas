@@ -89,22 +89,16 @@ constructor TBEncoded.Create(Stream: TStream);
   var
     X: AnsiChar;
   begin
-    // loop until we come across it
     repeat
-      if Stream.Read(X, 1) <> 1 then
-        FormatException;
-      if not ((X in ['0'..'9']) or (x = ':')) then
-        FormatException;
+      if Stream.Read(X, 1) <> 1 then FormatException;
+      if not ((X in ['0'..'9']) or (x = ':')) then FormatException;
       if X = ':' then
       begin
-        if Buffer = '' then
-          FormatException;
-        if Length(Buffer) > 8 then
-          FormatException;
+        if Buffer = '' then FormatException;
+        if Length(Buffer) > 8 then FormatException;
         SetLength(Result, StrToInt(String(Buffer)));
         if Length(Result)>0 then
-          if Stream.Read(Result[1], Length(Result)) <> Length(Result) then
-            FormatException;
+          if Stream.Read(Result[1], Length(Result)) <> Length(Result) then FormatException;
         Break;
       end
       else
@@ -120,20 +114,14 @@ var
 begin
   inherited Create;
 
-  // get first character to determine the format of the proceeding data
-  if Stream.Read(X, 1) <> 1 then
-    FormatException;
+  if Stream.Read(X, 1) <> 1 then FormatException;
 
-  // is it an integer?
   if X = 'i' then
   begin
-    // yes it is, let's read until we come across e
     Buffer := '';
     repeat
-      if Stream.Read(X, 1) <> 1 then
-        FormatException;
-      if not ((X in ['0'..'9']) or (X = 'e')) then
-        FormatException;
+      if Stream.Read(X, 1) <> 1 then FormatException;
+      if not ((X in ['0'..'9']) or (X = 'e')) then FormatException;
       if X = 'e' then
       begin
         if Buffer = '' then
@@ -149,71 +137,44 @@ begin
         Buffer := Buffer + X;
     until False;
   end
-  // is it a list?
   else if X = 'l' then
   begin
-    // its a list
     Format := befList;
-
-    // loop until we come across e
     repeat
-      // have a peek around and see if theres an e
-      if Stream.Read(X, 1) <> 1 then
-        FormatException;
-      // is it an e?
-      if X = 'e' then
-        Break;
-      // otherwise move the cursor back
+      if Stream.Read(X, 1) <> 1 then FormatException;
+      if X = 'e' then Break;
       Stream.Seek(-1, soFromCurrent);
-      // create the element
       Encoded := TBEncoded.Create(Stream);
-      // add it to the list
       ListData.Add(TBEncodedData.Create(Encoded));
     until False;
   end
-  // is it a dictionary?
   else if X = 'd' then
   begin
-    // its a dictionary :>
     Format := befDictionary;
-
-    // loop until we come across e
     repeat
-      // have a peek around and see if theres an e
       if Stream.Read(X, 1) <> 1 then
         FormatException;
-      // is it an e?
-      if X = 'e' then
-        Break;
-      // if it isnt an e it has to be numerical!
-      if not (X in ['0'..'9']) then
-        FormatException;
-      // now read the string data
+      if X = 'e' then Break;
+      if not (X in ['0'..'9']) then FormatException;
       Buffer := GetString(X);
-      // create the element
       Encoded := TBEncoded.Create(Stream);
-      // create the data element
       Data := TBEncodedData.Create(Encoded);
       Data.Header := Buffer;
-      // add it to the list
       ListData.Add(Data);
     until False;
   end
-  // is it a string?
   else if X in ['0'..'9'] then
   begin
     StringData := GetString(X);
     Format := befString;
   end
-  else
-    FormatException;
+  else FormatException;
 end;
 
 class procedure TBEncoded.Encode(Encoded: TBEncoded; var Output: TStringBuilder);
 begin
   with Encoded do
   begin
-    // what type of member is it?
     case Format of
       befString:
         begin
