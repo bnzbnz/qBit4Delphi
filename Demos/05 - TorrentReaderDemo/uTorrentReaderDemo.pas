@@ -82,7 +82,6 @@ begin
       Memo1.Text := 'Invalid File Format';
       Exit;
     end;
-    Self.Memo1.LockDrawing;
     Tme := GetTickCount64 - Tme;
     Memo1.Lines.add( 'Filename : ' + FileOpenDialog1.FileName + ' (Parsing Duration: ' + Tme.ToString + 'ms)');
     Memo1.Lines.add( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
@@ -110,7 +109,6 @@ begin
       StringBuildeR.AppendLine( '       Size :' + Int64FormatBKM(FileData.Length));
     end;
     Memo1.Text := Memo1.Text  + StringBuilder.ToString;
-    Self.Memo1.UnlockDrawing;
   finally
     StringBuilder.Free;
     Torrent.Free;
