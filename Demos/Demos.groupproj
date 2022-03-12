@@ -15,6 +15,9 @@
         <Projects Include="04 - NOXMon\NOXMon.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="05 - TorrentReaderDemo\TorrentReaderDemo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -59,14 +62,23 @@
     <Target Name="NOXMon:Make">
         <MSBuild Projects="04 - NOXMon\NOXMon.dproj" Targets="Make"/>
     </Target>
+    <Target Name="TorrentReaderDemo">
+        <MSBuild Projects="05 - TorrentReaderDemo\TorrentReaderDemo.dproj"/>
+    </Target>
+    <Target Name="TorrentReaderDemo:Clean">
+        <MSBuild Projects="05 - TorrentReaderDemo\TorrentReaderDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TorrentReaderDemo:Make">
+        <MSBuild Projects="05 - TorrentReaderDemo\TorrentReaderDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon"/>
+        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon;TorrentReaderDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean"/>
+        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean;TorrentReaderDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make"/>
+        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make;TorrentReaderDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
