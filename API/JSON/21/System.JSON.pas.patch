@@ -1,0 +1,23 @@
+--- System.JSON.pas	Sat Feb 20 05:57:42 2021
++++ System.JSON.pas	Wed Oct 27 17:16:38 2021
+@@ -1331,7 +1331,9 @@
+   SetLength(FCharData, CInitialLen);
+   FCharLen := CInitialLen;
+   FCharPos := 0;
+-  FCache := (Range - Offset) > 1000000;
++  // LMR: Disable caching, it crashes on large json requests...
++  // FCache := (Range - Offset) > 1000000;
++  FCache := False;
+ end;
+ 
+ constructor TJSONByteReader.Create(const Data: PByte; const Offset: Integer; const Range: Integer);
+@@ -2442,7 +2444,8 @@
+     FMembers.List[0].ToChars(Builder, Options);
+   for I := 1 to Size - 1 do
+   begin
+-    Builder.Append(',');
++    // LMR:
++    if Builder.Length > 1 then Builder.Append(',');
+     FMembers.List[I].ToChars(Builder, Options);
+   end;
+   Builder.Append('}');
