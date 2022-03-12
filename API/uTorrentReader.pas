@@ -1,7 +1,7 @@
 ///
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  Version: 1.0.3
+///  Version: 1.0.4
 ///
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
@@ -82,6 +82,11 @@ uses System.NetEncoding, System.Hash;
 
 { TTorrentData }
 
+procedure RaiseException(Str: string);
+begin
+  raise Exception.Create('TTorrentReader: ' + Str);
+end;
+
 constructor TTorrentData.Create;
 begin
   inherited;
@@ -118,6 +123,7 @@ class function TTorrentReader.LoadFromStream(Stream: TStream; Options: TTorrentR
 begin
   Result := TTorrentReader.Create;
   try
+    if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MB)');
     Result.FBe := TBEncoded.Create(Stream);
     Result.Parse(Result.FBe, Options);
   except
@@ -310,6 +316,7 @@ begin
   end else // V2
     ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
 
+  // MultiFiles (Helper)
   FData.Info.MultiFiles := True;
   if FData.Info.FileList.Count = 1  then
     if  FData.Info.Name =  FData.Info.FileList[0].FullPath then

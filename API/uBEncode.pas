@@ -52,7 +52,7 @@ type
     IntegerData: int64;
     ListData: TBEncodedDataList;
     property Format: TBEncodedFormat read FFormat write SetFormat;
-    class procedure Encode(Encoded: TBEncoded; var Output: TStringBuilder);
+    class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
     destructor Destroy; override;
     constructor Create(Stream: TStream);
   end;
@@ -60,9 +60,14 @@ type
 implementation
 uses System.Types;
 
-procedure FormatException;
+procedure RaiseException(Str: string); inline;
 begin
-  raise Exception.Create('BEncode: Invalid Format');
+  raise Exception.Create('TBEncoded: ' + Str);
+end;
+
+procedure FormatException; inline;
+begin
+  RaiseException('Invalid Format');
 end;
 
 destructor TBEncodedData.Destroy;
@@ -96,8 +101,8 @@ constructor TBEncoded.Create(Stream: TStream);
       begin
         if Buffer = '' then FormatException;
         if Length(Buffer) > 8 then FormatException;
-        SetLength(Result, StrToInt(String(Buffer)));
-        if Length(Result)>0 then
+        SetLength(Result, StrToInt(Buffer));
+        if Length(Result) > 0 then
           if Stream.Read(Result[1], Length(Result)) <> Length(Result) then FormatException;
         Break;
       end
@@ -110,7 +115,6 @@ var
   X: AnsiChar;
   Buffer: AnsiString;
   Data: TBEncodedData;
-  Encoded: TBEncoded;
 begin
   inherited Create;
 
@@ -129,7 +133,7 @@ begin
         else
         begin
           Format := befInteger;
-          IntegerData := StrToInt64(String(Buffer));
+          IntegerData := StrToInt64(Buffer);
           Break;
         end;
       end
@@ -144,21 +148,18 @@ begin
       if Stream.Read(X, 1) <> 1 then FormatException;
       if X = 'e' then Break;
       Stream.Seek(-1, soFromCurrent);
-      Encoded := TBEncoded.Create(Stream);
-      ListData.Add(TBEncodedData.Create(Encoded));
+      ListData.Add(TBEncodedData.Create(TBEncoded.Create(Stream)));
     until False;
   end
   else if X = 'd' then
   begin
     Format := befDictionary;
     repeat
-      if Stream.Read(X, 1) <> 1 then
-        FormatException;
+      if Stream.Read(X, 1) <> 1 then FormatException;
       if X = 'e' then Break;
       if not (X in ['0'..'9']) then FormatException;
       Buffer := GetString(X);
-      Encoded := TBEncoded.Create(Stream);
-      Data := TBEncodedData.Create(Encoded);
+      Data := TBEncodedData.Create(TBEncoded.Create(Stream));
       Data.Header := Buffer;
       ListData.Add(Data);
     until False;
@@ -171,7 +172,7 @@ begin
   else FormatException;
 end;
 
-class procedure TBEncoded.Encode(Encoded: TBEncoded; var Output: TStringBuilder);
+class procedure TBEncoded.Encode(Encoded: TBEncoded; Output: TStringBuilder);
 begin
   with Encoded do
   begin
@@ -221,7 +222,7 @@ function TBEncodedDataList.FindElement(Header: AnsiString): TBEncoded;
 begin
   Result := nil;
   for var i := 0 to Count - 1 do
-    if LowerCase(String(Items[i].Header)) = LowerCase(String(Header)) then
+    if AnsiLowerCase(Items[i].Header) = AnsiLowerCase(Header) then
     begin
       Result := Items[i].Data;
       Break;
