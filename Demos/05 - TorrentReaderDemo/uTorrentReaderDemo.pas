@@ -69,8 +69,9 @@ end;
 procedure TForm2.Button1Click(Sender: TObject);
 var
   Torrent: TTorrentReader;
+  StringBuilder: TStringBuilder;
 begin
-  Torrent := nil;
+  Torrent := nil; StringBuilder := nil;
   Memo1.Clear;
   if not FileOpenDialog1.Execute then exit;
   try
@@ -102,13 +103,16 @@ begin
     Memo1.Lines.Add( '' );
     Memo1.Lines.add( 'Root Folder : ' + Torrent.Data.Info.Name );
     Memo1.Lines.add( 'Files :' + Torrent.Data.Info.FileList.Count.ToString);
+    StringBuilder := TStringBuilder.Create;
     for var FileData in Torrent.Data.Info.FileList do
     begin
-      Memo1.Lines.add( '   -> ' + FileData.FullPath );
-      Memo1.Lines.add( '       Size :' + Int64FormatBKM(FileData.Length));
+      StringBuildeR.AppendLine('   -> ' + FileData.FullPath);
+      StringBuildeR.AppendLine( '       Size :' + Int64FormatBKM(FileData.Length));
     end;
+    Memo1.Text := Memo1.Text  + StringBuilder.ToString;
     Self.Memo1.UnlockDrawing;
   finally
+    StringBuilder.Free;
     Torrent.Free;
   end;
 end;
