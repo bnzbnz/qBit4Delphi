@@ -47,9 +47,9 @@ begin
       Memo1.Lines.add(Format('Edition %d.0, Original files copied to %s', [Version, DestDir]));
       var CurDir := GetCurrentDir;
       SetCurrentDir(DestDir);
-      ShellExecute(0, nil, PChar('patch.exe'), PChar('-u REST.JsonReflect.pas REST.JsonReflect.pas.patch'), nil, SW_HIDE);
-      ShellExecute(0, nil, PChar('patch.exe'), PChar('-u REST.Json.pas REST.Json.pas.patch'), nil, SW_HIDE);
-      ShellExecute(0, nil, PChar('patch.exe'), PChar('-u System.JSON.pas System.JSON.pas.patch'), nil, SW_HIDE);
+      ShellExecute(0, nil, PChar(DestDir + 'patch.exe'), PChar('-u REST.JsonReflect.pas REST.JsonReflect.pas.patch'), nil, SW_HIDE);
+      ShellExecute(0, nil, PChar(DestDir + 'patch.exe'), PChar('-u REST.Json.pas REST.Json.pas.patch'), nil, SW_HIDE);
+      ShellExecute(0, nil, PChar(DestDir + 'patch.exe'), PChar('-u System.JSON.pas System.JSON.pas.patch'), nil, SW_HIDE);
       Memo1.Lines.Add('Files Patched!!!!');
       SetCurrentDir(CurDir);
       Reg.CloseKey;
