@@ -51,12 +51,11 @@ begin
     var RowIndex := 1;
     for var Srv in Srvs do
     begin
-      Th := TqBitThread.Create(True);
+      Th := TqBitThread.Create;
       Th.RowIndex := RowIndex;
       Inc(RowIndex);
       Th.qB := TqBitObject.Connect(Srv.FHP, Srv.FUN, Srv.FPW);
       ThList.Add(Th);
-      Th.Resume;
     end;
     Srvs.Free;
   end;
@@ -94,12 +93,11 @@ begin
   Inc(C); SG.Cells[C, 0] := 'Up Speed :'; SG.ColWidths[C]:=80;
   Inc(C); SG.Cells[C, 0] := 'Cache Hits :'; SG.ColWidths[C]:=80;
   Inc(C); SG.Cells[C, 0] := 'Free disk :'; SG.ColWidths[C]:=80;
-
 end;
 
 procedure TNOXMonDlg.UpdateRow(Thread: TqBitThread);
 begin
-  Var Q := Thread.qB;
+  var Q := Thread.qB;
   var M := Thread.qBMainTh;
 
   var Traffic := M.Fserver_state.Fdl_info_data + M.Fserver_state.Fup_info_data;

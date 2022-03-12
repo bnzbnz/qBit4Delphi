@@ -7,16 +7,11 @@
 ///  https://torry.net/pages.php?id=650
 ///  https://stackoverflow.com/questions/34157958/delphi-how-to-use-bencode-to-get-info-hash
 ///
-
 unit uBEncode;
-
 interface
-
 uses
   Classes, Contnrs, SysUtils;
-
 type
-
   TBEncoded = class;
   TBEncodedFormat = (befEmpty, befString, befInteger, befList, befDictionary);
   TBEncodedData = class(TObject)
@@ -26,7 +21,6 @@ type
     constructor Create(Data: TBEncoded);
     destructor Destroy; override;
   end;
-
   TBEncodedDataList = class(TObjectList)
   protected
     function GetItems(Index: Integer): TBEncodedData;
@@ -42,7 +36,6 @@ type
     procedure Insert(Index: Integer; AClass: TBEncodedData);
     property Items[Index: Integer]: TBEncodedData read GetItems write SetItems; default;
   end;
-
   TBEncoded = class(TObject)
   private
     FFormat: TBEncodedFormat;
@@ -56,40 +49,32 @@ type
     destructor Destroy; override;
     constructor Create(Stream: TStream);
   end;
-
 implementation
 uses System.Types;
-
 procedure RaiseException(Str: string); inline;
 begin
   raise Exception.Create('TBEncoded: ' + Str);
 end;
-
 procedure FormatException; inline;
 begin
   RaiseException('Invalid Format');
 end;
-
 destructor TBEncodedData.Destroy;
 begin
   Data.Free;
   inherited Destroy;
 end;
-
 constructor TBEncodedData.Create(Data: TBEncoded);
 begin
   inherited Create;
   Self.Data := Data;
 end;
-
 destructor TBEncoded.Destroy;
 begin
   if ListData <> nil then ListData.Free;
   inherited Destroy;
 end;
-
 constructor TBEncoded.Create(Stream: TStream);
-
   function GetString(Buffer: AnsiString): AnsiString;
   var
     X: AnsiChar;
@@ -101,7 +86,7 @@ constructor TBEncoded.Create(Stream: TStream);
       begin
         if Buffer = '' then FormatException;
         if Length(Buffer) > 8 then FormatException;
-        SetLength(Result, StrToInt(Buffer));
+        SetLength(Result, StrToInt(String(Buffer)));
         if Length(Result) > 0 then
           if Stream.Read(Result[1], Length(Result)) <> Length(Result) then FormatException;
         Break;
@@ -110,16 +95,13 @@ constructor TBEncoded.Create(Stream: TStream);
         Buffer := Buffer + X;
     until False;
   end;
-
 var
   X: AnsiChar;
   Buffer: AnsiString;
   Data: TBEncodedData;
 begin
   inherited Create;
-
   if Stream.Read(X, 1) <> 1 then FormatException;
-
   if X = 'i' then
   begin
     Buffer := '';
@@ -133,7 +115,7 @@ begin
         else
         begin
           Format := befInteger;
-          IntegerData := StrToInt64(Buffer);
+          IntegerData := StrToInt64(String(Buffer));
           Break;
         end;
       end
@@ -171,7 +153,6 @@ begin
   end
   else FormatException;
 end;
-
 class procedure TBEncoded.Encode(Encoded: TBEncoded; Output: TStringBuilder);
 begin
   with Encoded do
@@ -211,67 +192,55 @@ begin
     end;
   end;
 end;
-
 procedure TBEncoded.SetFormat(Format: TBEncodedFormat);
 begin
   if Format in [befList, befDictionary] then ListData := TBEncodedDataList.Create;
   FFormat := Format;
 end;
-
 function TBEncodedDataList.FindElement(Header: AnsiString): TBEncoded;
 begin
   Result := nil;
   for var i := 0 to Count - 1 do
-    if AnsiLowerCase(Items[i].Header) = AnsiLowerCase(Header) then
+    if LowerCase(String(Items[i].Header)) = LowerCase(String(Header)) then
     begin
       Result := Items[i].Data;
       Break;
     end;
 end;
-
 function TBEncodedDataList.Add(AClass: TBEncodedData): Integer;
 begin
   Result := inherited Add(AClass);
 end;
-
 function TBEncodedDataList.Extract(Item: TBEncodedData): TBEncodedData;
 begin
   Result := TBEncodedData(inherited Extract(Item));
 end;
-
 function TBEncodedDataList.First: TBEncodedData;
 begin
   Result := TBEncodedData(inherited First);
 end;
-
 function TBEncodedDataList.GetItems(Index: Integer): TBEncodedData;
 begin
   Result := TBEncodedData(inherited Items[Index]);
 end;
-
 function TBEncodedDataList.IndexOf(AClass: TBEncodedData): Integer;
 begin
   Result := inherited IndexOf(AClass);
 end;
-
 procedure TBEncodedDataList.Insert(Index: Integer; AClass: TBEncodedData);
 begin
   inherited Insert(Index, AClass);
 end;
-
 function TBEncodedDataList.Last: TBEncodedData;
 begin
   Result := TBEncodedData(inherited First);
 end;
-
 function TBEncodedDataList.Remove(AClass: TBEncodedData): Integer;
 begin
   Result := inherited Remove(AClass);
 end;
-
 procedure TBEncodedDataList.SetItems(Index: Integer; AClass: TBEncodedData);
 begin
   inherited Items[Index] := AClass;
 end;
-
 end.

@@ -6,24 +6,18 @@
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
-
 unit uTorrentReader;
-
 interface
 uses
   System.Classes, System.Generics.Collections, System.Generics.Defaults,
   uBEncode, DateUtils, SysUtils;
-
 const
   TORRENTPATHSEPARATOR = '\';
-
 type
-
   TTorrentReaderOptions = set of (
     trRaiseException,     // Will raise Exception on error (Default), silent otherwise
     trGetHashV1FromV2     // Always calculate HashV1 for V2 Torrents
   );
-
   TFileData = class(TObject)
     Length: Int64;
     PathList: TStringList;
@@ -32,7 +26,6 @@ type
     constructor Create; overload;
     destructor Destroy; override;
   end;
-
   TTorrentDataInfo = class(TObject)
     MetaVersion: Int64;
     MultiFiles: Boolean;
@@ -46,7 +39,6 @@ type
     constructor Create; overload;
     destructor Destroy; override;
   end;
-
   TTorrentData = class(TObject)
   public
     Announce: string;
@@ -61,7 +53,6 @@ type
     constructor Create; overload;
     destructor Destroy; override;
   end;
-
   TTorrentReader = class(TObject)
   private
     FData: TTorrentData;
@@ -76,17 +67,13 @@ type
     property Data: TTorrentData read FData;
     property BEncoded: TBEncoded read FBe;
   end;
-
 implementation
 uses System.NetEncoding, System.Hash;
-
 { TTorrentData }
-
 procedure RaiseException(Str: string);
 begin
   raise Exception.Create('TTorrentReader: ' + Str);
 end;
-
 constructor TTorrentData.Create;
 begin
   inherited;
@@ -94,7 +81,6 @@ begin
   AnnounceList := TStringList.Create;
   UrlList := TStringList.Create;
 end;
-
 destructor TTorrentData.Destroy;
 begin
   UrlList.Free;
@@ -102,23 +88,19 @@ begin
   Info.Free;
   inherited;
 end;
-
 { TTorrentReader }
-
 constructor TTorrentReader.Create;
 begin
   inherited;
   FBe := nil;
   FData := TTorrentData.Create;
 end;
-
 destructor TTorrentReader.Destroy;
 begin
   FBe.Free;
   FData.Free;
   inherited;
 end;
-
 class function TTorrentReader.LoadFromStream(Stream: TStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   Result := TTorrentReader.Create;
@@ -132,10 +114,8 @@ begin
       FreeAndNil(Result);
       if trRaiseException in Options then raise;
     end;
-
   end;
 end;
-
 class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 var
   MemStream: TMemoryStream;
@@ -149,7 +129,6 @@ begin
     MemStream.Free;
   end;
 end;
-
 class function TTorrentReader.LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 var
   stringStream: TStringStream;
@@ -162,9 +141,7 @@ begin
     stringStream.Free;
   end;
 end;
-
 procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
-
   procedure ParseFileListV2(Dic: TBencoded; Path: string; FileData: TFileData);
   begin
     if not assigned(Dic.ListData) then exit;
@@ -196,23 +173,18 @@ procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
           ParseFileListV2(TmpDic.Data, UTF8ToString(Hdr),  FileData);
     end;
   end;
-
 var
   Enc, Info: TBencoded;
   EncStr: string;
 begin
-
   Info := Be.ListData.FindElement('info'); //Helper;
-
   //MetaVersion
   FData.Info.MetaVersion := 1;
   Enc := Info.ListData.FindElement('meta version');
   if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
-
   //Announce
   Enc := Be.ListData.FindElement('announce');
   if assigned(Enc) then FData.Announce := UTF8ToString(Enc.StringData);
-
   // AnnounceList
   var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
   if assigned(AnnounceList) then
@@ -221,25 +193,20 @@ begin
       for var i := 0 to SubList.ListData.Count - 1 do
         FData.AnnounceList.Add(UTF8ToString((SubList.ListData[i].Data).StringData));
     end;
-
   // Comment
   Enc := Be.ListData.FindElement('comment');
   if assigned(Enc) then FData.Comment :=UTF8ToString(Enc.StringData);
-
   // CreatedBy
   Enc := Be.ListData.FindElement('created by');
   if assigned(Enc) then FData.CreatedBy := UTF8ToString(Enc.StringData);
-
   // CreationDate
   Enc := Be.ListData.FindElement('creation date');
   if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
-
    // IsHybrid
   FData.Info.IsHybrid :=
     (FData.Info.MetaVersion > 1)
     and (Info.ListData.FindElement('files') <> nil)
     and (Info.ListData.FindElement('file tree') <> nil);
-
   // Hash
   var stringBuilder := TStringBuilder.Create;
   TBencoded.Encode(Info, stringBuilder);
@@ -255,37 +222,30 @@ begin
   end;
   stringBuilder.Free;
   Ss.Free;
-
   // Name:
   Enc := Info.ListData.FindElement('name') as TBencoded;
   if assigned(Enc) then FData.Info.Name := UTF8ToString(Enc.StringData);
-
   // Length:
   Enc := Info.ListData.FindElement('length') as TBencoded;
   if assigned(Enc) then FData.Info.Length := Enc.IntegerData;
-
   // PieceLength:
   Enc := Info.ListData.FindElement('piece length') as TBencoded;
   if assigned(Enc) then FData.Info.PieceLength := Enc.IntegerData;
-
   // Pieces:
   Enc := Info.ListData.FindElement('pieces') as TBencoded;
   if assigned(Enc) then FData.Info.Pieces := Enc.StringData;
-
   //Private
   FData.Info.IsPrivate := False;
   Enc := Info.ListData.FindElement('private') as TBencoded;
   if assigned(Enc) then FData.Info.IsPrivate := Enc.IntegerData = 1;
-
   //UrlList:
   Enc := Be.ListData.FindElement('url-list') as TBencoded;
   if assigned(Enc) then
     if Enc.ListData = nil then
-      FData.UrlList.Add(Enc.StringData)
+      FData.UrlList.Add(String(Enc.StringData))
     else
       for var i := 0 to Enc.ListData.Count - 1 do
         FData.UrlList.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
-
   // files :
   if FData.Info.MetaVersion = 1 then
   begin // V1
@@ -315,7 +275,6 @@ begin
     end;
   end else // V2
     ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
-
   // MultiFiles (Helper)
   FData.Info.MultiFiles := True;
   if FData.Info.FileList.Count = 1  then
@@ -324,35 +283,27 @@ begin
       FData.Info.Name := '';
       FData.Info.MultiFiles := False;
     end;
-
 end;
-
 { TTorrentDataInfo }
-
 constructor TTorrentDataInfo.Create;
 begin
   inherited;
   FileList := TObjectList<TFileData>.Create(True);
 end;
-
 destructor TTorrentDataInfo.Destroy;
 begin
   FileList.Free;
   inherited;
 end;
-
 { TFileData }
-
 constructor TFileData.Create;
 begin
   inherited;
   PathList := TStringList.Create;
 end;
-
 destructor TFileData.Destroy;
 begin
   PathList.Free;
   inherited;
 end;
-
 end.
