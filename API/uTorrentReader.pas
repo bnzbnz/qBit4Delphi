@@ -38,6 +38,7 @@ type
     Pieces: AnsiString; // V1 Only
     IsPrivate: Boolean;
     IsHybrid: Boolean;
+    FilesSize: Int64;
     constructor Create; overload;
     destructor Destroy; override;
   end;
@@ -292,6 +293,12 @@ begin
       FData.Info.Name := '';
       FData.Info.MultiFiles := False;
     end;
+  // FilesSize
+  Data.Info.FilesSize := 0;
+  for var fle in Data.Info.FileList do
+    Data.Info.FilesSize := Data.Info.FilesSize + fle.Length;
+
+
 end;
 
 { TTorrentDataInfo }

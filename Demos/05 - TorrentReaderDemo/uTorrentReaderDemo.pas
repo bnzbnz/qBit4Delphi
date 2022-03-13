@@ -84,33 +84,34 @@ begin
     end;
     StringBuilder := TStringBuilder.Create;
     StringBuildeR.AppendLine( 'Filename : ' + FileOpenDialog1.FileName);
-    StringBuildeR.AppendLine( 'Parsing Duration: ' + (GetTickCount64 - Tme).ToString + 'ms');
+    StringBuildeR.AppendLine( 'Parsing Duration : ' + (GetTickCount64 - Tme).ToString + 'ms');
     StringBuildeR.AppendLine( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
-    StringBuildeR.AppendLine( 'Hybrid: ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
+    StringBuildeR.AppendLine( 'Hybrid : ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
     StringBuildeR.AppendLine( 'HashV1 : ' + Torrent.Data.HashV1 );
     StringBuildeR.AppendLine( 'HashV2 : ' + Torrent.Data.HashV2 );
-    StringBuildeR.AppendLine( 'Announce: ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
-    StringBuildeR.AppendLine( 'Created By: ' + Torrent.Data.CreatedBy);
-    StringBuildeR.AppendLine( 'Creation Date: ' + DateTimeToStr(Torrent.Data.CreationDate));
-    StringBuildeR.AppendLine( 'Comment: ' + Torrent.Data.Comment);
-    StringBuildeR.AppendLine( 'Private: ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
+    StringBuildeR.AppendLine( 'Announce : ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
+    StringBuildeR.AppendLine( 'Created By : ' + Torrent.Data.CreatedBy);
+    StringBuildeR.AppendLine( 'Creation Date : ' + DateTimeToStr(Torrent.Data.CreationDate));
+    StringBuildeR.AppendLine( 'Comment : ' + Torrent.Data.Comment);
+    StringBuildeR.AppendLine( 'Private : ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
     StringBuildeR.AppendLine( '' );
-    StringBuildeR.AppendLine( 'Multi Announce List  : ');
+    StringBuildeR.AppendLine( 'Multi Announce List : ');
     for var Url in Torrent.Data.AnnounceList do StringBuildeR.AppendLine(Url);
     StringBuildeR.AppendLine( '' );
-    StringBuildeR.AppendLine( 'Multi Web Seed Url List: ');
+    StringBuildeR.AppendLine( 'Multi Web Seed Url List : ');
     for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Root Folder : ' + Torrent.Data.Info.Name );
-    StringBuildeR.AppendLine( 'Files Count :' + Torrent.Data.Info.FileList.Count.ToString);
-    StringBuildeR.AppendLine( 'Files List: ');
+    StringBuildeR.AppendLine( 'Files Count : ' + Torrent.Data.Info.FileList.Count.ToString);
+    StringBuildeR.AppendLine( 'Piece Size : ' + Int64FormatBKM(Torrent.Data.Info.PieceLength));
+    StringBuildeR.AppendLine( 'Files Size : ' + Int64FormatBKM(Torrent.Data.Info.FilesSize));
     for var FileData in Torrent.Data.Info.FileList do
     begin
       StringBuildeR.AppendLine('   -> ' + FileData.FullPath);
       StringBuildeR.AppendLine( '       Size :' + Int64FormatBKM(FileData.Length));
     end;
     Memo1.Text := StringBuilder.ToString;
-    Memo1.Lines.add( 'Total Duration: ' + (GetTickCount64 - Tme).ToString + 'ms');
+    Memo1.Lines.add( 'Total Duration : ' + (GetTickCount64 - Tme).ToString + 'ms');
     Memo1.Lines.Insert(0, '');
   finally
     StringBuilder.Free;

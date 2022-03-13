@@ -1,7 +1,7 @@
 object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'Form2'
+  Caption = 'Torrent File Reader :'
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace
@@ -21,6 +21,7 @@ object Form2: TForm2
     Caption = 'Parse Torrent File'
     TabOrder = 0
     OnClick = Button1Click
+    ExplicitTop = -6
   end
   object Memo1: TMemo
     Left = 0
