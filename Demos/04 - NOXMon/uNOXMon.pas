@@ -51,11 +51,12 @@ begin
     var RowIndex := 1;
     for var Srv in Srvs do
     begin
-      Th := TqBitThread.Create;
+      Th := TqBitThread.Create(True);
       Th.RowIndex := RowIndex;
       Inc(RowIndex);
       Th.qB := TqBitObject.Connect(Srv.FHP, Srv.FUN, Srv.FPW);
       ThList.Add(Th);
+      Th.Start;
     end;
     Srvs.Free;
   end;
