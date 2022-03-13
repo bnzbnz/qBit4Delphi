@@ -2,18 +2,18 @@
 
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  API v2.8.3 + Hidden/Missing Fields
+///  API v2.8.3.dev.025 + Hidden/Missing Fields
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
-///  ToDo : Search
+///  ToDo : Search (if requested)
 
 interface
 uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types,
      System.Generics.Defaults, Classes;
 
 const
-  Const_qBitAPI_Implemented_Version = 'v2.8.3.dev.024';
+  Const_qBitAPI_Implemented_Version = 'v2.8.3.dev.025';
   Const_qBitAPI_Developer = 'Laurent Meyer, qBit4Delphi@ea4d.com';
 
 type
@@ -1113,7 +1113,11 @@ end;
 
 function TqBitObjectDictionaryInterceptor.StringConverter(Data: TObject; Field: string): string;
 begin
-  Result := '';
+  raise
+    Exception.Create(Format(
+        'Class: %s, %s not implemented.',
+        [Data.ClassName, 'TqBitObjectDictionaryInterceptor.StringConverter']
+      ));
 end;
 
 { TqBitStringDictionaryInterceptor }

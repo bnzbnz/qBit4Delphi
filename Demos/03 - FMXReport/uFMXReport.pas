@@ -70,6 +70,17 @@ begin
         Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
       end;
 
+      Memo1.Lines.Add('******************* Preferences *******************');
+      var Q := qB.GetPreferences;
+        var rttitype4:= rttictx.GetType(TqBitPreferencesType);
+     for var field in rttitype4.GetFields do
+      if field.FieldType.TypeKind = tkVariant then
+      begin
+       var v :=  field.GetValue(Q).asVariant;
+        Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
+      end;
+      Q.Free;
+
      Memo1.Lines.Add(Format('******************* Torrents : %d *******************',[M.Ftorrents.Count]));
      var rttitype2 := rttictx.GetType(TqBitTorrentType);
      for var T in M.Ftorrents do
@@ -99,6 +110,7 @@ begin
      Memo1.Lines.Add(Format('******************* Tags : %d *******************',[M.Ftags.Count]));
      for var G in M.Ftags do
       Memo1.Lines.Add('  ' + G);
+
   finally
     rttictx.Free;
   end;
