@@ -11,8 +11,10 @@ interface
 uses
   System.Classes, System.Generics.Collections, System.Generics.Defaults,
   uBEncode, DateUtils, SysUtils;
+
 const
-  TORRENTPATHSEPARATOR = '\';
+  TORRENTREADER_PATH_SEPARATOR = '\';
+
 type
   TTorrentReaderOptions = set of (
     trRaiseException,     // Will raise Exception on error (Default), silent otherwise
@@ -67,13 +69,17 @@ type
     property Data: TTorrentData read FData;
     property BEncoded: TBEncoded read FBe;
   end;
+
 implementation
 uses System.NetEncoding, System.Hash;
-{ TTorrentData }
+
 procedure RaiseException(Str: string);
 begin
   raise Exception.Create('TTorrentReader: ' + Str);
 end;
+
+{ TTorrentData }
+
 constructor TTorrentData.Create;
 begin
   inherited;
@@ -88,7 +94,9 @@ begin
   Info.Free;
   inherited;
 end;
+
 { TTorrentReader }
+
 constructor TTorrentReader.Create;
 begin
   inherited;
@@ -103,9 +111,10 @@ begin
 end;
 class function TTorrentReader.LoadFromStream(Stream: TStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
-  Result := TTorrentReader.Create;
+  Result := nil;
   try
-    if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MB)');
+    if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MiB)');
+    Result := TTorrentReader.Create;
     Result.FBe := TBEncoded.Create(Stream);
     Result.Parse(Result.FBe, Options);
   except
@@ -156,7 +165,7 @@ procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
         FileData := TFileData.Create;
         FData.Info.FileList.Add(FileData);
         FileData.FullPath := Path;
-        FileData.PathList.Delimiter := TORRENTPATHSEPARATOR;
+        FileData.PathList.Delimiter := TORRENTREADER_PATH_SEPARATOR;
         FileData.PathList.QuoteChar := #0;
         FileData.PathList.StrictDelimiter := True;
         FileData.PathList.DelimitedText := string(Path);
@@ -168,7 +177,7 @@ procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
       end;
       if assigned(TmpDic.data.ListData) then
         if Path <> '' then
-          ParseFileListV2(TmpDic.Data, Path + TORRENTPATHSEPARATOR + UTF8ToString(Hdr),  FileData)
+          ParseFileListV2(TmpDic.Data, Path + TORRENTREADER_PATH_SEPARATOR + UTF8ToString(Hdr),  FileData)
         else
           ParseFileListV2(TmpDic.Data, UTF8ToString(Hdr),  FileData);
     end;
@@ -260,7 +269,7 @@ begin
       var FLDP := FLD.ListData.FindElement('path');
       for var j := 0 to FLDP.ListData.Count - 1 do
         FileData.PathList.Add(UTF8ToString(FLDP.ListData.Items[j].Data.StringData));
-      FileData.PathList.Delimiter := TORRENTPATHSEPARATOR;
+      FileData.PathList.Delimiter := TORRENTREADER_PATH_SEPARATOR;
       FileData.PathList.QuoteChar := #0;
       FileData.PathList.StrictDelimiter := True;
       FileData.FullPath := FileData.PathList.DelimitedText;
@@ -284,7 +293,9 @@ begin
       FData.Info.MultiFiles := False;
     end;
 end;
+
 { TTorrentDataInfo }
+
 constructor TTorrentDataInfo.Create;
 begin
   inherited;
@@ -295,7 +306,9 @@ begin
   FileList.Free;
   inherited;
 end;
+
 { TFileData }
+
 constructor TFileData.Create;
 begin
   inherited;

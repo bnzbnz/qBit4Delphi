@@ -102,7 +102,8 @@ begin
     for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Root Folder : ' + Torrent.Data.Info.Name );
-    StringBuildeR.AppendLine( 'Files :' + Torrent.Data.Info.FileList.Count.ToString);
+    StringBuildeR.AppendLine( 'Files Count :' + Torrent.Data.Info.FileList.Count.ToString);
+    StringBuildeR.AppendLine( 'Files List: ');
     for var FileData in Torrent.Data.Info.FileList do
     begin
       StringBuildeR.AppendLine('   -> ' + FileData.FullPath);
