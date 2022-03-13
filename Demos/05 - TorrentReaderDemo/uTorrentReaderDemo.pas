@@ -82,33 +82,35 @@ begin
       Memo1.Text := 'Invalid File Format';
       Exit;
     end;
-    Tme := GetTickCount64 - Tme;
-    Memo1.Lines.add( 'Filename : ' + FileOpenDialog1.FileName + ' (Parsing Duration: ' + Tme.ToString + 'ms)');
-    Memo1.Lines.add( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
-    Memo1.Lines.add( 'Hybrid: ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
-    Memo1.Lines.add( 'HashV1 : ' + Torrent.Data.HashV1 );
-    Memo1.Lines.add( 'HashV2 : ' + Torrent.Data.HashV2 );
-    Memo1.Lines.add( 'Announce: ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
-    Memo1.Lines.add( 'Created By: ' + Torrent.Data.CreatedBy);
-    Memo1.Lines.add( 'Creation Date: ' + DateTimeToStr(Torrent.Data.CreationDate));
-    Memo1.Lines.add( 'Comment: ' + Torrent.Data.Comment);
-    Memo1.Lines.add( 'Private: ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
-    Memo1.Lines.Add( '' );
-    Memo1.Lines.Add( 'Multi Announce List  : ');
-    for var Url in Torrent.Data.AnnounceList do Memo1.Lines.Add(Url);
-    Memo1.Lines.Add( '' );
-    Memo1.Lines.Add( 'Multi Web Seed Url List: ');
-    for var Url in Torrent.Data.UrlList do Memo1.Lines.Add(Url);
-    Memo1.Lines.Add( '' );
-    Memo1.Lines.add( 'Root Folder : ' + Torrent.Data.Info.Name );
-    Memo1.Lines.add( 'Files :' + Torrent.Data.Info.FileList.Count.ToString);
     StringBuilder := TStringBuilder.Create;
+    StringBuildeR.AppendLine( 'Filename : ' + FileOpenDialog1.FileName);
+    StringBuildeR.AppendLine( 'Parsing Duration: ' + (GetTickCount64 - Tme).ToString + 'ms');
+    StringBuildeR.AppendLine( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
+    StringBuildeR.AppendLine( 'Hybrid: ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
+    StringBuildeR.AppendLine( 'HashV1 : ' + Torrent.Data.HashV1 );
+    StringBuildeR.AppendLine( 'HashV2 : ' + Torrent.Data.HashV2 );
+    StringBuildeR.AppendLine( 'Announce: ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
+    StringBuildeR.AppendLine( 'Created By: ' + Torrent.Data.CreatedBy);
+    StringBuildeR.AppendLine( 'Creation Date: ' + DateTimeToStr(Torrent.Data.CreationDate));
+    StringBuildeR.AppendLine( 'Comment: ' + Torrent.Data.Comment);
+    StringBuildeR.AppendLine( 'Private: ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
+    StringBuildeR.AppendLine( '' );
+    StringBuildeR.AppendLine( 'Multi Announce List  : ');
+    for var Url in Torrent.Data.AnnounceList do StringBuildeR.AppendLine(Url);
+    StringBuildeR.AppendLine( '' );
+    StringBuildeR.AppendLine( 'Multi Web Seed Url List: ');
+    for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);
+    StringBuildeR.AppendLine( '' );
+    StringBuildeR.AppendLine( 'Root Folder : ' + Torrent.Data.Info.Name );
+    StringBuildeR.AppendLine( 'Files :' + Torrent.Data.Info.FileList.Count.ToString);
     for var FileData in Torrent.Data.Info.FileList do
     begin
       StringBuildeR.AppendLine('   -> ' + FileData.FullPath);
       StringBuildeR.AppendLine( '       Size :' + Int64FormatBKM(FileData.Length));
     end;
-    Memo1.Text := Memo1.Text  + StringBuilder.ToString;
+    Memo1.Text := StringBuilder.ToString;
+    Memo1.Lines.add( 'Total Duration: ' + (GetTickCount64 - Tme).ToString + 'ms');
+    Memo1.Lines.Insert(0, '');
   finally
     StringBuilder.Free;
     Torrent.Free;
