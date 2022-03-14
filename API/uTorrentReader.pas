@@ -17,8 +17,7 @@ const
 
 type
   TTorrentReaderOptions = set of (
-    trRaiseException,     // Will raise Exception on error (Default), silent otherwise
-    trGetHashV1FromV2     // Always calculate HashV1 for V2 Torrents
+    trRaiseException     // Will raise Exception on error (Default), silent otherwise
   );
   TFileData = class(TObject)
     Length: Int64;
@@ -218,20 +217,17 @@ begin
     and (Info.ListData.FindElement('files') <> nil)
     and (Info.ListData.FindElement('file tree') <> nil);
   // Hash
-  var stringBuilder := TStringBuilder.Create;
-  TBencoded.Encode(Info, stringBuilder);
-  var Ss := TStringStream.Create(StringBuilder.ToString);
+  var Ms := TMemoryStream.Create;
+  Info.GetRawStream(Ms);
   if FData.Info.MetaVersion = 1 then
-    FData.HashV1 := THashSHA1.GetHashString(Ss)
+    FData.HashV1 := THashSHA1.GetHashString(Ms)
   else
   begin
-    if (FData.Info.IsHybrid) or (trGetHashV1FromV2 in Options) then
-       FData.HashV1 := THashSHA1.GetHashString(Ss);
-    Ss.Position:=0;
-    FData.HashV2 := THashSHA2.GetHashString(Ss);
+    if FData.Info.IsHybrid then FData.HashV1 := THashSHA1.GetHashString(Ms);
+    Ms.Position:=0;
+    FData.HashV2 := THashSHA2.GetHashString(Ms);
   end;
-  stringBuilder.Free;
-  Ss.Free;
+  Ms.Free;
   // Name:
   Enc := Info.ListData.FindElement('name') as TBencoded;
   if assigned(Enc) then FData.Info.Name := UTF8ToString(Enc.StringData);
@@ -297,8 +293,6 @@ begin
   Data.Info.FilesSize := 0;
   for var fle in Data.Info.FileList do
     Data.Info.FilesSize := Data.Info.FilesSize + fle.Length;
-
-
 end;
 
 { TTorrentDataInfo }

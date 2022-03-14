@@ -39,11 +39,15 @@ type
   TBEncoded = class(TObject)
   private
     FFormat: TBEncodedFormat;
+    FStream: TStream;
     procedure SetFormat(Format: TBEncodedFormat);
   public
     StringData: AnsiString;
     IntegerData: int64;
     ListData: TBEncodedDataList;
+    RawStart: Int64;
+    RawEnd: Int64;
+    procedure GetRawStream(ToStream: TStream);
     property Format: TBEncodedFormat read FFormat write SetFormat;
     class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
     destructor Destroy; override;
@@ -101,6 +105,8 @@ var
   Data: TBEncodedData;
 begin
   inherited Create;
+  FStream := Stream;
+  RawStart := Stream.Position;
   if Stream.Read(X, 1) <> 1 then FormatException;
   if X = 'i' then
   begin
@@ -152,6 +158,7 @@ begin
     Format := befString;
   end
   else FormatException;
+  RawEnd := Stream.Position;
 end;
 class procedure TBEncoded.Encode(Encoded: TBEncoded; Output: TStringBuilder);
 begin
@@ -191,6 +198,13 @@ begin
         end;
     end;
   end;
+end;
+procedure TBEncoded.GetRawStream(ToStream: TStream);
+begin
+  FStream.Position := RawStart;
+  ToStream.Position := 0;
+  ToStream.CopyFrom(FStream,  RawEnd - RawStart);
+  ToStream.Position := 0;
 end;
 procedure TBEncoded.SetFormat(Format: TBEncodedFormat);
 begin
