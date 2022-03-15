@@ -68,7 +68,7 @@ type
     FBe: TBEncoded;
     procedure Parse(Be: TBencoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromStream(Stream: TStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     class function LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     constructor Create; overload;
@@ -119,13 +119,13 @@ begin
   inherited;
 end;
 
-class function TTorrentReader.LoadFromStream(Stream: TStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   Result := nil;
   try
     // Size is not an issue anymore : if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MiB)');
     Result := TTorrentReader.Create;
-    Result.FBe := TBEncoded.Create(Stream);
+    Result.FBe := TBEncoded.Create(MemStream);
     Result.Parse(Result.FBe, Options);
   except
     on E : Exception do
@@ -144,7 +144,7 @@ begin
   try
     MemStream := TMemoryStream.Create;
     MemStream.LoadFromFile(Filename);
-    Result := LoadFromStream(MemStream, Options);
+    Result := LoadFromMemoryStream(MemStream, Options);
   finally
     MemStream.Free;
   end;
@@ -157,7 +157,7 @@ begin
   stringStream := nil;
   try
     stringStream:=TStringStream.Create(Str);
-    Result := LoadFromStream(StringStream, Options);
+    Result := LoadFromMemoryStream(StringStream, Options);
   finally
     stringStream.Free;
   end;
@@ -245,17 +245,13 @@ begin
     and (Info.ListData.FindElement('file tree') <> nil);
 
   // Hash
-  var Ms := TMemoryStream.Create;
-  Info.GetRawStream(Ms);
   if FData.Info.MetaVersion = 1 then
-    FData.HashV1 := THashSHA1.GetHashString(Ms)
+    FData.HashV1 := Info.SHA1
   else
   begin
-    if FData.Info.IsHybrid then FData.HashV1 := THashSHA1.GetHashString(Ms);
-    Ms.Position:=0;
-    FData.HashV2 := THashSHA2.GetHashString(Ms);
+    if FData.Info.IsHybrid then FData.HashV1 := Info.SHA1;
+    FData.HashV2 :=  Info.SHA256;
   end;
-  Ms.Free;
 
   // Name:
   Enc := Info.ListData.FindElement('name') as TBencoded;
