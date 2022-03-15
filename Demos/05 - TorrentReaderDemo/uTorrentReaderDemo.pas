@@ -47,7 +47,6 @@ begin
       Result := Format('%.2f', [x / 1099511627776 ])+ ' TiB';
       Exit;
     end else
-
     if (x / (1024 * 1024 * 1024) >= 1) then
     begin
       Result := Format('%.2f', [x /(1024 * 1024 * 1024)] )+ ' GiB';
@@ -96,15 +95,17 @@ begin
     StringBuildeR.AppendLine( 'Private : ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Multi Announce List : ');
-    for var Url in Torrent.Data.AnnounceList do StringBuildeR.AppendLine(Url);
+    for var Announce in Torrent.Data.AnnounceList do StringBuildeR.AppendLine(Announce);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Multi Web Seed Url List : ');
     for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Root Folder : ' + Torrent.Data.Info.Name );
     StringBuildeR.AppendLine( 'Files Count : ' + Torrent.Data.Info.FileList.Count.ToString);
-    StringBuildeR.AppendLine( 'Piece Size : ' + Int64FormatBKM(Torrent.Data.Info.PieceLength));
-    StringBuildeR.AppendLine( 'Files Size : ' + Int64FormatBKM(Torrent.Data.Info.FilesSize));
+    StringBuildeR.AppendLine( 'Pieces Length : ' + Int64FormatBKM(Torrent.Data.Info.PieceLength));
+    StringBuildeR.AppendLine( 'Pieces Count (Total): ' + Torrent.Data.Info.PiecesCount.ToString);
+    StringBuildeR.AppendLine( 'Files Size (Total): ' + Int64FormatBKM(Torrent.Data.Info.FilesSize));
+    StringBuildeR.AppendLine;
     for var FileData in Torrent.Data.Info.FileList do
     begin
       StringBuildeR.AppendLine('   -> ' + FileData.FullPath);

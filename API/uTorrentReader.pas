@@ -24,6 +24,7 @@ type
     PathList: TStringList;
     FullPath: string;
     PiecesRoot: AnsiString; // V2 Only
+    PiecesCount: Int64; // V2 Only
     constructor Create; overload;
     destructor Destroy; override;
   end;
@@ -35,6 +36,7 @@ type
     Name: string;
     PieceLength: Int64;
     Pieces: AnsiString; // V1 Only
+    PiecesCount: Int64; // V1 Only;
     IsPrivate: Boolean;
     IsHybrid: Boolean;
     FilesSize: Int64;
@@ -71,7 +73,7 @@ type
   end;
 
 implementation
-uses System.NetEncoding, System.Hash;
+uses System.NetEncoding, System.Hash, Windows;
 
 procedure RaiseException(Str: string);
 begin
@@ -113,7 +115,7 @@ class function TTorrentReader.LoadFromStream(Stream: TStream; Options: TTorrentR
 begin
   Result := nil;
   try
-    if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MiB)');
+    // Size is not an issue anymore : if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MiB)');
     Result := TTorrentReader.Create;
     Result.FBe := TBEncoded.Create(Stream);
     Result.Parse(Result.FBe, Options);
@@ -151,7 +153,7 @@ begin
   end;
 end;
 procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
-  procedure ParseFileListV2(Dic: TBencoded; Path: string; FileData: TFileData);
+  procedure ParseFileListV2(Dic: TBencoded; const Path: string; FileData: TFileData);
   begin
     if not assigned(Dic.ListData) then exit;
     for var i := 0 to Dic.ListData.Count - 1 do
@@ -173,7 +175,11 @@ procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
       else if assigned(FileData) then
       begin
        if Hdr = 'length' then FileData.Length := Int;
-       if Hdr = 'pieces root' then FileData.PiecesRoot := Str;
+       if Hdr = 'pieces root' then
+       begin
+        FileData.PiecesRoot := Str;
+        FileData.PiecesCount := Length(Str) div 32;
+       end;
       end;
       if assigned(TmpDic.data.ListData) then
         if Path <> '' then
@@ -239,7 +245,12 @@ begin
   if assigned(Enc) then FData.Info.PieceLength := Enc.IntegerData;
   // Pieces:
   Enc := Info.ListData.FindElement('pieces') as TBencoded;
-  if assigned(Enc) then FData.Info.Pieces := Enc.StringData;
+  if assigned(Enc) then
+  begin
+    FData.Info.Pieces := Enc.StringData;
+    FData.Info.PiecesCount := Length(FData.Info.Pieces) div 20;
+  end;
+  var Len := ( Length(FData.Info.Pieces) / 20.0);
   //Private
   FData.Info.IsPrivate := False;
   Enc := Info.ListData.FindElement('private') as TBencoded;
@@ -281,6 +292,8 @@ begin
     end;
   end else // V2
     ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
+
+  // ********* Helper ********** //
   // MultiFiles (Helper)
   FData.Info.MultiFiles := True;
   if FData.Info.FileList.Count = 1  then
@@ -289,10 +302,14 @@ begin
       FData.Info.Name := '';
       FData.Info.MultiFiles := False;
     end;
-  // FilesSize
+  // FilesSize & PiecesCount
   Data.Info.FilesSize := 0;
   for var fle in Data.Info.FileList do
+  begin
     Data.Info.FilesSize := Data.Info.FilesSize + fle.Length;
+    if Data.Info.MetaVersion > 1 then
+      Data.Info.PiecesCount := Data.Info.PiecesCount + fle.PiecesCount;
+  end;
 end;
 
 { TTorrentDataInfo }
