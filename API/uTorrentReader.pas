@@ -123,7 +123,6 @@ class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Opt
 begin
   Result := nil;
   try
-    // Size is not an issue anymore : if Stream.Size > 104857600 then RaiseException('File size exceeds the max size limit (100 MiB)');
     Result := TTorrentReader.Create;
     Result.FBe := TBEncoded.Create(MemStream);
     Result.Parse(Result.FBe, Options);

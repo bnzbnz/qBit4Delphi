@@ -47,6 +47,8 @@ type
     FMemStream: TMemoryStream;
     FMemStart: Int64;
     FMemEnd: Int64;
+    FCachedSHA1: string;
+    FCachedSHA256: string;
     procedure SetFormat(Format: TBEncodedFormat);
     function GetSHA1: string;
     function GetSHA256: string;
@@ -217,16 +219,24 @@ end;
 
 function TBEncoded.GetSHA1: string;
 begin
-  var SHA := THashSHA1.Create;
-  SHA.Update( PByte(Cardinal(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
-  Result := SHA.HashAsString;
+  if FCachedSHA1 = '' then
+  begin
+    var SHA := THashSHA1.Create;
+    SHA.Update( PByte(Cardinal(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
+    FCachedSHA1 := SHA.HashAsString;
+  end;
+  Result := FCachedSHA1;
 end;
 
 function TBEncoded.GetSHA256: string;
 begin
-  var SHA := THashSHA2.Create;
-  SHA.Update( PByte(Cardinal(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
-  Result := SHA.HashAsString;
+  if FCachedSHA256 = '' then
+  begin
+    var SHA := THashSHA2.Create;
+    SHA.Update( PByte(Cardinal(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
+    FCachedSHA256 := SHA.HashAsString;
+  end;
+  Result := FCachedSHA256;
 end;
 
 function TBEncodedDataList.FindElement(Header: AnsiString): TBEncoded;
