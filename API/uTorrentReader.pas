@@ -79,7 +79,6 @@ type
   end;
 
 implementation
-uses System.NetEncoding;
 
 procedure RaiseException(Str: string);
 begin

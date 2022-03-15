@@ -7,8 +7,11 @@
 ///  https://torry.net/pages.php?id=650
 ///  https://stackoverflow.com/questions/34157958/delphi-how-to-use-bencode-to-get-info-hash
 ///
+
 unit uBEncode;
+
 interface
+
 uses
   Classes, Contnrs, SysUtils;
 
@@ -54,11 +57,11 @@ type
     function GetSHA256: string;
   public
     StringData: AnsiString;
-    IntegerData: int64;
+    IntegerData: Int64;
     ListData: TBEncodedDataList;
     class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
-    destructor Destroy; override;
     constructor Create(MemStream: TMemoryStream);
+    destructor Destroy; override;
     property Format: TBEncodedFormat read FFormat write SetFormat;
     property SHA1: string read GetSHA1;
     property SHA256: string read GetSHA256;
@@ -67,12 +70,12 @@ type
 implementation
 uses System.Types, System.Hash;
 
-procedure RaiseException(Str: string); inline;
+procedure RaiseException(Str: string);
 begin
   raise Exception.Create('TBEncoded: ' + Str);
 end;
 
-procedure FormatException; inline
+procedure FormatException;
 begin
   RaiseException('TBEncoded : Invalid Format');
 end;
