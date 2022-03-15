@@ -18,7 +18,8 @@ const
 
 type
   TTorrentReaderOptions = set of (
-    trRaiseException     // Will raise Exception on error (Default), silent otherwise
+    trRaiseException,     // Will raise Exception on error (Default), silent otherwise
+    trHashV1forV2         // Get HashV1 with V2 Torrents
   );
 
   TFileData = class(TObject)
@@ -78,7 +79,7 @@ type
   end;
 
 implementation
-uses System.NetEncoding, System.Hash, Windows;
+uses System.NetEncoding;
 
 procedure RaiseException(Str: string);
 begin
@@ -248,7 +249,7 @@ begin
     FData.HashV1 := Info.SHA1
   else
   begin
-    if FData.Info.IsHybrid then FData.HashV1 := Info.SHA1;
+    if (FData.Info.IsHybrid) or (trHashV1forV2 in Options) then FData.HashV1 := Info.SHA1;
     FData.HashV2 :=  Info.SHA256;
   end;
 
@@ -316,8 +317,9 @@ begin
   end else // V2
     ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
 
-  // ********* Helper ********** //
-  // HasMultipleFiles (Helper)
+  // **************** Helpers **************** //
+
+  // HasMultipleFiles
   FData.Info.HasMultipleFiles := True;
   if FData.Info.FileList.Count = 1  then
     if  FData.Info.Name =  FData.Info.FileList[0].FullPath then
