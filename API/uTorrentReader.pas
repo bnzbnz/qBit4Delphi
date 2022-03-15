@@ -220,11 +220,11 @@ begin
   // AnnounceList
   var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
   if assigned(AnnounceList) then
-    begin
-      var SubList := AnnounceList.ListData[0].Data;
-      for var i := 0 to SubList.ListData.Count - 1 do
-        FData.AnnounceList.Add(UTF8ToString((SubList.ListData[i].Data).StringData));
-    end;
+  begin
+    var SubList := AnnounceList.ListData[0].Data;
+    for var i := 0 to SubList.ListData.Count - 1 do
+      FData.AnnounceList.Add(UTF8ToString((SubList.ListData[i].Data).StringData));
+  end;
 
   // Comment
   Enc := Be.ListData.FindElement('comment');
@@ -276,7 +276,6 @@ begin
     FData.Info.Pieces := Enc.StringData;
     FData.Info.PiecesCount := Length(FData.Info.Pieces) div 20;
   end;
-  var Len := ( Length(FData.Info.Pieces) / 20.0);
 
   //Private
   FData.Info.IsPrivate := False;
