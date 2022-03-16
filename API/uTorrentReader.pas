@@ -19,7 +19,8 @@ const
 type
   TTorrentReaderOptions = set of (
     trRaiseException,     // Will raise Exception on error (Default), silent otherwise
-    trHashV1forV2         // Get HashV1 with V2 Torrents
+    trHybridAsV1,        // Handle hybrid torrent files as V1
+    trHybridAsV2         // Handle hybrid torrent files as V2
   );
 
   TFileData = class(TObject)
@@ -69,9 +70,9 @@ type
     FBe: TBEncoded;
     procedure Parse(Be: TBencoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
-    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
-    class function LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
+    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
+    class function LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
     constructor Create; overload;
     destructor Destroy; override;
     property Data: TTorrentData read FData;
@@ -119,7 +120,7 @@ begin
   inherited;
 end;
 
-class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
 begin
   Result := nil;
   try
@@ -135,7 +136,7 @@ begin
   end;
 end;
 
-class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
 var
   MemStream: TMemoryStream;
 begin
@@ -149,7 +150,7 @@ begin
   end;
 end;
 
-class function TTorrentReader.LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+class function TTorrentReader.LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
 var
   stringStream: TStringStream;
 begin
@@ -212,6 +213,13 @@ begin
   Enc := Info.ListData.FindElement('meta version');
   if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
 
+  // IsHybrid
+  FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
+                          and (Info.ListData.FindElement('file tree') <> nil);
+
+  if (FData.Info.IsHybrid) and (trHybridAsV1 in Options) then FData.Info.MetaVersion := 1;
+  if (FData.Info.IsHybrid) and (trHybridAsV2 in Options) then FData.Info.MetaVersion := 2;
+
   //Announce
   Enc := Be.ListData.FindElement('announce');
   if assigned(Enc) then FData.Announce := UTF8ToString(Enc.StringData);
@@ -246,20 +254,18 @@ begin
   Enc := Be.ListData.FindElement('creation date');
   if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
-  // IsHybrid
-  FData.Info.IsHybrid :=
-    (FData.Info.MetaVersion > 1)
-    and (Info.ListData.FindElement('files') <> nil)
-    and (Info.ListData.FindElement('file tree') <> nil);
-
   // Hash
-  if FData.Info.MetaVersion = 1 then
-    FData.HashV1 := Info.SHA1
-  else
+  if (FData.Info.IsHybrid) then
   begin
-    if (FData.Info.IsHybrid) or (trHashV1forV2 in Options) then FData.HashV1 := Info.SHA1;
-    FData.HashV2 :=  Info.SHA256;
-  end;
+    FData.HashV1 := Info.SHA1;
+    FData.HashV2 := Info.SHA256;
+  end else
+    case  FData.Info.MetaVersion of
+      1: FData.HashV1 := Info.SHA1;
+      2: FData.HashV2 := Info.SHA256;
+    else
+      RaiseException('Unknown Format');
+    end;
 
   // Name:
   Enc := Info.ListData.FindElement('name') as TBencoded;

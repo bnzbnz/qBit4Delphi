@@ -75,7 +75,7 @@ begin
   if not FileOpenDialog1.Execute then exit;
   try
     var Tme := GetTickCount64;
-    Torrent := TTorrentReader.LoadFromFile(FileOpenDialog1.FileName, [trRaiseException]);
+    Torrent := TTorrentReader.LoadFromFile(FileOpenDialog1.FileName);
     if Torrent = nil then
     begin
       Memo1.Text := 'Invalid File Format';
