@@ -95,7 +95,12 @@ begin
     StringBuildeR.AppendLine( 'Private : ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Multi Announce List : ');
-    for var Announce in Torrent.Data.AnnounceList do StringBuildeR.AppendLine(Announce);
+    for var i := 0 to Torrent.Data.AnnounceList.Count -1 do
+    begin
+      var Tier := Integer(Torrent.Data.AnnounceList.Objects[i]);
+      var Url := Torrent.Data.AnnounceList[i];
+      StringBuildeR.AppendLine( '  Tier : ' + Tier.ToString + ' : ' + Url );
+    end;
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Multi Web Seed Url List : ');
     for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);

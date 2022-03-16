@@ -220,13 +220,17 @@ begin
   var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
   if assigned(AnnounceList) then
   begin
+    var TierID := 0;
     for var SubA := 0 to AnnounceList.ListData.Count - 1 do
       case AnnounceList.ListData[SubA].Data.Format of
-        befList: 
-          for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
-             FData.AnnounceList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(True));
-        befString: 
-         FData.AnnounceList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(False));  
+        befList:
+          begin
+            for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
+             FData.AnnounceList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(TierId));
+             Inc(TierId);
+          end;
+        befString:
+          FData.AnnounceList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(0));
       end;
   end;
 
