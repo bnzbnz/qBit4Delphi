@@ -216,13 +216,18 @@ begin
   Enc := Be.ListData.FindElement('announce');
   if assigned(Enc) then FData.Announce := UTF8ToString(Enc.StringData);
 
-  // AnnounceList
+  // AnnounceList : http://bittorrent.org/beps/bep_0012.html
   var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
   if assigned(AnnounceList) then
   begin
-    var SubList := AnnounceList.ListData[0].Data;
-    for var i := 0 to SubList.ListData.Count - 1 do
-      FData.AnnounceList.Add(UTF8ToString((SubList.ListData[i].Data).StringData));
+    for var SubA := 0 to AnnounceList.ListData.Count - 1 do
+      case AnnounceList.ListData[SubA].Data.Format of
+        befList: 
+          for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
+             FData.AnnounceList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(True));
+        befString: 
+         FData.AnnounceList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(False));  
+      end;
   end;
 
   // Comment
