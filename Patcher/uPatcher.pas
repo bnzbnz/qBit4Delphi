@@ -39,9 +39,13 @@ begin
       Memo1.Lines.add(Format('Edition %d.0 found, processing...', [Version]));
       var RootDir := Reg.ReadString('RootDir');
       var DestDir := GetCurrentDir + Format('\API\JSON\%d\', [Version]);
-      var F := CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.pas'), PWideChar(DestDir + 'REST.Json.pas'), False);
+      var F := CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.pas'), PWideChar(DestDir + 'REST.Json.pas.org'), False);
+      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.pas'), PWideChar(DestDir + 'REST.Json.pas'), False);
+      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.Types.pas'),  PWideChar(DestDir + 'REST.Json.Types.pas.org'), False);
       F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.Types.pas'),  PWideChar(DestDir + 'REST.Json.Types.pas'), False);
+      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.JsonReflect.pas'),  PWideChar(DestDir + 'REST.JsonReflect.pas.org'), False);
       F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.JsonReflect.pas'),  PWideChar(DestDir + 'REST.JsonReflect.pas'), False);
+      F := F and CopyFile(PWideChar(RootDir + 'source\rtl\common\System.JSON.pas'),  PWideChar(DestDir + 'System.JSON.pas.org'), False);
       F := F and CopyFile(PWideChar(RootDir + 'source\rtl\common\System.JSON.pas'),  PWideChar(DestDir + 'System.JSON.pas'), False);
       if not F then Exit;
       Memo1.Lines.add(Format('Edition %d.0, Original files copied to %s', [Version, DestDir]));

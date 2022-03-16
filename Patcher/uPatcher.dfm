@@ -49,5 +49,6 @@ object Form2: TForm2
       'Laurent Meyer / qBit4Delphi@ea4d.com'
       '')
     TabOrder = 1
+    ExplicitTop = -6
   end
 end
