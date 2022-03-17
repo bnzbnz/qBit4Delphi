@@ -1,13 +1,10 @@
 unit uTorrentReaderDemo;
-
 interface
-
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, uTorrentReader,
   uBEncode, DateUtils, System.Generics.Defaults, System.Generics.Collections,
   Vcl.ExtCtrls;
-
 type
   TForm2 = class(TForm)
     Button1: TButton;
@@ -19,18 +16,13 @@ type
   public
     { Public declarations }
   end; 
-
 var
   Form2: TForm2;
-
 implementation
-
 {$R *.dfm}
-
 // Helpers
 const
   BoolToStr: array[boolean] of string = ('False','True');
-
 function Int64FormatBKM(v: Int64): string;
 var
   x: Double;
@@ -64,7 +56,6 @@ begin
       Result := Format('%.0f', [x] )+ ' B';
     end;
 end;
-
 procedure TForm2.Button1Click(Sender: TObject);
 var
   Torrent: TTorrentReader;
@@ -94,15 +85,15 @@ begin
     StringBuildeR.AppendLine( 'Comment : ' + Torrent.Data.Comment);
     StringBuildeR.AppendLine( 'Private : ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
     StringBuildeR.AppendLine( '' );
-    StringBuildeR.AppendLine( 'Multi Announce List : ');
-    for var i := 0 to Torrent.Data.AnnounceList.Count -1 do
+    StringBuildeR.AppendLine( 'Announce Tier/URLs : ');
+    for var Tier in Torrent.Data.AnnounceDict do
     begin
-      var Tier := Integer(Torrent.Data.AnnounceList.Objects[i]);
-      var Url := Torrent.Data.AnnounceList[i];
-      StringBuildeR.AppendLine( '  Tier : ' + Tier.ToString + ' : ' + Url );
+      StringBuildeR.AppendLine( '  Tier : ' + Tier.Key.ToString  );
+      for var Url in Tier.Value do
+        StringBuildeR.AppendLine( '         ' +  Url );
     end;
     StringBuildeR.AppendLine( '' );
-    StringBuildeR.AppendLine( 'Multi Web Seed Url List : ');
+    StringBuildeR.AppendLine( 'MWeb Seeds : ');
     for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Root Folder : ' + Torrent.Data.Info.Name );
@@ -124,5 +115,4 @@ begin
     Torrent.Free;
   end;
 end;
-
 end.

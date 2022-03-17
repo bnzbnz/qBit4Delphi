@@ -1,11 +1,12 @@
 ///
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  Version: 1.0.4
+///  Version: 1.0.5
 ///
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///  https://www.nayuki.io/page/bittorrent-bencode-format-tools
+///
 
 unit uTorrentReader;
 interface
@@ -18,8 +19,8 @@ const
 
 type
   TTorrentReaderOptions = set of (
-    trRaiseException,     // Will raise Exception on error (Default), silent otherwise
-    trHybridAsV1,        // Handle hybrid torrent files as V1
+    trRaiseException,    // Will raise Exception on error (Default), silent otherwise
+    trHybridAsV1,        // Handle hybrid torrent files as V1 (Default)
     trHybridAsV2         // Handle hybrid torrent files as V2
   );
 
@@ -52,7 +53,7 @@ type
   TTorrentData = class(TObject)
   public
     Announce: string;
-    AnnounceList: TStringList;
+    AnnounceDict : TDictionary<Integer, TStringList>;
     Comment: string;
     CreatedBy: string;
     CreationDate: TDateTime;
@@ -92,14 +93,15 @@ constructor TTorrentData.Create;
 begin
   inherited;
   Info := TTorrentDataInfo.Create;
-  AnnounceList := TStringList.Create;
+  AnnounceDict := TDictionary<Integer, TStringList>.Create;
   UrlList := TStringList.Create;
 end;
 
 destructor TTorrentData.Destroy;
 begin
   UrlList.Free;
-  AnnounceList.Free;
+  for var Tier in AnnounceDict do Tier.Value.Free;
+  AnnounceDict.Free;
   Info.Free;
   inherited;
 end;
@@ -204,6 +206,7 @@ procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
 var
   Enc, Info: TBencoded;
   EncStr: string;
+  SList: TStringList;
 
 begin
   Info := Be.ListData.FindElement('info'); //Helper;
@@ -228,17 +231,27 @@ begin
   var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
   if assigned(AnnounceList) then
   begin
-    var TierID := 0;
     for var SubA := 0 to AnnounceList.ListData.Count - 1 do
       case AnnounceList.ListData[SubA].Data.Format of
-        befList:
+        befList: // Multi Tiers
           begin
+            if not FData.AnnounceDict.TryGetValue( FData.AnnounceDict.Count , SList) then
+            begin
+              SList := TStringList.Create;
+              FData.AnnounceDict.Add(FData.AnnounceDict.Count, SList);
+            end;
             for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
-             FData.AnnounceList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(TierId));
-             Inc(TierId);
+              SList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(FData.AnnounceDict.Count - 1));
           end;
-        befString:
-          FData.AnnounceList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(0));
+        befString: // Single Tier
+          begin
+            if not FData.AnnounceDict.TryGetValue( 0, SList) then
+            begin
+              SList := TStringList.Create;
+              FData.AnnounceDict.Add(0, SList);
+            end;
+            SList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(0));
+          end;
       end;
   end;
 
@@ -264,7 +277,7 @@ begin
       1: FData.HashV1 := Info.SHA1;
       2: FData.HashV2 := Info.SHA256;
     else
-      RaiseException('Unknown Format');
+      RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
     end;
 
   // Name:
