@@ -96,6 +96,7 @@ begin
   AnnouncesDict := TDictionary<Integer, TStringList>.Create;
   WebSeeds := TStringList.Create;
   Comment := TStringList.Create;
+  Comment.StrictDelimiter := True;
   Comment.Delimiter := #$A;
 end;
 
