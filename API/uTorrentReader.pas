@@ -214,158 +214,161 @@ var
 
 begin
   Info := Be.ListData.FindElement('info'); //Helper;
+  try
+    //MetaVersion
+    FData.Info.MetaVersion := 1;
+    Enc := Info.ListData.FindElement('meta version');
+    if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
 
-  //MetaVersion
-  FData.Info.MetaVersion := 1;
-  Enc := Info.ListData.FindElement('meta version');
-  if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
+    // IsHybrid
+    FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
+                            and (Info.ListData.FindElement('file tree') <> nil);
 
-  // IsHybrid
-  FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
-                          and (Info.ListData.FindElement('file tree') <> nil);
+    if (FData.Info.IsHybrid) and (trHybridAsV1 in Options) then FData.Info.MetaVersion := 1;
+    if (FData.Info.IsHybrid) and (trHybridAsV2 in Options) then FData.Info.MetaVersion := 2;
 
-  if (FData.Info.IsHybrid) and (trHybridAsV1 in Options) then FData.Info.MetaVersion := 1;
-  if (FData.Info.IsHybrid) and (trHybridAsV2 in Options) then FData.Info.MetaVersion := 2;
+    //Announce
+    Enc := Be.ListData.FindElement('announce');
+    if assigned(Enc) then FData.Announce := UTF8ToString(Enc.StringData);
 
-  //Announce
-  Enc := Be.ListData.FindElement('announce');
-  if assigned(Enc) then FData.Announce := UTF8ToString(Enc.StringData);
-
-  // AnnounceList : http://bittorrent.org/beps/bep_0012.html
-  var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
-  if assigned(AnnounceList) then
-  begin
-    for var SubA := 0 to AnnounceList.ListData.Count - 1 do
-      case AnnounceList.ListData[SubA].Data.Format of
-        befList: // Multi Tiers
-          begin
-            if not FData.AnnouncesDict.TryGetValue( FData.AnnouncesDict.Count , SList) then
+    // AnnounceList : http://bittorrent.org/beps/bep_0012.html
+    var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
+    if assigned(AnnounceList) then
+    begin
+      for var SubA := 0 to AnnounceList.ListData.Count - 1 do
+        case AnnounceList.ListData[SubA].Data.Format of
+          befList: // Multi Tiers
             begin
-              SList := TStringList.Create;
-              FData.AnnouncesDict.Add(FData.AnnouncesDict.Count, SList);
+              if not FData.AnnouncesDict.TryGetValue( FData.AnnouncesDict.Count , SList) then
+              begin
+                SList := TStringList.Create;
+                FData.AnnouncesDict.Add(FData.AnnouncesDict.Count, SList);
+              end;
+              for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
+                SList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(FData.AnnouncesDict.Count - 1));
             end;
-            for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
-              SList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(FData.AnnouncesDict.Count - 1));
-          end;
-        befString: // Single Tier
-          begin
-            if not FData.AnnouncesDict.TryGetValue( 0, SList) then
+          befString: // Single Tier
             begin
-              SList := TStringList.Create;
-              FData.AnnouncesDict.Add(0, SList);
+              if not FData.AnnouncesDict.TryGetValue( 0, SList) then
+              begin
+                SList := TStringList.Create;
+                FData.AnnouncesDict.Add(0, SList);
+              end;
+              SList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(0));
             end;
-            SList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(0));
-          end;
+        end;
+    end;
+
+    // Comment
+    Enc := Be.ListData.FindElement('comment');
+    if assigned(Enc) then FData.Comment.DelimitedText := UTF8ToString(Enc.StringData);
+
+    // CreatedBy
+    Enc := Be.ListData.FindElement('created by');
+    if assigned(Enc) then FData.CreatedBy := UTF8ToString(Enc.StringData);
+
+    // CreationDate
+    Enc := Be.ListData.FindElement('creation date');
+    if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
+
+    // Hash
+    if (FData.Info.IsHybrid) then
+    begin
+      FData.HashV1 := Info.SHA1;
+      FData.HashV2 := Info.SHA256;
+    end else
+      case  FData.Info.MetaVersion of
+        1: FData.HashV1 := Info.SHA1;
+        2: FData.HashV2 := Info.SHA256;
+      else
+        RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
       end;
-  end;
 
-  // Comment
-  Enc := Be.ListData.FindElement('comment');
-  if assigned(Enc) then FData.Comment.DelimitedText := UTF8ToString(Enc.StringData);
+    // Name:
+    Enc := Info.ListData.FindElement('name') as TBencoded;
+    if assigned(Enc) then FData.Info.Name := UTF8ToString(Enc.StringData);
 
-  // CreatedBy
-  Enc := Be.ListData.FindElement('created by');
-  if assigned(Enc) then FData.CreatedBy := UTF8ToString(Enc.StringData);
+    // Length:
+    Enc := Info.ListData.FindElement('length') as TBencoded;
+    if assigned(Enc) then FData.Info.Length := Enc.IntegerData;
 
-  // CreationDate
-  Enc := Be.ListData.FindElement('creation date');
-  if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
+    // PieceLength:
+    Enc := Info.ListData.FindElement('piece length') as TBencoded;
+    if assigned(Enc) then FData.Info.PieceLength := Enc.IntegerData;
 
-  // Hash
-  if (FData.Info.IsHybrid) then
-  begin
-    FData.HashV1 := Info.SHA1;
-    FData.HashV2 := Info.SHA256;
-  end else
-    case  FData.Info.MetaVersion of
-      1: FData.HashV1 := Info.SHA1;
-      2: FData.HashV2 := Info.SHA256;
-    else
-      RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
-    end;
-
-  // Name:
-  Enc := Info.ListData.FindElement('name') as TBencoded;
-  if assigned(Enc) then FData.Info.Name := UTF8ToString(Enc.StringData);
-
-  // Length:
-  Enc := Info.ListData.FindElement('length') as TBencoded;
-  if assigned(Enc) then FData.Info.Length := Enc.IntegerData;
-
-  // PieceLength:
-  Enc := Info.ListData.FindElement('piece length') as TBencoded;
-  if assigned(Enc) then FData.Info.PieceLength := Enc.IntegerData;
-
-  // Pieces:
-  Enc := Info.ListData.FindElement('pieces') as TBencoded;
-  if assigned(Enc) then
-  begin
-    FData.Info.Pieces := Enc.StringData;
-    FData.Info.PiecesCount := Length(FData.Info.Pieces) div 20;
-  end;
-
-  //Private
-  FData.Info.IsPrivate := False;
-  Enc := Info.ListData.FindElement('private') as TBencoded;
-  if assigned(Enc) then FData.Info.IsPrivate := Enc.IntegerData = 1;
-
-  //UrlList:
-  Enc := Be.ListData.FindElement('url-list') as TBencoded;
-  if assigned(Enc) then
-    if Enc.ListData = nil then
-      FData.WebSeeds.Add(String(Enc.StringData))
-    else
-      for var i := 0 to Enc.ListData.Count - 1 do
-        FData.WebSeeds.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
-
-  // files :
-  if FData.Info.MetaVersion = 1 then
-  begin // V1
-    var FL := Info.ListData.FindElement('files');
-    if FL <> nil then
-    for var i := 0 to FL.ListData.Count - 1 do
+    // Pieces:
+    Enc := Info.ListData.FindElement('pieces') as TBencoded;
+    if assigned(Enc) then
     begin
-      // Multiple Files/Folders
-      var FileData := TFileData.Create;
-      var FLD := FL.ListData.Items[i].Data;
-      FileData.Length := FLD.ListData.FindElement('length').IntegerData;
-      var FLDP := FLD.ListData.FindElement('path');
-      for var j := 0 to FLDP.ListData.Count - 1 do
-        FileData.PathList.Add(UTF8ToString(FLDP.ListData.Items[j].Data.StringData));
-      FileData.PathList.Delimiter := TORRENTREADER_PATH_SEPARATOR;
-      FileData.PathList.QuoteChar := #0;
-      FileData.PathList.StrictDelimiter := True;
-      FileData.FullPath := FileData.PathList.DelimitedText;
-      FData.Info.FileList.Add(FileData);
-    end else begin
-      // A Single File
-      var FileData := TFileData.Create;
-      FileData.Length := FData.Info.Length;
-      FileData.FullPath := FData.Info.Name;
-      FileData.PathList.Add(FData.Info.Name);
-      FData.Info.FileList.Add(FileData);
+      FData.Info.Pieces := Enc.StringData;
+      FData.Info.PiecesCount := Length(FData.Info.Pieces) div 20;
     end;
-  end else // V2
-    ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
 
-  // **************** Helpers **************** //
+    //Private
+    FData.Info.IsPrivate := False;
+    Enc := Info.ListData.FindElement('private') as TBencoded;
+    if assigned(Enc) then FData.Info.IsPrivate := Enc.IntegerData = 1;
 
-  // HasMultipleFiles
-  FData.Info.HasMultipleFiles := True;
-  if FData.Info.FileList.Count = 1  then
-    if  FData.Info.Name =  FData.Info.FileList[0].FullPath then
+    //UrlList:
+    Enc := Be.ListData.FindElement('url-list') as TBencoded;
+    if assigned(Enc) then
+      if Enc.ListData = nil then
+        FData.WebSeeds.Add(String(Enc.StringData))
+      else
+        for var i := 0 to Enc.ListData.Count - 1 do
+          FData.WebSeeds.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
+
+    // files :
+    if FData.Info.MetaVersion = 1 then
+    begin // V1
+      var FL := Info.ListData.FindElement('files');
+      if FL <> nil then
+      for var i := 0 to FL.ListData.Count - 1 do
+      begin
+        // Multiple Files/Folders
+        var FileData := TFileData.Create;
+        var FLD := FL.ListData.Items[i].Data;
+        FileData.Length := FLD.ListData.FindElement('length').IntegerData;
+        var FLDP := FLD.ListData.FindElement('path');
+        for var j := 0 to FLDP.ListData.Count - 1 do
+          FileData.PathList.Add(UTF8ToString(FLDP.ListData.Items[j].Data.StringData));
+        FileData.PathList.Delimiter := TORRENTREADER_PATH_SEPARATOR;
+        FileData.PathList.QuoteChar := #0;
+        FileData.PathList.StrictDelimiter := True;
+        FileData.FullPath := FileData.PathList.DelimitedText;
+        FData.Info.FileList.Add(FileData);
+      end else begin
+        // A Single File
+        var FileData := TFileData.Create;
+        FileData.Length := FData.Info.Length;
+        FileData.FullPath := FData.Info.Name;
+        FileData.PathList.Add(FData.Info.Name);
+        FData.Info.FileList.Add(FileData);
+      end;
+    end else // V2
+      ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
+
+    // **************** Helpers **************** //
+
+    // HasMultipleFiles
+    FData.Info.HasMultipleFiles := True;
+    if FData.Info.FileList.Count = 1  then
+      if  FData.Info.Name =  FData.Info.FileList[0].FullPath then
+      begin
+        FData.Info.Name := '';
+        FData.Info.HasMultipleFiles := False;
+      end;
+
+    // FilesSize & PiecesCount
+    Data.Info.FilesSize := 0;
+    for var fle in Data.Info.FileList do
     begin
-      FData.Info.Name := '';
-      FData.Info.HasMultipleFiles := False;
+      Data.Info.FilesSize := Data.Info.FilesSize + fle.Length;
+      if Data.Info.MetaVersion > 1 then
+        Data.Info.PiecesCount := Data.Info.PiecesCount + fle.PiecesCount;
     end;
-
-  // FilesSize & PiecesCount
-  Data.Info.FilesSize := 0;
-  for var fle in Data.Info.FileList do
-  begin
-    Data.Info.FilesSize := Data.Info.FilesSize + fle.Length;
-    if Data.Info.MetaVersion > 1 then
-      Data.Info.PiecesCount := Data.Info.PiecesCount + fle.PiecesCount;
+  except
+    RaiseException('Invalid Torrent File');
   end;
 end;
 
