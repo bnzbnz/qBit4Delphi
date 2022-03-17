@@ -13,7 +13,7 @@ unit uBEncode;
 interface
 
 uses
-  Classes, Contnrs, SysUtils;
+  Classes, Contnrs, SysUtils, System.Generics.Collections, System.Generics.Defaults;
 
 type
   TBEncoded = class;
@@ -22,26 +22,14 @@ type
 
   TBEncodedData = class(TObject)
   public
-    Header: AnsiString;
     Data: TBEncoded;
+    Header: AnsiString;
     constructor Create(Data: TBEncoded);
     destructor Destroy; override;
   end;
 
-  TBEncodedDataList = class(TObjectList)
-  protected
-    function GetItems(Index: Integer): TBEncodedData;
-    procedure SetItems(Index: Integer; AClass: TBEncodedData);
-  public
+  TBEncodedDataList = class(TObjectList<TBEncodedData>)
     function FindElement(Header: AnsiString): TBEncoded;
-    function Add(AClass: TBEncodedData): Integer;
-    function Extract(Item: TBEncodedData): TBEncodedData;
-    function Remove(AClass: TBEncodedData): Integer;
-    function IndexOf(AClass: TBEncodedData): Integer;
-    function First: TBEncodedData;
-    function Last: TBEncodedData;
-    procedure Insert(Index: Integer; AClass: TBEncodedData);
-    property Items[Index: Integer]: TBEncodedData read GetItems write SetItems; default;
   end;
 
   TBEncoded = class(TObject)
@@ -56,9 +44,9 @@ type
     function GetSHA1: string;
     function GetSHA256: string;
   public
-    StringData: AnsiString;
     IntegerData: Int64;
     ListData: TBEncodedDataList;
+    StringData: AnsiString;
     class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
     constructor Create(MemStream: TMemoryStream);
     destructor Destroy; override;
@@ -68,7 +56,7 @@ type
   end;
 
 implementation
-uses System.Types, System.Hash;
+uses System.Types, System.Hash, Windows;
 
 procedure RaiseException(Str: string);
 begin
@@ -246,56 +234,11 @@ function TBEncodedDataList.FindElement(Header: AnsiString): TBEncoded;
 begin
   Result := nil;
   for var i := 0 to Count - 1 do
-    if LowerCase(String(Items[i].Header)) = LowerCase(String(Header)) then
+    if Items[i].Header = Header then
     begin
       Result := Items[i].Data;
       Break;
     end;
-end;
-
-function TBEncodedDataList.Add(AClass: TBEncodedData): Integer;
-begin
-  Result := inherited Add(AClass);
-end;
-
-function TBEncodedDataList.Extract(Item: TBEncodedData): TBEncodedData;
-begin
-  Result := TBEncodedData(inherited Extract(Item));
-end;
-
-function TBEncodedDataList.First: TBEncodedData;
-begin
-  Result := TBEncodedData(inherited First);
-end;
-
-function TBEncodedDataList.GetItems(Index: Integer): TBEncodedData;
-begin
-  Result := TBEncodedData(inherited Items[Index]);
-end;
-
-function TBEncodedDataList.IndexOf(AClass: TBEncodedData): Integer;
-begin
-  Result := inherited IndexOf(AClass);
-end;
-
-procedure TBEncodedDataList.Insert(Index: Integer; AClass: TBEncodedData);
-begin
-  inherited Insert(Index, AClass);
-end;
-
-function TBEncodedDataList.Last: TBEncodedData;
-begin
-  Result := TBEncodedData(inherited First);
-end;
-
-function TBEncodedDataList.Remove(AClass: TBEncodedData): Integer;
-begin
-  Result := inherited Remove(AClass);
-end;
-
-procedure TBEncodedDataList.SetItems(Index: Integer; AClass: TBEncodedData);
-begin
-  inherited Items[Index] := AClass;
 end;
 
 end.
