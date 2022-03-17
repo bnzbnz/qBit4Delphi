@@ -82,19 +82,20 @@ begin
     StringBuildeR.AppendLine( 'Announce : ' + Torrent.Data.Announce); // AnnounceList for multiple Annouces
     StringBuildeR.AppendLine( 'Created By : ' + Torrent.Data.CreatedBy);
     StringBuildeR.AppendLine( 'Creation Date : ' + DateTimeToStr(Torrent.Data.CreationDate));
-    StringBuildeR.AppendLine( 'Comment : ' + Torrent.Data.Comment);
+    StringBuildeR.AppendLine( 'Comments : ');
+    StringBuildeR.AppendLine(  Torrent.Data.Comment.Text);
     StringBuildeR.AppendLine( 'Private : ' + BoolToStr[Torrent.Data.Info.IsPrivate]);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Announce Tier/URLs : ');
-    for var Tier in Torrent.Data.AnnounceDict do
+    for var Tier in Torrent.Data.AnnouncesDict do
     begin
       StringBuildeR.AppendLine( '  Tier : ' + Tier.Key.ToString  );
       for var Url in Tier.Value do
         StringBuildeR.AppendLine( '         ' +  Url );
     end;
     StringBuildeR.AppendLine( '' );
-    StringBuildeR.AppendLine( 'MWeb Seeds : ');
-    for var Url in Torrent.Data.UrlList do StringBuildeR.AppendLine(Url);
+    StringBuildeR.AppendLine( 'Web Seeds : ');
+    for var Url in Torrent.Data.WebSeeds do StringBuildeR.AppendLine(Url);
     StringBuildeR.AppendLine( '' );
     StringBuildeR.AppendLine( 'Root Folder : ' + Torrent.Data.Info.Name );
     StringBuildeR.AppendLine( 'Files Count : ' + Torrent.Data.Info.FileList.Count.ToString);

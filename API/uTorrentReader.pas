@@ -25,9 +25,9 @@ type
   );
 
   TFileData = class(TObject)
+    FullPath: string;
     Length: Int64;
     PathList: TStringList;
-    FullPath: string;
     PiecesRoot: AnsiString; // V2 Only
     PiecesCount: Int64; // V2 Only
     constructor Create; overload;
@@ -35,17 +35,17 @@ type
   end;
 
   TTorrentDataInfo = class(TObject)
-    MetaVersion: Int64;
-    HasMultipleFiles: Boolean;
     FileList: TObjectList<TFileData>;
+    FilesSize: Int64;
+    HasMultipleFiles: Boolean;
+    IsHybrid: Boolean;
+    IsPrivate: Boolean;
     Length: Int64;
+    MetaVersion: Int64;
     Name: string;
-    PieceLength: Int64;
     Pieces: AnsiString; // V1 Only
     PiecesCount: Int64; // V1 Only;
-    IsPrivate: Boolean;
-    IsHybrid: Boolean;
-    FilesSize: Int64;
+    PieceLength: Int64;
     constructor Create; overload;
     destructor Destroy; override;
   end;
@@ -53,31 +53,31 @@ type
   TTorrentData = class(TObject)
   public
     Announce: string;
-    AnnounceDict : TDictionary<Integer, TStringList>;
-    Comment: string;
+    AnnouncesDict : TDictionary<Integer, TStringList>;
+    Comment: TStringList;
     CreatedBy: string;
     CreationDate: TDateTime;
     HashV1: string;
     HashV2: string;
     Info: TTorrentDataInfo;
-    UrlList: TStringList;
+    WebSeeds: TStringList;
     constructor Create; overload;
     destructor Destroy; override;
   end;
 
   TTorrentReader = class(TObject)
   private
-    FData: TTorrentData;
     FBe: TBEncoded;
+    FData: TTorrentData;
     procedure Parse(Be: TBencoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
     class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
+    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
     class function LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
     constructor Create; overload;
     destructor Destroy; override;
-    property Data: TTorrentData read FData;
     property BEncoded: TBEncoded read FBe;
+    property Data: TTorrentData read FData;
   end;
 
 implementation
@@ -93,15 +93,18 @@ constructor TTorrentData.Create;
 begin
   inherited;
   Info := TTorrentDataInfo.Create;
-  AnnounceDict := TDictionary<Integer, TStringList>.Create;
-  UrlList := TStringList.Create;
+  AnnouncesDict := TDictionary<Integer, TStringList>.Create;
+  WebSeeds := TStringList.Create;
+  Comment := TStringList.Create;
+  Comment.Delimiter := #$A;
 end;
 
 destructor TTorrentData.Destroy;
 begin
-  UrlList.Free;
-  for var Tier in AnnounceDict do Tier.Value.Free;
-  AnnounceDict.Free;
+  Comment.Free;
+  WebSeeds.Free;
+  for var Tier in AnnouncesDict do Tier.Value.Free;
+  AnnouncesDict.Free;
   Info.Free;
   inherited;
 end;
@@ -235,20 +238,20 @@ begin
       case AnnounceList.ListData[SubA].Data.Format of
         befList: // Multi Tiers
           begin
-            if not FData.AnnounceDict.TryGetValue( FData.AnnounceDict.Count , SList) then
+            if not FData.AnnouncesDict.TryGetValue( FData.AnnouncesDict.Count , SList) then
             begin
               SList := TStringList.Create;
-              FData.AnnounceDict.Add(FData.AnnounceDict.Count, SList);
+              FData.AnnouncesDict.Add(FData.AnnouncesDict.Count, SList);
             end;
             for var SubL := 0 to  AnnounceList.ListData[SubA].Data.ListData.Count - 1 do
-              SList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(FData.AnnounceDict.Count - 1));
+              SList.AddObject(UTF8ToString(AnnounceList.ListData[SubA].Data.ListData[SubL].Data.StringData), Pointer(FData.AnnouncesDict.Count - 1));
           end;
         befString: // Single Tier
           begin
-            if not FData.AnnounceDict.TryGetValue( 0, SList) then
+            if not FData.AnnouncesDict.TryGetValue( 0, SList) then
             begin
               SList := TStringList.Create;
-              FData.AnnounceDict.Add(0, SList);
+              FData.AnnouncesDict.Add(0, SList);
             end;
             SList.AddObject(UTF8ToString((AnnounceList.ListData[SubA].Data).StringData), Pointer(0));
           end;
@@ -257,7 +260,7 @@ begin
 
   // Comment
   Enc := Be.ListData.FindElement('comment');
-  if assigned(Enc) then FData.Comment :=UTF8ToString(Enc.StringData);
+  if assigned(Enc) then FData.Comment.DelimitedText := UTF8ToString(Enc.StringData);
 
   // CreatedBy
   Enc := Be.ListData.FindElement('created by');
@@ -309,10 +312,10 @@ begin
   Enc := Be.ListData.FindElement('url-list') as TBencoded;
   if assigned(Enc) then
     if Enc.ListData = nil then
-      FData.UrlList.Add(String(Enc.StringData))
+      FData.WebSeeds.Add(String(Enc.StringData))
     else
       for var i := 0 to Enc.ListData.Count - 1 do
-        FData.UrlList.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
+        FData.WebSeeds.Add(UTF8ToString(Enc.ListData[i].Data.StringData));
 
   // files :
   if FData.Info.MetaVersion = 1 then
