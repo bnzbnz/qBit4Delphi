@@ -36,8 +36,8 @@ type
   private
     FFormat: TBEncodedFormat;
     FMemStream: TMemoryStream;
-    FMemStart: Int64;
-    FMemEnd: Int64;
+    FMemStart: NativeUInt;
+    FMemEnd: NativeUInt;
     procedure SetFormat(Format: TBEncodedFormat);
     function GetSHA1: string;
     function GetSHA256: string;
@@ -91,26 +91,28 @@ begin
   RaiseException('TBEncoded : Invalid Format');
 end;
 
-function GetSHA(AlgoID: DWORD; const Buffer; const Size: Integer): string;
+{$IF defined(MSWINDOWS)}
+function GetSHA(AlgoID: DWORD; Buffer: Pointer; Size: DWORD): string;
 var
-  phProv: ULONG_PTR;
-  phHash: ULONG_PTR;
-  ByfeBuffer: Array[0..32-1] of Byte;
+  phProv: ULONG_PTR ;
+  phHash: ULONG_PTR ;
+  ByteBuffer: Array[0..32-1] of Byte;
   TempResult: AnsiString;
-  Len: DWord;
+  Len: DWORD;
 begin
   // AlgoID : SHA1 = $8004, SHA256 = $800C
   var R := _CryptAcquireContextA(phProv, nil, nil, 24, DWORD($F0000000));
   R := R and _CryptCreateHash(phProv,  AlgoId, 0, 0, phHash);
-  R := R and _CryptHashData(phHash,PByte(@Buffer), size, 0);
-  Len := Length(ByfeBuffer);
-  R := R and _CryptGetHashParam(phHash, 2, @ByfeBuffer, Len, 0);
+  R := R and _CryptHashData(phHash, LPBYTE(Buffer), Size,0);
+  Len := Length(ByteBuffer);
+  R := R and _CryptGetHashParam(phHash, 2, @ByteBuffer, Len, 0);
   SetLength(TempResult, Len * 2);
-  BinToHex(@ByfeBuffer, PAnsiChar(@TempResult[1]), Len);
+  BinToHex(@ByteBuffer, PAnsiChar(@TempResult[1]), Len);
   R := R and _CryptDestroyHash(phHash);
   R := R and _CryptReleaseContext(phProv, 0);
   if not R then Result := '' else Result := LowerCase(String(TempResult));
 end;
+{$ENDIF}
 
 { TBEncodedData }
 
@@ -259,10 +261,10 @@ end;
 function TBEncoded.GetSHA1: string;
 begin
 {$IF defined(MSWINDOWS)}
-  Result := GetSHA($8004, PByte(Cardinal(FMemStream.Memory) + FMemStart)^, FMemEnd - FMemStart);
+  Result := GetSHA($8004, Pointer(NativeUInt(FMemStream.Memory) + FMemStart), FMemEnd - FMemStart);
 {$ELSE}
   var SHA := THashSHA1.Create;
-  SHA.Update( PByte(Cardinal(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
+  SHA.Update( PByte(NativeUInt(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
   Result := SHA.HashAsString;
 {$ENDIF}
 end;
@@ -270,7 +272,7 @@ end;
 function TBEncoded.GetSHA256: string;
 begin
 {$IF defined(MSWINDOWS)}
-  Result := GetSHA($800C, PByte(Cardinal(FMemStream.Memory) + FMemStart)^, FMemEnd - FMemStart);
+  Result := GetSHA($800C, Pointer(NativeUInt(FMemStream.Memory) + FMemStart), FMemEnd - FMemStart);
 {$ELSE}
   var SHA := THashSHA2.Create;
   SHA.Update( PByte(Cardinal(FMemStream.Memory) + FMemStart)^ ,  FMemEnd - FMemStart);
