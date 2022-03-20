@@ -37,7 +37,6 @@ type
     FFormat: TBEncodedFormat;
     FBufferStart: NativeUInt;
     FBufferEnd: NativeUInt;
-    procedure SetFormat(Format: TBEncodedFormat);
   public
     IntegerData: Int64;
     ListData: TBEncodedDataList;
@@ -45,7 +44,7 @@ type
     class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
     constructor Create(var BufferPtr: PAnsiChar);
     destructor Destroy; override;
-    property Format: TBEncodedFormat read FFormat write SetFormat;
+    property Format: TBEncodedFormat read FFormat;
     property BufferStart: NativeUInt read FBufferStart;
     property BufferEnd: NativeUInt read FBufferEnd;
   end;
@@ -147,6 +146,7 @@ var
 begin
   inherited Create;
   FBufferStart := NativeUInt(BufferPtr);
+
   if BufferPtr^ = 'i' then
   begin
     Buffer := '';
@@ -155,7 +155,8 @@ begin
   end
   else if BufferPtr^ = 'l' then
   begin
-    Format := befList;
+    FFormat := befList;
+    ListData := TBEncodedDataList.Create;
     Inc(BufferPtr);
     repeat
       if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
@@ -164,7 +165,8 @@ begin
   end
   else if  BufferPtr^ = 'd' then
   begin
-    Format := befDictionary;
+    FFormat := befDictionary;
+    ListData := TBEncodedDataList.Create;
     Inc(BufferPtr);
     repeat
       if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
@@ -174,12 +176,12 @@ begin
       ListData.Add(Data);
     until False;
   end
-  else if BufferPtr^ in ['0'..'9'] then
+  else
   begin
+    FFormat := befString;
     GetString(StringData);
-    Format := befString;
-  end
-    else FormatException;
+  end;
+
   FBufferEnd := NativeUInt(BufferPtr);
 end;
 
@@ -211,12 +213,6 @@ begin
         end;
     end;
   end;
-end;
-
-procedure TBEncoded.SetFormat(Format: TBEncodedFormat);
-begin
-  if Format in [befList, befDictionary] then ListData := TBEncodedDataList.Create;
-  FFormat := Format;
 end;
 
 { TBEncodedDataList }
