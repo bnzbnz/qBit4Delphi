@@ -69,7 +69,7 @@ begin
   RaiseException('TBEncoded : Invalid Format');
 end;
 
-function AnsiToUInt(const AnsiStr: AnsiString): NativeUInt; inline
+function AnsiToUInt(var AnsiStr: AnsiString): NativeUInt; inline
 var
   P: PByte;
 begin
@@ -106,24 +106,23 @@ end;
 
 constructor TBEncoded.Create(var BufferPtr: PAnsiChar);
 
-  procedure GetString(var Str: AnsiString);
+  procedure GetString(var AnsiStr: AnsiString);
   var
     Len: Int64;
   begin
-    Str := BufferPtr^;;
+    Len := PByte(BufferPtr)^ - 48 ;
     repeat
       Inc(BufferPtr);
       if BufferPtr^ = ':' then
       begin
          Inc(BufferPtr);
-         Len := AnsiToUInt(Str);
-         SetLength(Str, Len);
-         Move(BufferPtr^, Str[1] , Len);
-         BufferPtr := BufferPtr + Len;
+         SetLength(AnsiStr, Len);
+         Move(BufferPtr^, AnsiStr[1] , Len);
+         Inc(BufferPtr, Len);
          Break;
       end
       else
-        Str := Str + BufferPtr^;
+        Len := (Len * 10) + PByte(BufferPtr)^ - 48;
     until False;
   end;
 
