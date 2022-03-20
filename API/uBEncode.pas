@@ -106,17 +106,15 @@ end;
 constructor TBEncoded.Create(var BufferPtr: PAnsiChar);
 
   procedure GetString(var AnsiStr: AnsiString);
-  var
-    Len: Int64;
   begin
-    Len := PByte(BufferPtr)^ - 48 ;
+    var Len := Int64(PByte(BufferPtr)^ - 48) ;
     repeat
       Inc(BufferPtr);
       if BufferPtr^ = ':' then
       begin
          Inc(BufferPtr);
          SetLength(AnsiStr, Len);
-         Move(BufferPtr^, AnsiStr[1] , Len);
+         Move(BufferPtr^, AnsiStr[1], Len);
          Inc(BufferPtr, Len);
          Break;
       end

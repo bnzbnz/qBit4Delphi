@@ -69,13 +69,13 @@ type
   private
     FBe: TBEncoded;
     FData: TTorrentData;
-    function GetSHA1(Enc: TBencoded): string;
-    function GetSHA256(Enc: TBencoded): string;
-    procedure Parse(Be: TBencoded; Options: TTorrentReaderOptions);
+    function GetSHA1(Enc: TBEncoded): string;
+    function GetSHA2(Enc: TBEncoded): string;
+    procedure Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
-    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
-    class function LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
+    class function LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
     constructor Create; overload;
     destructor Destroy; override;
     property BEncoded: TBEncoded read FBe;
@@ -84,7 +84,7 @@ type
 
 implementation
 {$IF defined(MSWINDOWS)}
-uses System.Types, System.Hash, Windows;
+uses Windows;
 {$ELSE}
 uses System.Types, System.Hash;
 {$ENDIF}
@@ -106,16 +106,9 @@ function CryptDestroyHash(hHash: ULONG_PTR): BOOL; stdcall;
   external 'advapi32.dll' Name 'CryptDestroyHash';
 function CryptDestroyKey(hKey: ULONG_PTR): BOOL; stdcall;
   external 'advapi32.dll' Name 'CryptDestroyKey';
-{$ENDIF}
 
-procedure RaiseException(Str: string);
-begin
-  raise Exception.Create('TTorrentReader: ' + Str);
-end;
-
-{$IF defined(MSWINDOWS)}
- // AlgoID : SHA1 = $8004, SHA256 = $800C
-function GetSHA(AlgoID: DWORD; Buffer: Pointer; Size: DWORD): AnsiString;
+// AlgoID : SHA1 = $8004, SHA2-256 = $800C
+function WinCryptSHA(AlgoID: DWORD; Buffer: Pointer; Size: DWORD): AnsiString;
 var
   phProv: ULONG_PTR ;
   phHash: ULONG_PTR ;
@@ -123,7 +116,7 @@ var
   Len: DWORD;
 begin
   CryptAcquireContextA(phProv, nil, nil, 24, DWORD($F0000000));
-   CryptCreateHash(phProv,  AlgoId, 0, 0, phHash);
+  CryptCreateHash(phProv, AlgoID, 0, 0, phHash);
   CryptHashData(phHash, LPBYTE(Buffer), Size,0);
   Len := Length(ByteBuffer);
   CryptGetHashParam(phHash, 2, @ByteBuffer, Len, 0);
@@ -133,6 +126,11 @@ begin
   CryptReleaseContext(phProv, 0);
 end;
 {$ENDIF}
+
+procedure RaiseException(Str: string);
+begin
+  raise Exception.Create('TTorrentReader: ' + Str);
+end;
 
 { TTorrentData }
 
@@ -173,10 +171,10 @@ begin
   inherited;
 end;
 
-function TTorrentReader.GetSHA1(Enc: TBencoded): string;
+function TTorrentReader.GetSHA1(Enc: TBEncoded): string;
 begin
 {$IF defined(MSWINDOWS)}
-  Result := LowerCase(string(GetSHA($8004, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
+  Result := LowerCase(string(WinCryptSHA($8004, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
 {$ELSE}
   var SHA := THashSHA1.Create;
   SHA.Update( PByte(Enc.BufferStart)^ , Enc.BufferEnd - Enc.BufferStart);
@@ -184,10 +182,10 @@ begin
 {$ENDIF}
 end;
 
-function TTorrentReader.GetSHA256(Enc: TBencoded): string;
+function TTorrentReader.GetSHA2(Enc: TBEncoded): string;
 begin
 {$IF defined(MSWINDOWS)}
-  Result := LowerCase(string(GetSHA($800C, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
+  Result := LowerCase(string(WinCryptSHA($800C, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
 {$ELSE}
   var SHA := THashSHA2.Create;
   SHA.Update( PByte(Enc.BufferStart)^ , Enc.BufferEnd - Enc.BufferStart);
@@ -195,12 +193,11 @@ begin
 {$ENDIF}
 end;
 
-class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
+class function TTorrentReader.LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
 begin
   Result := nil;
   try
     Result := TTorrentReader.Create;
-    var BufferPtr :=  PAnsiChar(MemStream.Memory);
     Result.FBe := TBEncoded.Create(BufferPtr);
     Result.Parse(Result.FBe, Options);
   except
@@ -212,7 +209,13 @@ begin
   end;
 end;
 
-class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
+class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+begin
+  var BufferPtr := PAnsiChar(MemStream.Memory);
+  Result := LoadFromBufferPtr(BufferPtr, Options);
+end;
+
+class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
 var
   MemStream: TMemoryStream;
 begin
@@ -226,22 +229,9 @@ begin
   end;
 end;
 
-class function TTorrentReader.LoadFromString(Str: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
-var
-  stringStream: TStringStream;
-begin
-  stringStream := nil;
-  try
-    stringStream:=TStringStream.Create(Str);
-    Result := LoadFromMemoryStream(StringStream, Options);
-  finally
-    stringStream.Free;
-  end;
-end;
+procedure TTorrentReader.Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
 
-procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
-
-  procedure ParseFileListV2(Dic: TBencoded; const Path: string; FileData: TFileData);
+  procedure ParseFileListV2(Dic: TBEncoded; const Path: string; FileData: TFileData);
   begin
     if not assigned(Dic.ListData) then exit;
     for var i := 0 to Dic.ListData.Count - 1 do
@@ -278,7 +268,7 @@ procedure TTorrentReader.Parse(Be: TBencoded; Options: TTorrentReaderOptions);
   end;
 
 var
-  Enc, Info: TBencoded;
+  Enc, Info: TBEncoded;
   EncStr: string;
   SList: TStringList;
 
@@ -289,6 +279,7 @@ begin
     FData.Info.MetaVersion := 1;
     Enc := Info.ListData.FindElement('meta version');
     if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
+    if FData.Info.MetaVersion >2 then RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
 
     // IsHybrid
     FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
@@ -302,7 +293,7 @@ begin
     if assigned(Enc) then FData.Announce := UTF8ToString(Enc.StringData);
 
     // AnnounceList : http://bittorrent.org/beps/bep_0012.html
-    var AnnounceList := Be.ListData.FindElement('announce-list') as TBencoded;
+    var AnnounceList := Be.ListData.FindElement('announce-list') as TBEncoded;
     if assigned(AnnounceList) then
     begin
       for var SubA := 0 to AnnounceList.ListData.Count - 1 do
@@ -342,32 +333,23 @@ begin
     if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
     // Hash
-    if (FData.Info.IsHybrid) then
-    begin
-      FData.HashV1 := GetSHA1(Info);
-      FData.HashV2 := GetSHA256(Info);
-    end else
-      case  FData.Info.MetaVersion of
-        1: FData.HashV1 := GetSHA1(Info);
-        2: FData.HashV2 := GetSHA256(Info);
-      else
-        RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
-      end;
+    if (FData.Info.MetaVersion = 1) or (FData.Info.IsHybrid) then FData.HashV1 := GetSHA1(Info);
+    if (FData.Info.MetaVersion = 2) or (FData.Info.IsHybrid) then FData.HashV2 := GetSHA2(Info);
 
     // Name:
-    Enc := Info.ListData.FindElement('name') as TBencoded;
+    Enc := Info.ListData.FindElement('name') as TBEncoded;
     if assigned(Enc) then FData.Info.Name := UTF8ToString(Enc.StringData);
 
     // Length:
-    Enc := Info.ListData.FindElement('length') as TBencoded;
+    Enc := Info.ListData.FindElement('length') as TBEncoded;
     if assigned(Enc) then FData.Info.Length := Enc.IntegerData;
 
     // PieceLength:
-    Enc := Info.ListData.FindElement('piece length') as TBencoded;
+    Enc := Info.ListData.FindElement('piece length') as TBEncoded;
     if assigned(Enc) then FData.Info.PieceLength := Enc.IntegerData;
 
     // Pieces:
-    Enc := Info.ListData.FindElement('pieces') as TBencoded;
+    Enc := Info.ListData.FindElement('pieces') as TBEncoded;
     if assigned(Enc) then
     begin
       FData.Info.Pieces := Enc.StringData;
@@ -376,11 +358,11 @@ begin
 
     //Private
     FData.Info.IsPrivate := False;
-    Enc := Info.ListData.FindElement('private') as TBencoded;
+    Enc := Info.ListData.FindElement('private') as TBEncoded;
     if assigned(Enc) then FData.Info.IsPrivate := Enc.IntegerData = 1;
 
     //UrlList:
-    Enc := Be.ListData.FindElement('url-list') as TBencoded;
+    Enc := Be.ListData.FindElement('url-list') as TBEncoded;
     if assigned(Enc) then
       if Enc.ListData = nil then
         FData.WebSeeds.Add(String(Enc.StringData))
