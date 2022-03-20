@@ -20,7 +20,9 @@ var
   Form2: TForm2;
 implementation
 {$R *.dfm}
-// Helpers
+
+{ Helpers }
+
 const
   BoolToStr: array[boolean] of string = ('False','True');
 function Int64FormatBKM(v: Int64): string;
@@ -56,6 +58,7 @@ begin
       Result := Format('%.0f', [x] )+ ' B';
     end;
 end;
+
 procedure TForm2.Button1Click(Sender: TObject);
 var
   Torrent: TTorrentReader;
@@ -116,4 +119,5 @@ begin
     Torrent.Free;
   end;
 end;
+
 end.

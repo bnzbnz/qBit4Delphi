@@ -1,7 +1,7 @@
 ///
 ///  Authors: ShareNET Networks, Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  Version: 2.0.1
+///  Version: 2.2.0
 ///
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://torry.net/pages.php?id=650
@@ -35,22 +35,19 @@ type
   TBEncoded = class(TObject)
   private
     FFormat: TBEncodedFormat;
-    FMemStream: TMemoryStream;
-    FMemStart: FixedUInt;
-    FMemEnd: FixedUInt;
+    FBufferStart: NativeUInt;
+    FBufferEnd: NativeUInt;
     procedure SetFormat(Format: TBEncodedFormat);
-    function GetSHA1: string;
-    function GetSHA256: string;
   public
     IntegerData: Int64;
     ListData: TBEncodedDataList;
     StringData: AnsiString;
     class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
-    constructor Create(MemStream: TMemoryStream);
+    constructor Create(var BufferPtr: PAnsiChar);
     destructor Destroy; override;
     property Format: TBEncodedFormat read FFormat write SetFormat;
-    property SHA1: string read GetSHA1;
-    property SHA256: string read GetSHA256;
+    property BufferStart: NativeUInt read FBufferStart;
+    property BufferEnd: NativeUInt read FBufferEnd;
   end;
 
 implementation
@@ -61,25 +58,6 @@ uses System.Types, System.Hash;
 {$ENDIF}
 
 { Helpers }
-
-{$IF defined(MSWINDOWS)}
-function _CryptAcquireContextA(var phProv: ULONG_PTR; pszContainer: LPCSTR; pszProvider: LPCSTR; dwProvType: DWORD; dwFlags: DWORD): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptAcquireContextA';
-function _CryptReleaseContext(hProv: ULONG_PTR; dwFlags: ULONG_PTR): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptReleaseContext';
-function _CryptCreateHash(hProv: ULONG_PTR; Algid: DWORD; hKey: ULONG_PTR; dwFlags: DWORD; var phHash: ULONG_PTR): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptCreateHash';
-function _CryptGetHashParam(hHash: ULONG_PTR; dwParam: DWORD; pbData: LPBYTE; var pdwDataLen: DWORD; dwFlags: DWORD): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptGetHashParam';
-function _CryptHashData(hHash: ULONG_PTR; pbData: LPBYTE; dwDataLen, dwFlags: DWORD): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptHashData';
-function _CryptDeriveKey(hProv: ULONG_PTR; Algid: DWORD; hBaseData: ULONG_PTR; dwFlags: DWORD; var phKey: ULONG_PTR): BOOL;
-  external 'advapi32.dll' Name 'CryptDeriveKey';
-function _CryptDestroyHash(hHash: ULONG_PTR): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptDestroyHash';
-function _CryptDestroyKey(hKey: ULONG_PTR): BOOL; stdcall;
-  external 'advapi32.dll' Name 'CryptDestroyKey';
-{$ENDIF}
 
 procedure RaiseException(Str: string);
 begin
@@ -97,33 +75,12 @@ var
 begin
   Result := 0;
   P := Pointer(AnsiStr);
-  while (P^ <> 0) do
+  while (PByte(P)^ <> 0) do
   begin
-    Result := (Result * 10) +  P^ - 48;
+    Result := (Result * 10) + PByte(P)^ - 48;
     Inc(P);
   end;
 end;
-
-{$IF defined(MSWINDOWS)}
-function GetSHA(AlgoID: DWORD; Buffer: Pointer; Size: DWORD): AnsiString;
-var
-  phProv: ULONG_PTR ;
-  phHash: ULONG_PTR ;
-  ByteBuffer: Array[0..31] of Byte;
-  Len: DWORD;
-begin
-  // AlgoID : SHA1 = $8004, SHA256 = $800C
-  _CryptAcquireContextA(phProv, nil, nil, 24, DWORD($F0000000));
-   _CryptCreateHash(phProv,  AlgoId, 0, 0, phHash);
-  _CryptHashData(phHash, LPBYTE(Buffer), Size,0);
-  Len := Length(ByteBuffer);
-  _CryptGetHashParam(phHash, 2, @ByteBuffer, Len, 0);
-  SetLength(Result, Len * 2);
-  BinToHex(@ByteBuffer, PAnsiChar(@Result[1]), Len);
-  _CryptDestroyHash(phHash);
-  _CryptReleaseContext(phProv, 0);
-end;
-{$ENDIF}
 
 { TBEncodedData }
 
@@ -147,90 +104,84 @@ begin
   inherited Destroy;
 end;
 
-constructor TBEncoded.Create(MemStream: TMemoryStream);
+constructor TBEncoded.Create(var BufferPtr: PAnsiChar);
 
-  function GetString(Buffer: AnsiString): AnsiString;
+  procedure GetString(var Str: AnsiString);
   var
-    X: AnsiChar;
+    Len: Int64;
   begin
+    Str := BufferPtr^;;
     repeat
-      if MemStream.Read(X, 1) <> 1 then FormatException;
-      if not ((X in ['0'..'9']) or (x = ':')) then FormatException;
-      if X = ':' then
+      Inc(BufferPtr);
+      if BufferPtr^ = ':' then
       begin
-        if Buffer = '' then FormatException;
-        if Length(Buffer) > 12 then FormatException;
-        SetLength(Result, AnsiToUInt(Buffer));
-        if Length(Result) > 0 then
-          if MemStream.Read(Result[1], Length(Result)) <> Length(Result) then FormatException;
-        Break;
+         Inc(BufferPtr);
+         Len := AnsiToUInt(Str);
+         SetLength(Str, Len);
+         Move(BufferPtr^, Str[1] , Len);
+         BufferPtr := BufferPtr + Len;
+         Break;
       end
       else
-        Buffer := Buffer + X;
+        Str := Str + BufferPtr^;
     until False;
   end;
 
+  procedure GetInt64(var IntValue: Int64);
+  begin
+    IntValue := 0;
+    while (BufferPtr^ <> 'e') do
+    begin
+      if BufferPtr^= '-' then
+        IntValue := IntValue * -1
+      else
+        IntValue := (IntValue * 10) +  PByte(BufferPtr)^ - 48;
+      Inc(BufferPtr);
+    end;
+    Inc(BufferPtr);
+  end;
+
 var
-  X: AnsiChar;
   Buffer: AnsiString;
   Data: TBEncodedData;
 
 begin
   inherited Create;
-  FMemStream := MemStream;
-  FMemStart := MemStream.Position;
-  if MemStream.Read(X, 1) <> 1 then FormatException;
-  if X = 'i' then
+  FBufferStart := NativeUInt(BufferPtr);
+  if BufferPtr^ = 'i' then
   begin
     Buffer := '';
-    repeat
-      if MemStream.Read(X, 1) <> 1 then FormatException;
-      if not ((X in ['0'..'9']) or (X = 'e')) then FormatException;
-      if X = 'e' then
-      begin
-        if Buffer = '' then
-          raise Exception.Create('Invalid Format')
-        else
-        begin
-          Format := befInteger;
-          IntegerData := AnsiToUInt(Buffer);
-          Break;
-        end;
-      end
-      else
-        Buffer := Buffer + X;
-    until False;
+    Inc(BufferPtr);
+    GetInt64(IntegerData);
   end
-  else if X = 'l' then
+  else if BufferPtr^ = 'l' then
   begin
     Format := befList;
+    Inc(BufferPtr);
     repeat
-      if MemStream.Read(X, 1) <> 1 then FormatException;
-      if X = 'e' then Break;
-      MemStream.Seek(Int64(-1), soFromCurrent);
-      ListData.Add(TBEncodedData.Create(TBEncoded.Create(MemStream)));
+      if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
+      ListData.Add(TBEncodedData.Create(TBEncoded.Create(BufferPtr)));
     until False;
   end
-  else if X = 'd' then
+  else if  BufferPtr^ = 'd' then
   begin
     Format := befDictionary;
+    Inc(BufferPtr);
     repeat
-      if MemStream.Read(X, 1) <> 1 then FormatException;
-      if X = 'e' then Break;
-      if not (X in ['0'..'9']) then FormatException;
-      Buffer := GetString(X);
-      Data := TBEncodedData.Create(TBEncoded.Create(MemStream));
+      if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
+      GetString(Buffer);
+      Data := TBEncodedData.Create(TBEncoded.Create(BufferPtr));
       Data.Header := Buffer;
       ListData.Add(Data);
     until False;
   end
-  else if X in ['0'..'9'] then
+  else if BufferPtr^ in ['0'..'9'] then
   begin
-    StringData := GetString(X);
+    GetString(StringData);
     Format := befString;
   end
-  else FormatException;
-  FMemEnd := MemStream.Position;
+    else FormatException;
+  FBufferEnd := NativeUInt(BufferPtr);
 end;
 
 class procedure TBEncoded.Encode(Encoded: TBEncoded; Output: TStringBuilder);
@@ -267,32 +218,6 @@ procedure TBEncoded.SetFormat(Format: TBEncodedFormat);
 begin
   if Format in [befList, befDictionary] then ListData := TBEncodedDataList.Create;
   FFormat := Format;
-end;
-
-function TBEncoded.GetSHA1: string;
-begin
-  var MemOffset := NativeUInt(FMemStream.Memory) + FMemStart;
-  var MemSize := FMemEnd - FMemStart;
-{$IF defined(MSWINDOWS)}
-  Result := LowerCase(string(GetSHA($8004, Pointer(MemOffset), MemSize)));
-{$ELSE}
-  var SHA := THashSHA1.Create;
-  SHA.Update( PByte(MemOffset)^ , MemSize);
-  Result := SHA.HashAsString;
-{$ENDIF}
-end;
-
-function TBEncoded.GetSHA256: string;
-begin
-  var MemOffset := NativeUInt(FMemStream.Memory) + FMemStart;
-  var MemSize := FMemEnd - FMemStart;
-{$IF defined(MSWINDOWS)}
-  Result := LowerCase(string(GetSHA($800C, Pointer(MemOffset), MemSize)));
-{$ELSE}
-  var SHA := THashSHA2.Create;
-  SHA.Update( PByte(MemOffset)^ , MemSize);
-  Result := SHA.HashAsString;
-{$ENDIF}
 end;
 
 { TBEncodedDataList }

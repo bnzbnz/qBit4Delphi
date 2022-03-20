@@ -1,7 +1,7 @@
 ///
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  Version: 1.0.5
+///  Version: 2.0.0
 ///
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
@@ -69,6 +69,8 @@ type
   private
     FBe: TBEncoded;
     FData: TTorrentData;
+    function GetSHA1(Enc: TBencoded): string;
+    function GetSHA256(Enc: TBencoded): string;
     procedure Parse(Be: TBencoded; Options: TTorrentReaderOptions);
   public
     class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
@@ -81,11 +83,56 @@ type
   end;
 
 implementation
+{$IF defined(MSWINDOWS)}
+uses System.Types, System.Hash, Windows;
+{$ELSE}
+uses System.Types, System.Hash;
+{$ENDIF}
+
+{$IF defined(MSWINDOWS)}
+function CryptAcquireContextA(var phProv: ULONG_PTR; pszContainer: LPCSTR; pszProvider: LPCSTR; dwProvType: DWORD; dwFlags: DWORD): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptAcquireContextA';
+function CryptReleaseContext(hProv: ULONG_PTR; dwFlags: ULONG_PTR): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptReleaseContext';
+function CryptCreateHash(hProv: ULONG_PTR; Algid: DWORD; hKey: ULONG_PTR; dwFlags: DWORD; var phHash: ULONG_PTR): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptCreateHash';
+function CryptGetHashParam(hHash: ULONG_PTR; dwParam: DWORD; pbData: LPBYTE; var pdwDataLen: DWORD; dwFlags: DWORD): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptGetHashParam';
+function CryptHashData(hHash: ULONG_PTR; pbData: LPBYTE; dwDataLen, dwFlags: DWORD): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptHashData';
+function CryptDeriveKey(hProv: ULONG_PTR; Algid: DWORD; hBaseData: ULONG_PTR; dwFlags: DWORD; var phKey: ULONG_PTR): BOOL;
+  external 'advapi32.dll' Name 'CryptDeriveKey';
+function CryptDestroyHash(hHash: ULONG_PTR): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptDestroyHash';
+function CryptDestroyKey(hKey: ULONG_PTR): BOOL; stdcall;
+  external 'advapi32.dll' Name 'CryptDestroyKey';
+{$ENDIF}
 
 procedure RaiseException(Str: string);
 begin
   raise Exception.Create('TTorrentReader: ' + Str);
 end;
+
+{$IF defined(MSWINDOWS)}
+ // AlgoID : SHA1 = $8004, SHA256 = $800C
+function GetSHA(AlgoID: DWORD; Buffer: Pointer; Size: DWORD): AnsiString;
+var
+  phProv: ULONG_PTR ;
+  phHash: ULONG_PTR ;
+  ByteBuffer: Array[0..31] of Byte;
+  Len: DWORD;
+begin
+  CryptAcquireContextA(phProv, nil, nil, 24, DWORD($F0000000));
+   CryptCreateHash(phProv,  AlgoId, 0, 0, phHash);
+  CryptHashData(phHash, LPBYTE(Buffer), Size,0);
+  Len := Length(ByteBuffer);
+  CryptGetHashParam(phHash, 2, @ByteBuffer, Len, 0);
+  SetLength(Result, Len * 2);
+  BinToHex(@ByteBuffer, PAnsiChar(@Result[1]), Len);
+  CryptDestroyHash(phHash);
+  CryptReleaseContext(phProv, 0);
+end;
+{$ENDIF}
 
 { TTorrentData }
 
@@ -126,12 +173,35 @@ begin
   inherited;
 end;
 
+function TTorrentReader.GetSHA1(Enc: TBencoded): string;
+begin
+{$IF defined(MSWINDOWS)}
+  Result := LowerCase(string(GetSHA($8004, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
+{$ELSE}
+  var SHA := THashSHA1.Create;
+  SHA.Update( PByte(Enc.BufferStart)^ , Enc.BufferEnd - Enc.BufferStart);
+  Result := SHA.HashAsString;
+{$ENDIF}
+end;
+
+function TTorrentReader.GetSHA256(Enc: TBencoded): string;
+begin
+{$IF defined(MSWINDOWS)}
+  Result := LowerCase(string(GetSHA($800C, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
+{$ELSE}
+  var SHA := THashSHA2.Create;
+  SHA.Update( PByte(Enc.BufferStart)^ , Enc.BufferEnd - Enc.BufferStart);
+  Result := SHA.HashAsString;
+{$ENDIF}
+end;
+
 class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV1]): TTorrentReader;
 begin
   Result := nil;
   try
     Result := TTorrentReader.Create;
-    Result.FBe := TBEncoded.Create(MemStream);
+    var BufferPtr :=  PAnsiChar(MemStream.Memory);
+    Result.FBe := TBEncoded.Create(BufferPtr);
     Result.Parse(Result.FBe, Options);
   except
     on E : Exception do
@@ -274,12 +344,12 @@ begin
     // Hash
     if (FData.Info.IsHybrid) then
     begin
-      FData.HashV1 := Info.SHA1;
-      FData.HashV2 := Info.SHA256;
+      FData.HashV1 := GetSHA1(Info);
+      FData.HashV2 := GetSHA256(Info);
     end else
       case  FData.Info.MetaVersion of
-        1: FData.HashV1 := Info.SHA1;
-        2: FData.HashV2 := Info.SHA256;
+        1: FData.HashV1 := GetSHA1(Info);
+        2: FData.HashV2 := GetSHA256(Info);
       else
         RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
       end;
