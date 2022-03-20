@@ -91,6 +91,19 @@ begin
   RaiseException('TBEncoded : Invalid Format');
 end;
 
+function AnsiToUInt(const AnsiStr: AnsiString): NativeUInt; inline
+var
+  P: PByte;
+begin
+  Result := 0;
+  P := Pointer(AnsiStr);
+  while (P^ <> 0) do
+  begin
+    Result := (Result * 10) +  P^ - 48;
+    Inc(P);
+  end;
+end;
+
 {$IF defined(MSWINDOWS)}
 function GetSHA(AlgoID: DWORD; Buffer: Pointer; Size: DWORD): AnsiString;
 var
@@ -147,7 +160,7 @@ constructor TBEncoded.Create(MemStream: TMemoryStream);
       begin
         if Buffer = '' then FormatException;
         if Length(Buffer) > 12 then FormatException;
-        SetLength(Result, StrToInt(String(Buffer)));
+        SetLength(Result, AnsiToUInt(Buffer));
         if Length(Result) > 0 then
           if MemStream.Read(Result[1], Length(Result)) <> Length(Result) then FormatException;
         Break;
@@ -180,7 +193,7 @@ begin
         else
         begin
           Format := befInteger;
-          IntegerData := StrToInt64(String(Buffer));
+          IntegerData := AnsiToUInt(Buffer);
           Break;
         end;
       end
@@ -194,7 +207,7 @@ begin
     repeat
       if MemStream.Read(X, 1) <> 1 then FormatException;
       if X = 'e' then Break;
-      MemStream.Seek(-1, soFromCurrent);
+      MemStream.Seek(Int64(-1), soFromCurrent);
       ListData.Add(TBEncodedData.Create(TBEncoded.Create(MemStream)));
     until False;
   end
