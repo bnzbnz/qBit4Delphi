@@ -68,19 +68,6 @@ begin
   RaiseException('Invalid Format');
 end;
 
-function AnsiToUInt(var AnsiStr: AnsiString): NativeUInt; inline
-var
-  P: PByte;
-begin
-  Result := 0;
-  P := Pointer(AnsiStr);
-  while (PByte(P)^ <> 0) do
-  begin
-    Result := (Result * 10) + PByte(P)^ - 48;
-    Inc(P);
-  end;
-end;
-
 { TBEncodedData }
 
 destructor TBEncodedData.Destroy;
@@ -103,22 +90,28 @@ begin
   inherited Destroy;
 end;
 
-constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
+procedure CheckPtrRangeInline(BufferPtr, BufferEndPtr: PAnsiChar; Offset: NativeUInt = 1); inline
+begin
+  if BufferPtr + Offset > BufferEndPtr then FormatException;
+end;
 
-  procedure CheckPtrRange(Offset: NativeUInt = 1);
-  begin
-    if PByte(BufferPtr) + Offset > BufferEndPtr then FormatException;
-  end;
+procedure IncPtrCheck(var BufferPtr, BufferEndPtr: PAnsiChar); inline;
+begin
+   CheckPtrRangeInline(BufferPtr, BufferEndPtr, 1);
+   Inc(BufferPtr);
+end;
+
+constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
 
   procedure DecodeString(var AnsiStr: AnsiString);
   begin
     var Len := NativeUInt(PByte(BufferPtr)^ - 48) ;
     repeat
-      CheckPtrRange; Inc(BufferPtr);
-      if (BufferPtr^ <> ':') and (not (BufferPtr^ in ['0'..'9'])) then FormatException;
+      IncPtrCheck(BufferPtr, BufferEndPtr);
       if BufferPtr^ = ':' then
       begin
-         CheckPtrRange(Len + 1); Inc(BufferPtr);
+         CheckPtrRangeInline(BufferPtr, BufferEndPtr, Len + 1);
+         Inc(BufferPtr);
          SetLength(AnsiStr, Len);
          Move(BufferPtr^, AnsiStr[1], Len);
          Inc(BufferPtr, Len);
@@ -126,6 +119,7 @@ constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
       end
       else
       begin
+        if not (BufferPtr^ in ['0'..'9']) then FormatException;
         Len := (Len * 10) + PByte(BufferPtr)^ - 48;
       end;
     until False;
@@ -141,9 +135,9 @@ constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
         IntValue := IntValue * -1
       else
         IntValue := (IntValue * 10) +  PByte(BufferPtr)^ - 48;
-      CheckPtrRange; Inc(BufferPtr);
+      IncPtrCheck(BufferPtr, BufferEndPtr);
     end;
-    CheckPtrRange; Inc(BufferPtr);
+    IncPtrCheck(BufferPtr, BufferEndPtr);
   end;
 
 var
@@ -157,16 +151,16 @@ begin
   if BufferPtr^ = 'i' then
   begin
     FFormat := befInteger;
-    CheckPtrRange; Inc(BufferPtr);
+    IncPtrCheck(BufferPtr, BufferEndPtr);
     DecodeInt64(IntegerData);
   end
   else if BufferPtr^ = 'l' then
   begin
     FFormat := befList;
     ListData := TBEncodedDataList.Create;
-    CheckPtrRange; Inc(BufferPtr);
+   IncPtrCheck(BufferPtr, BufferEndPtr);
     repeat
-      if BufferPtr^ = 'e' then begin CheckPtrRange; Inc(BufferPtr); Break; end;
+      if BufferPtr^ = 'e' then begin IncPtrCheck(BufferPtr, BufferEndPtr); Break; end;
       ListData.Add(TBEncodedData.Create(TBEncoded.Create(BufferPtr, BufferEndPtr)));
     until False;
   end
@@ -174,7 +168,7 @@ begin
   begin
     FFormat := befDictionary;
     ListData := TBEncodedDataList.Create;
-    CheckPtrRange; Inc(BufferPtr);
+    IncPtrCheck(BufferPtr, BufferEndPtr);
     repeat
       if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
       DecodeString(Buffer);
