@@ -68,7 +68,7 @@ type
   private
     FBe: TBEncoded;
     FData: TTorrentData;
-    FProcessTimeMS: Int64;
+    FProcessTimeMS: UInt64;
     function GetSHA1(Enc: TBEncoded): string;
     function GetSHA2(Enc: TBEncoded): string;
     procedure Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
@@ -80,7 +80,7 @@ type
     destructor Destroy; override;
     property BEncoded: TBEncoded read FBe;
     property Data: TTorrentData read FData;
-    property ProcessTimeMS: Int64 read FProcessTimeMS;
+    property ProcessTimeMS: UInt64 read FProcessTimeMS;
   end;
 
 implementation

@@ -156,7 +156,7 @@ begin
 
   if BufferPtr^ = 'i' then
   begin
-    Buffer := '';
+    FFormat := befInteger;
     CheckPtrRange; Inc(BufferPtr);
     DecodeInt64(IntegerData);
   end
