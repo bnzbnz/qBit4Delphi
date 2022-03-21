@@ -65,7 +65,7 @@ end;
 
 procedure FormatException;
 begin
-  RaiseException('TBEncoded : Invalid Format');
+  RaiseException('Invalid Format');
 end;
 
 function AnsiToUInt(var AnsiStr: AnsiString): NativeUInt; inline
@@ -107,7 +107,7 @@ constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
 
   procedure CheckPtrRange(Offset: NativeUInt = 1);
   begin
-    if PByte(BufferPtr) + Offset >= BufferEndPtr then FormatException;
+    if PByte(BufferPtr) + Offset > BufferEndPtr then FormatException;
   end;
 
   procedure DecodeString(var AnsiStr: AnsiString);
@@ -166,7 +166,7 @@ begin
     ListData := TBEncodedDataList.Create;
     CheckPtrRange; Inc(BufferPtr);
     repeat
-      if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
+      if BufferPtr^ = 'e' then begin CheckPtrRange; Inc(BufferPtr); Break; end;
       ListData.Add(TBEncodedData.Create(TBEncoded.Create(BufferPtr, BufferEndPtr)));
     until False;
   end
