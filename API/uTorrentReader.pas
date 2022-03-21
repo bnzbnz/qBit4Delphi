@@ -285,8 +285,8 @@ begin
     FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
                             and (Info.ListData.FindElement('file tree') <> nil);
 
+    if (FData.Info.IsHybrid) then FData.Info.MetaVersion := 2;
     if (FData.Info.IsHybrid) and (trHybridAsV1 in Options) then FData.Info.MetaVersion := 1;
-    if (FData.Info.IsHybrid) and (trHybridAsV2 in Options) then FData.Info.MetaVersion := 2;
 
     //Announce
     Enc := Be.ListData.FindElement('announce');
@@ -379,6 +379,7 @@ begin
       begin
         // Multiple Files/Folders
         var FileData := TFileData.Create;
+        FData.Info.FileList.Add(FileData);
         var FLD := FL.ListData.Items[i].Data;
         FileData.Length := FLD.ListData.FindElement('length').IntegerData;
         var FLDP := FLD.ListData.FindElement('path');
@@ -388,10 +389,10 @@ begin
         FileData.PathList.QuoteChar := #0;
         FileData.PathList.StrictDelimiter := True;
         FileData.FullPath := FileData.PathList.DelimitedText;
-        FData.Info.FileList.Add(FileData);
       end else begin
         // A Single File
         var FileData := TFileData.Create;
+        FData.Info.FileList.Add(FileData);
         FileData.Length := FData.Info.Length;
         FileData.FullPath := FData.Info.Name;
         FileData.PathList.Add(FData.Info.Name);
