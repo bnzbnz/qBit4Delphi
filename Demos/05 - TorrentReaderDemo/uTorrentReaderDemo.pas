@@ -72,7 +72,7 @@ begin
     Torrent := TTorrentReader.LoadFromFile(FileOpenDialog1.FileName);
     if Torrent = nil then
     begin
-      Memo1.Text := 'Invalid File Format';
+      Memo1.Text := 'Invalid Torrent File Format';
       Exit;
     end;
     StringBuilder := TStringBuilder.Create;

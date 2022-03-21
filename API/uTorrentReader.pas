@@ -19,9 +19,8 @@ const
 
 type
   TTorrentReaderOptions = set of (
-    trRaiseException,    // Will raise Exception on error (Default), silent otherwise
-    trHybridAsV1,        // Handle hybrid torrent files as V1 (Default)
-    trHybridAsV2         // Handle hybrid torrent files as V2
+    trRaiseException,    // Will raise Exception on error (Default), silent otherwise will return nil on error
+    trProcessHybridAsV2
   );
 
   TFileData = class(TObject)
@@ -73,9 +72,9 @@ type
     function GetSHA2(Enc: TBEncoded): string;
     procedure Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
-    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
-    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+    class function LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     constructor Create; overload;
     destructor Destroy; override;
     property BEncoded: TBEncoded read FBe;
@@ -193,7 +192,7 @@ begin
 {$ENDIF}
 end;
 
-class function TTorrentReader.LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+class function TTorrentReader.LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   Result := nil;
   try
@@ -209,13 +208,13 @@ begin
   end;
 end;
 
-class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   var BufferPtr := PAnsiChar(MemStream.Memory);
   Result := LoadFromBufferPtr(BufferPtr, Options);
 end;
 
-class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException, trHybridAsV2]): TTorrentReader;
+class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 var
   MemStream: TMemoryStream;
 begin
@@ -285,8 +284,8 @@ begin
     FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
                             and (Info.ListData.FindElement('file tree') <> nil);
 
-    if (FData.Info.IsHybrid) then FData.Info.MetaVersion := 2;
-    if (FData.Info.IsHybrid) and (trHybridAsV1 in Options) then FData.Info.MetaVersion := 1;
+    if (FData.Info.IsHybrid) then FData.Info.MetaVersion := 1;
+    if (FData.Info.IsHybrid) and (trProcessHybridAsV2 in Options) then FData.Info.MetaVersion := 2;
 
     //Announce
     Enc := Be.ListData.FindElement('announce');
@@ -333,8 +332,8 @@ begin
     if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
     // Hash
-    if (FData.Info.MetaVersion = 1) or (FData.Info.IsHybrid) then FData.HashV1 := GetSHA1(Info);
-    if (FData.Info.MetaVersion = 2) or (FData.Info.IsHybrid) then FData.HashV2 := GetSHA2(Info);
+    if (FData.Info.MetaVersion = 1) then FData.HashV1 := GetSHA1(Info);
+    if (FData.Info.MetaVersion = 2) then FData.HashV2 := GetSHA2(Info);
 
     // Name:
     Enc := Info.ListData.FindElement('name') as TBEncoded;
