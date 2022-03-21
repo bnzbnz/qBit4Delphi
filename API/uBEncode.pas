@@ -34,9 +34,9 @@ type
 
   TBEncoded = class(TObject)
   private
-    FFormat: TBEncodedFormat;
-    FBufferStartPtr: NativeUInt;
     FBufferEndPtr: NativeUInt;
+    FBufferStartPtr: NativeUInt;
+    FFormat: TBEncodedFormat;
   public
     IntegerData: Int64;
     ListData: TBEncodedDataList;
@@ -104,8 +104,10 @@ end;
 constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
 
   procedure DecodeString(var AnsiStr: AnsiString);
+  var
+    Len: NativeUInt;
   begin
-    var Len := NativeUInt(PByte(BufferPtr)^ - 48) ;
+    Len := PByte(BufferPtr)^ - 48;
     repeat
       IncPtrCheck(BufferPtr, BufferEndPtr);
       if BufferPtr^ = ':' then
@@ -141,7 +143,7 @@ constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
   end;
 
 var
-  Buffer: AnsiString;
+  Header: AnsiString;
   Data: TBEncodedData;
 
 begin
@@ -158,7 +160,7 @@ begin
   begin
     FFormat := befList;
     ListData := TBEncodedDataList.Create;
-   IncPtrCheck(BufferPtr, BufferEndPtr);
+    IncPtrCheck(BufferPtr, BufferEndPtr);
     repeat
       if BufferPtr^ = 'e' then begin IncPtrCheck(BufferPtr, BufferEndPtr); Break; end;
       ListData.Add(TBEncodedData.Create(TBEncoded.Create(BufferPtr, BufferEndPtr)));
@@ -171,9 +173,9 @@ begin
     IncPtrCheck(BufferPtr, BufferEndPtr);
     repeat
       if BufferPtr^ = 'e' then begin Inc(BufferPtr); Break; end;
-      DecodeString(Buffer);
+      DecodeString(Header);
       Data := TBEncodedData.Create(TBEncoded.Create(BufferPtr, BufferEndPtr));
-      Data.Header := Buffer;
+      Data.Header := Header;
       ListData.Add(Data);
     until False;
   end
