@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 0
   ActiveControl = Edit1
   BorderStyle = Single
-  Caption = 'qBittorent / Nox Info'
+  Caption = 'qBittorent / Nox Info FMX'
   ClientHeight = 527
   ClientWidth = 434
   FormFactor.Width = 320

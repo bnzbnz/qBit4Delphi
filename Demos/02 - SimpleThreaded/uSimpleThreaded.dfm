@@ -1,7 +1,7 @@
 object SimpleThreadedDlg: TSimpleThreadedDlg
   Left = 0
   Top = 0
-  Caption = 'SimpleThreadedDlg'
+  Caption = 'Simple Threaded'
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace
@@ -10,10 +10,8 @@ object SimpleThreadedDlg: TSimpleThreadedDlg
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnClose = FormClose
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object LBTorrents: TListBox
     Left = 0

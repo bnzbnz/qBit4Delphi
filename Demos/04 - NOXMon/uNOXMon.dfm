@@ -12,7 +12,6 @@ object NOXMonDlg: TNOXMonDlg
   Font.Style = []
   OnClose = FormClose
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object SG: TStringGrid
     Left = 0
