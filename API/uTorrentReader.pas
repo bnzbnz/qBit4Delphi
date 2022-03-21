@@ -68,17 +68,19 @@ type
   private
     FBe: TBEncoded;
     FData: TTorrentData;
+    FProcessTimeMS: Int64;
     function GetSHA1(Enc: TBEncoded): string;
     function GetSHA2(Enc: TBEncoded): string;
     procedure Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
   public
-    class function LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromBufferPtr(BufferPtr, BufferEndPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     constructor Create; overload;
     destructor Destroy; override;
     property BEncoded: TBEncoded read FBe;
     property Data: TTorrentData read FData;
+    property ProcessTimeMS: Int64 read FProcessTimeMS;
   end;
 
 implementation
@@ -161,6 +163,7 @@ begin
   inherited;
   FBe := nil;
   FData := TTorrentData.Create;
+  FProcessTimeMS := 0;
 end;
 
 destructor TTorrentReader.Destroy;
@@ -173,10 +176,10 @@ end;
 function TTorrentReader.GetSHA1(Enc: TBEncoded): string;
 begin
 {$IF defined(MSWINDOWS)}
-  Result := LowerCase(string(WinCryptSHA($8004, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
+  Result := LowerCase(string(WinCryptSHA($8004, Pointer(Enc.BufferStartPtr), Enc.BufferEndPtr - Enc.BufferStartPtr)));
 {$ELSE}
   var SHA := THashSHA1.Create;
-  SHA.Update( PByte(Enc.BufferStart)^ , Enc.BufferEnd - Enc.BufferStart);
+  SHA.Update( PByte(Enc.BufferStartPtr)^ , Enc.BufferEndPtr - Enc.BufferStartPtr);
   Result := SHA.HashAsString;
 {$ENDIF}
 end;
@@ -184,21 +187,23 @@ end;
 function TTorrentReader.GetSHA2(Enc: TBEncoded): string;
 begin
 {$IF defined(MSWINDOWS)}
-  Result := LowerCase(string(WinCryptSHA($800C, Pointer(Enc.BufferStart), Enc.BufferEnd - Enc.BufferStart)));
+  Result := LowerCase(string(WinCryptSHA($800C, Pointer(Enc.BufferStartPtr), Enc.BufferEndPtr - Enc.BufferStartPtr)));
 {$ELSE}
   var SHA := THashSHA2.Create;
-  SHA.Update( PByte(Enc.BufferStart)^ , Enc.BufferEnd - Enc.BufferStart);
+  SHA.Update( PByte(Enc.BufferStartPtr)^ , Enc.BufferEndPtr - Enc.BufferStartPtr);
   Result := SHA.HashAsString;
 {$ENDIF}
 end;
 
-class function TTorrentReader.LoadFromBufferPtr(BufferPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+class function TTorrentReader.LoadFromBufferPtr(BufferPtr, BufferEndPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   Result := nil;
   try
     Result := TTorrentReader.Create;
-    Result.FBe := TBEncoded.Create(BufferPtr);
+    Result.FProcessTimeMS := GetTickCount64;
+    Result.FBe := TBEncoded.Create(BufferPtr, BufferEndPtr);
     Result.Parse(Result.FBe, Options);
+    Result.FProcessTimeMS := GetTickCount64 - Result.FProcessTimeMS;
   except
     on E : Exception do
     begin
@@ -211,7 +216,8 @@ end;
 class function TTorrentReader.LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
 begin
   var BufferPtr := PAnsiChar(MemStream.Memory);
-  Result := LoadFromBufferPtr(BufferPtr, Options);
+  Var EndPosPtr := PAnsiChar(NativeUInt(MemStream.Memory) + NativeUInt(MemStream.Size));
+  Result := LoadFromBufferPtr(BufferPtr, EndPosPtr, Options);
 end;
 
 class function TTorrentReader.LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;

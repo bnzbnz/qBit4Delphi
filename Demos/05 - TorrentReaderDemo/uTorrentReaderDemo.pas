@@ -25,6 +25,7 @@ implementation
 
 const
   BoolToStr: array[boolean] of string = ('False','True');
+
 function Int64FormatBKM(v: Int64): string;
 var
   x: Double;
@@ -68,7 +69,6 @@ begin
   Memo1.Clear;
   if not FileOpenDialog1.Execute then exit;
   try
-    var Tme := GetTickCount64;
     Torrent := TTorrentReader.LoadFromFile(FileOpenDialog1.FileName);
     if Torrent = nil then
     begin
@@ -77,7 +77,7 @@ begin
     end;
     StringBuilder := TStringBuilder.Create;
     StringBuildeR.AppendLine( 'Filename : ' + FileOpenDialog1.FileName);
-    StringBuildeR.AppendLine( 'Parsing Duration : ' + (GetTickCount64 - Tme).ToString + 'ms');
+    StringBuildeR.AppendLine( 'Parsing Duration : ' + (Torrent.ProcessTimeMS).ToString + 'ms');
     StringBuildeR.AppendLine( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
     StringBuildeR.AppendLine( 'Hybrid : ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
     StringBuildeR.AppendLine( 'HashV1 : ' + Torrent.Data.HashV1 );
@@ -112,7 +112,6 @@ begin
       StringBuildeR.AppendLine( '       Size :' + Int64FormatBKM(FileData.Length));
     end;
     Memo1.Text := StringBuilder.ToString;
-    Memo1.Lines.add( 'Total Duration : ' + (GetTickCount64 - Tme).ToString + 'ms');
     Memo1.Lines.Insert(0, '');
   finally
     StringBuilder.Free;
