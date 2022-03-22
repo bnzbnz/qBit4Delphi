@@ -69,7 +69,7 @@ type
   private
     FBe: TBEncoded;
     FData: TTorrentData;
-    FProcessTimeMS: UInt64;
+    FProcessingTimeMS: UInt64;
     function GetSHA1(Enc: TBEncoded): string;
     function GetSHA2(Enc: TBEncoded): string;
     procedure Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
@@ -81,7 +81,7 @@ type
     destructor Destroy; override;
     property BEncoded: TBEncoded read FBe;
     property Data: TTorrentData read FData;
-    property ProcessTimeMS: UInt64 read FProcessTimeMS;
+    property ProcessingTimeMS: UInt64 read FProcessingTimeMS;
   end;
 
 implementation
@@ -164,7 +164,7 @@ begin
   inherited;
   FBe := nil;
   FData := TTorrentData.Create;
-  FProcessTimeMS := 0;
+  FProcessingTimeMS := 0;
 end;
 
 destructor TTorrentReader.Destroy;
@@ -197,14 +197,23 @@ begin
 end;
 
 class function TTorrentReader.LoadFromBufferPtr(BufferPtr, BufferEndPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+var
+  Start: Int64;
+  Stop: Int64;
 begin
   Result := nil;
   try
     Result := TTorrentReader.Create;
-    Result.FProcessTimeMS := GetTickCount64;
+    {$IF defined(MSWINDOWS)}
+    Start := 0; Stop := 0;
+    QueryPerformanceCounter(Start);
+    {$ENDIF}
     Result.FBe := TBEncoded.Create(BufferPtr, BufferEndPtr);
     Result.Parse(Result.FBe, Options);
-    Result.FProcessTimeMS := GetTickCount64 - Result.FProcessTimeMS;
+    {$IF defined(MSWINDOWS)}
+    QueryPerformanceCounter(Stop);
+    Result.FProcessingTimeMS := (Stop - Start) div 10000;
+    {$ENDIF}
   except
     on E : Exception do
     begin

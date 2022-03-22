@@ -77,7 +77,7 @@ begin
     end;
     StringBuilder := TStringBuilder.Create;
     StringBuildeR.AppendLine( 'Filename : ' + FileOpenDialog1.FileName);
-    StringBuildeR.AppendLine( 'Parsing Duration : ' + (Torrent.ProcessTimeMS).ToString + 'ms');
+    StringBuildeR.AppendLine( 'Parsing Duration : ' + (Torrent.ProcessingTimeMS).ToString + 'ms');
     StringBuildeR.AppendLine( 'Version : ' + Torrent.Data.Info.MetaVersion.ToString );
     StringBuildeR.AppendLine( 'Hybrid : ' + BoolToStr[Torrent.Data.Info.IsHybrid]);
     StringBuildeR.AppendLine( 'HashV1 : ' + Torrent.Data.HashV1 );
