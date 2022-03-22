@@ -402,7 +402,6 @@ begin
         FileData.Length := FData.Info.Length;
         FileData.FullPath := FData.Info.Name;
         FileData.PathList.Add(FData.Info.Name);
-        FData.Info.FileList.Add(FileData);
       end;
     end else // V2
       ParseFileListV2(Info.ListData.FindElement('file tree'), EncStr, nil);
