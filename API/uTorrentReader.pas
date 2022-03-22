@@ -19,8 +19,9 @@ const
 
 type
   TTorrentReaderOptions = set of (
-    trRaiseException,    // Will raise Exception on error (Default), silent otherwise will return nil on error
-    trProcessHybridAsV2
+    trRaiseException,     // Will raise Exception on error (Default), silent otherwise will return nil on error
+    trProcessHybridAsV2,  // ProcessHybrid torrent as V2 (Default is V1)
+    trDoNotCalcHashes    // Do Not Calculate Hashes (Default is False)
   );
 
   TFileData = class(TObject)
@@ -338,8 +339,8 @@ begin
     if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
     // Hash
-    if (FData.Info.MetaVersion = 1) then FData.HashV1 := GetSHA1(Info);
-    if (FData.Info.MetaVersion = 2) then FData.HashV2 := GetSHA2(Info);
+    if (FData.Info.MetaVersion = 1) and (not (trDoNotCalcHashes in Options)) then FData.HashV1 := GetSHA1(Info);
+    if (FData.Info.MetaVersion = 2) and (not (trDoNotCalcHashes in Options)) then FData.HashV2 := GetSHA2(Info);
 
     // Name:
     Enc := Info.ListData.FindElement('name') as TBEncoded;
