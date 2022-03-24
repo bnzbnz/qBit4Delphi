@@ -112,7 +112,7 @@ constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
       else
       begin
         if not (BufferPtr^ in ['0'..'9']) then FormatException;
-        Len := (Len * 10) + (PByte(BufferPtr)^ - 48);
+        Len := (Len * 10) + PByte(BufferPtr)^ - 48;
       end;
     until False;
   end;
