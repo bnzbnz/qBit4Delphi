@@ -50,11 +50,6 @@ type
   end;
 
 implementation
-{$IF defined(MSWINDOWS)}
-uses System.Types, System.Hash, Windows;
-{$ELSE}
-uses System.Types, System.Hash;
-{$ENDIF}
 
 { Helpers }
 
@@ -222,13 +217,13 @@ end;
 
 function TBEncodedDataList.FindElement(Header: AnsiString): TBEncoded;
 begin
-  Result := nil;
-  for var i := 0 to Count - 1 do
-    if Items[i].Header = Header then
+  for var Item in Self do
+    if Item.Header = Header then
     begin
-      Result := Items[i].Data;
-      Break;
+      Result := Item.Data;
+      exit;
     end;
+  Result := nil;
 end;
 
 end.

@@ -85,13 +85,13 @@ type
   end;
 
 implementation
-{$IF defined(MSWINDOWS)}
+{$IFDEF MSWINDOWS}
 uses Windows;
 {$ELSE}
 uses System.Types, System.Hash;
 {$ENDIF}
 
-{$IF defined(MSWINDOWS)}
+{$IFDEF MSWINDOWS}
 function CryptAcquireContextA(var phProv: ULONG_PTR; pszContainer: LPCSTR; pszProvider: LPCSTR; dwProvType: DWORD; dwFlags: DWORD): BOOL; stdcall;
   external 'advapi32.dll' Name 'CryptAcquireContextA';
 function CryptReleaseContext(hProv: ULONG_PTR; dwFlags: ULONG_PTR): BOOL; stdcall;
@@ -117,15 +117,19 @@ var
   ByteBuffer: Array[0..31] of Byte;
   Len: DWORD;
 begin
-  CryptAcquireContextA(phProv, nil, nil, 24, DWORD($F0000000));
-  CryptCreateHash(phProv, AlgoID, 0, 0, phHash);
-  CryptHashData(phHash, LPBYTE(Buffer), Size,0);
-  Len := Length(ByteBuffer);
-  CryptGetHashParam(phHash, 2, @ByteBuffer, Len, 0);
-  SetLength(Result, Len * 2);
-  BinToHex(@ByteBuffer, PAnsiChar(@Result[1]), Len);
-  CryptDestroyHash(phHash);
-  CryptReleaseContext(phProv, 0);
+  phProv := 0; phHash := 0;
+  try
+    if not CryptAcquireContextA(phProv, nil, nil, 24, DWORD($F0000000)) then exit;
+    if not CryptCreateHash(phProv, AlgoID, 0, 0, phHash) then exit;
+    if not CryptHashData(phHash, LPBYTE(Buffer), Size,0) then exit;
+    Len := Length(ByteBuffer);
+    if not CryptGetHashParam(phHash, 2, @ByteBuffer, Len, 0) then exit;
+    SetLength(Result, Len * 2);
+    BinToHex(@ByteBuffer, PAnsiChar(@Result[1]), Len);
+  finally
+    if phHash <> 0 then CryptReleaseContext(phProv, 0);
+    if phProv <> 0 then CryptDestroyHash(phHash);
+  end;
 end;
 {$ENDIF}
 
@@ -143,6 +147,7 @@ begin
   AnnouncesDict := TDictionary<Integer, TStringList>.Create;
   WebSeeds := TStringList.Create;
   Comment := TStringList.Create;
+  Comment.QuoteChar := #0;
   Comment.StrictDelimiter := True;
   Comment.Delimiter := #$A;
 end;
@@ -176,7 +181,7 @@ end;
 
 function TTorrentReader.GetSHA1(Enc: TBEncoded): string;
 begin
-{$IF defined(MSWINDOWS)}
+{$IFDEF MSWINDOWS}
   Result := LowerCase(string(WinCryptSHA($8004, Pointer(Enc.BufferStartPtr), Enc.BufferEndPtr - Enc.BufferStartPtr)));
 {$ELSE}
   var SHA := THashSHA1.Create;
@@ -187,7 +192,7 @@ end;
 
 function TTorrentReader.GetSHA2(Enc: TBEncoded): string;
 begin
-{$IF defined(MSWINDOWS)}
+{$IFDEF MSWINDOWS}
   Result := LowerCase(string(WinCryptSHA($800C, Pointer(Enc.BufferStartPtr), Enc.BufferEndPtr - Enc.BufferStartPtr)));
 {$ELSE}
   var SHA := THashSHA2.Create;
@@ -197,20 +202,17 @@ begin
 end;
 
 class function TTorrentReader.LoadFromBufferPtr(BufferPtr, BufferEndPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
-var
-  Start: Int64;
-  Stop: Int64;
 begin
   Result := nil;
   try
     Result := TTorrentReader.Create;
-    {$IF defined(MSWINDOWS)}
-    Start := 0; Stop := 0;
+    {$IFDEF MSWINDOWS}
+    var Start := Int64(0); var Stop := Int64(0);
     QueryPerformanceCounter(Start);
     {$ENDIF}
     Result.FBe := TBEncoded.Create(BufferPtr, BufferEndPtr);
     Result.Parse(Result.FBe, Options);
-    {$IF defined(MSWINDOWS)}
+    {$IFDEF MSWINDOWS}
     QueryPerformanceCounter(Stop);
     Result.FProcessingTimeMS := (Stop - Start) div 10000;
     {$ENDIF}
@@ -252,33 +254,29 @@ procedure TTorrentReader.Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
     for var i := 0 to Dic.ListData.Count - 1 do
     begin
       var TmpDic := Dic.ListData.Items[i];
-      var Hdr := TmpDic.Header;
-      var Str := TmpDic.Data.StringData;
-      var Int := TmpDic.Data.IntegerData;
-      if (Hdr = '') and (Str = '') then
+      if (TmpDic.Header = '') and (TmpDic.Data.StringData = '') then
       begin
         FileData := TFileData.Create;
         FData.Info.FileList.Add(FileData);
         FileData.FullPath := Path;
         FileData.PathList.Delimiter := TORRENTREADER_PATH_SEPARATOR;
-        FileData.PathList.QuoteChar := #0;
         FileData.PathList.StrictDelimiter := True;
         FileData.PathList.DelimitedText := string(Path);
       end
       else if assigned(FileData) then
       begin
-       if Hdr = 'length' then FileData.Length := Int;
-       if Hdr = 'pieces root' then
-       begin
-        FileData.PiecesRoot := Str;
-        FileData.PiecesCount := Length(Str) div 32;
-       end;
+        if TmpDic.Header = 'length' then FileData.Length :=  TmpDic.Data.IntegerData;
+        if TmpDic.Header = 'pieces root' then
+        begin
+          FileData.PiecesRoot := TmpDic.Data.StringData;
+          FileData.PiecesCount := Length(TmpDic.Data.StringData) div 32;
+        end;
       end;
       if assigned(TmpDic.data.ListData) then
         if Path <> '' then
-          ParseFileListV2(TmpDic.Data, Path + TORRENTREADER_PATH_SEPARATOR + UTF8ToString(Hdr),  FileData)
+          ParseFileListV2(TmpDic.Data, Path + TORRENTREADER_PATH_SEPARATOR + UTF8ToString(TmpDic.Header),  FileData)
         else
-          ParseFileListV2(TmpDic.Data, UTF8ToString(Hdr),  FileData);
+          ParseFileListV2(TmpDic.Data, UTF8ToString(TmpDic.Header),  FileData);
     end;
   end;
 
@@ -390,16 +388,16 @@ begin
     begin // V1
       var FL := Info.ListData.FindElement('files');
       if FL <> nil then
-      for var i := 0 to FL.ListData.Count - 1 do
+      for var FileItem in FL.ListData do
       begin
         // Multiple Files/Folders
         var FileData := TFileData.Create;
         FData.Info.FileList.Add(FileData);
-        var FLD := FL.ListData.Items[i].Data;
+        var FLD := FileItem.Data;
         FileData.Length := FLD.ListData.FindElement('length').IntegerData;
         var FLDP := FLD.ListData.FindElement('path');
-        for var j := 0 to FLDP.ListData.Count - 1 do
-          FileData.PathList.Add(UTF8ToString(FLDP.ListData.Items[j].Data.StringData));
+        for var DataItem in FLDP.ListData do
+          FileData.PathList.Add(UTF8ToString(DataItem.Data.StringData));
         FileData.PathList.Delimiter := TORRENTREADER_PATH_SEPARATOR;
         FileData.PathList.QuoteChar := #0;
         FileData.PathList.StrictDelimiter := True;
