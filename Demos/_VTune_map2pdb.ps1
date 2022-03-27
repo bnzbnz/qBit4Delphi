@@ -8,5 +8,6 @@ mzp2pdb "FMXReport"
 mzp2pdb "NOXMon"
 mzp2pdb "Simple"
 mzp2pdb "SimpleThreaded"
+mzp2pdb "VnStatDemo"
 
 pause
