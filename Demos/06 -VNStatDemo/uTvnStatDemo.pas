@@ -12,6 +12,8 @@ type
     Button1: TButton;
     Edit1: TEdit;
     Label1: TLabel;
+    Label2: TLabel;
+    Edit2: TEdit;
     procedure Button1Click(Sender: TObject);
   private
     { Private declarations }
@@ -29,15 +31,26 @@ uses REST.Json, System.Net.URLClient, System.Net.HttpClient, System.Net.HttpClie
 
 procedure TvnStatDemoFrm.Button1Click(Sender: TObject);
 begin
-  var Vns := TvnStatClient.GetURL(Edit1.Text);
-  var M := Vns.GetCurrentMonth;
   Memo1.Clear;
+  var Vns := TvnStatClient.GetURL(Edit1.Text);
+  if Vns = nil then
+  begin
+    Memo1.Lines.Add('Please check the URL / php file setup...');
+    exit;
+  end;
+  var M := Vns.GetCurrentMonth(Edit2.Text);
+  if M = nil then
+  begin
+    Memo1.Lines.Add('Wrong Interface name...');
+    Vns.Free;
+    exit;
+  end;
   Memo1.Lines.Add(Format('tx: %8.2f TiB',[TvnStatClient.BtoTiB(M.Ftx)]));
   Memo1.Lines.Add(Format('rx: %8.2f TiB',[TvnStatClient.BtoTiB(M.Frx)]));
   Memo1.Lines.Add(Format('Toral: %8.2f TiB',[TvnStatClient.BtoTiB(M.Ftx + M.Frx)]));
   Memo1.lines.Add('');
   Memo1.lines.Add('Raw Data : copy/paste in https://jsonformatter.curiousconcept.com/ to get a cute view :');
-  Memo1.Lines.Add(Vns.Raw);
+  Memo1.Lines.Add(Vns.Fraw);
   Memo1.Lines.Insert(0,''); // Scroll to Top
   Vns.Free;
 end;

@@ -2,7 +2,7 @@ object vnStatDemoFrm: TvnStatDemoFrm
   Left = 0
   Top = 0
   Caption = 'vnStat Client Demo'
-  ClientHeight = 355
+  ClientHeight = 381
   ClientWidth = 624
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -18,9 +18,16 @@ object vnStatDemoFrm: TvnStatDemoFrm
     Height = 15
     Caption = 'URL : '
   end
+  object Label2: TLabel
+    Left = 8
+    Top = 37
+    Width = 52
+    Height = 15
+    Caption = 'Interface :'
+  end
   object Memo1: TMemo
     Left = 8
-    Top = 59
+    Top = 91
     Width = 608
     Height = 286
     Lines.Strings = (
@@ -32,13 +39,15 @@ object vnStatDemoFrm: TvnStatDemoFrm
       
         'TEST IT with your web browser (the passthru function may have be' +
         'en disabled in php.ini)'
-      'then provide the full php script URL to this demo...')
+      
+        'then provide the full php script URL and the interface name in w' +
+        'hich yourare  interrested in.')
     ScrollBars = ssVertical
     TabOrder = 0
   end
   object Button1: TButton
     Left = 8
-    Top = 32
+    Top = 64
     Width = 608
     Height = 25
     Caption = 'Get vnstat'
@@ -51,5 +60,13 @@ object vnStatDemoFrm: TvnStatDemoFrm
     Width = 572
     Height = 23
     TabOrder = 2
+  end
+  object Edit2: TEdit
+    Left = 66
+    Top = 35
+    Width = 550
+    Height = 23
+    TabOrder = 3
+    Text = 'ens2f0'
   end
 end
