@@ -77,6 +77,8 @@ type
     class function LoadFromBufferPtr(BufferPtr, BufferEndPtr: PAnsiChar; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     class function LoadFromMemoryStream(MemStream: TMemoryStream; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
     class function LoadFromFile(Filename: string; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+    class function LoadFromAnsiString(var AnsiStr: AnsiString; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+
     constructor Create; overload;
     destructor Destroy; override;
     property BEncoded: TBEncoded read FBe;
@@ -244,6 +246,11 @@ begin
   finally
     MemStream.Free;
   end;
+end;
+
+class function TTorrentReader.LoadFromAnsiString(var AnsiStr: AnsiString; Options: TTorrentReaderOptions = [trRaiseException]): TTorrentReader;
+begin
+  Result := LoadFromBufferPtr(@AnsiStr[1], PAnsiChar( NativeUInt(@AnsiStr[1]) + NativeUInt(Length(AnsiStr)) ), Options);
 end;
 
 procedure TTorrentReader.Parse(Be: TBEncoded; Options: TTorrentReaderOptions);
