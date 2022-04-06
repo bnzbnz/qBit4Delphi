@@ -250,8 +250,8 @@ end;
 
 class function TvnStatClient.FromURL(URL: string): TvnStatClient;
 var
-   Http: THTTPClient;
-   ReqSS: TStringStream;
+  Http: THTTPClient;
+  ReqSS: TStringStream;
 begin
   Result := nil; Http := nil; ReqSS := nil;
   try
