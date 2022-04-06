@@ -32,7 +32,7 @@ uses REST.Json, System.Net.URLClient, System.Net.HttpClient, System.Net.HttpClie
 procedure TvnStatDemoFrm.Button1Click(Sender: TObject);
 begin
   Memo1.Clear;
-  var Vns := TvnStatClient.GetURL(Edit1.Text);
+  var Vns := TvnStatClient.FromURL(Edit1.Text);
   if Vns = nil then
   begin
     Memo1.Lines.Add('Please check the URL / php file setup...');

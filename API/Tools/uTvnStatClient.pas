@@ -7,10 +7,10 @@
 ///
 
 // usage:
-// use a server running vnstat, a webserver(nginx ,lighthttpd, apache...), php
+// use a server running vnstat, a webserver(nginx, lighthttpd, apache...), php
 // create a php script:  <?php passthru('vnstat --json'); ?>
 // TEST IT with your web browser (the passthru function may have been disbled in php.ini)
-// then provide the full URL to the class function GetURL
+// then provide the full URL to the class function FromURL
 // You'll get a TvnStatClient which contains all the stats (nil if it fails)
 
 unit uTvnStatClient;
@@ -80,7 +80,8 @@ type
     Fjsonversion: string;
     Finterfaces: TArray<TvnsInterface>;
 
-    class function GetURL(URL: string): TvnStatClient;
+    class function FromJSON(JSONStr: string): TvnStatClient;
+    class function FromURL(URL: string): TvnStatClient;
     class function BtoTiB(Byte: Int64): real;
     class function BtoTB(Byte: Int64): real;
     destructor Destroy; override;
@@ -172,7 +173,6 @@ begin
   Result := GetDay(Intf, AYear, AMonth, ADay);
 end;
 
-
 class function TvnStatClient.BtoTB(Byte: Int64): real;
 begin
   Result := Byte / 1000000000000;
@@ -239,7 +239,16 @@ begin
   Result := nil;
 end;
 
-class function TvnStatClient.GetURL(URL: string): TvnStatClient;
+class function TvnStatClient.FromJSON(JSONStr: string): TvnStatClient;
+begin
+  try
+    Result := TJSon.JsonToObject<TvnStatClient>(JSONStr);
+  except
+    Result := nil;
+  end;
+end;
+
+class function TvnStatClient.FromURL(URL: string): TvnStatClient;
 var
    Http: THTTPClient;
    ReqSS: TStringStream;
@@ -253,7 +262,7 @@ begin
     var Res :=  Http.Get(URL, ReqSS);
     if Res.StatusCode = 200 then
     begin
-      Result := TJSon.JsonToObject<TvnStatClient>(ReqSS.DataString);
+      Result := TvnStatClient.FromJSON(ReqSS.DataString);
       if Result <> nil then Result.FRaw := ReqSS.DataString;
     end;
   finally

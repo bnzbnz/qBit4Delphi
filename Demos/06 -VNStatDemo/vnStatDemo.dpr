@@ -3,7 +3,7 @@ program vnStatDemo;
 uses
   Vcl.Forms,
   uTvnStatDemo in 'uTvnStatDemo.pas' {vnStatDemoFrm},
-  uTvnStatClient in '..\..\API\uTvnStatClient.pas';
+  uTvnStatClient in '..\..\API\Tools\uTvnStatClient.pas';
 
 {$R *.res}
 

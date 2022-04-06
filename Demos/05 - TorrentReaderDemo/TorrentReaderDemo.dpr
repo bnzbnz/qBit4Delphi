@@ -3,8 +3,8 @@ program TorrentReaderDemo;
 uses
   Vcl.Forms,
   uTorrentReaderDemo in 'uTorrentReaderDemo.pas' {Form2},
-  uTorrentReader in '..\..\API\uTorrentReader.pas',
-  uBEncode in '..\..\API\uBEncode.pas';
+  uTorrentReader in '..\..\API\Tools\uTorrentReader.pas',
+  uBEncode in '..\..\API\Tools\uBEncode.pas';
 
 {$R *.res} 
 

@@ -10,6 +10,8 @@ object vnStatDemoFrm: TvnStatDemoFrm
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OldCreateOrder = True
+  PixelsPerInch = 96
   TextHeight = 15
   object Label1: TLabel
     Left = 8
