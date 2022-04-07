@@ -9,6 +9,7 @@ type
     Fhostname: String;
     Fcity: String;
     Fregion: String;
+    Fcountry: String;
     Floc: String;
     Forg: String;
     Fpostal: String;
