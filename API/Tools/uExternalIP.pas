@@ -5,17 +5,16 @@ interface
 type
 
   TExternalIP = class
-    Fip: String;
-    Fhostname: String;
-    Fcity: String;
-    Fregion: String;
-    Fcountry: String;
-    Floc: String;
-    Forg: String;
-    Fpostal: String;
-    Ftimezone: String;
-    Freadme: String;
-
+    Fip: AnsiString;
+    Fhostname: AnsiString;
+    Fcity: AnsiString;
+    Fregion: AnsiString;
+    Fcountry: AnsiString;
+    Floc: AnsiString;
+    Forg: AnsiString;
+    Fpostal: AnsiString;
+    Ftimezone: AnsiString;
+    Freadme: AnsiString;
     class function FromJSON(JSONStr: string): TExternalIP;
     class function FromURL(URL: String = 'http://ipinfo.io/json'): TExternalIP;
   end;
@@ -47,7 +46,7 @@ begin
     ReqSS := TStringStream.Create('');
     Http := THTTPClient.Create;
     Http.ConnectionTimeout := 500;
-    var Res :=  Http.Get(URL, ReqSS);
+    var Res := Http.Get(URL, ReqSS);
     if Res.StatusCode = 200 then
       Result := TExternalIP.FromJSON(ReqSS.DataString);
   finally
