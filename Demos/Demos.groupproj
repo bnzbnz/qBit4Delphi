@@ -21,7 +21,7 @@
         <Projects Include="05 - TorrentReaderDemo\TorrentReaderDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="06 -VNStatDemo\vnStatDemo.dproj">
+        <Projects Include="06 - VNStatDemo\vnStatDemo.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -87,13 +87,13 @@
         <MSBuild Projects="05 - TorrentReaderDemo\TorrentReaderDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="vnStatDemo">
-        <MSBuild Projects="06 -VNStatDemo\vnStatDemo.dproj"/>
+        <MSBuild Projects="06 - VNStatDemo\vnStatDemo.dproj"/>
     </Target>
     <Target Name="vnStatDemo:Clean">
-        <MSBuild Projects="06 -VNStatDemo\vnStatDemo.dproj" Targets="Clean"/>
+        <MSBuild Projects="06 - VNStatDemo\vnStatDemo.dproj" Targets="Clean"/>
     </Target>
     <Target Name="vnStatDemo:Make">
-        <MSBuild Projects="06 -VNStatDemo\vnStatDemo.dproj" Targets="Make"/>
+        <MSBuild Projects="06 - VNStatDemo\vnStatDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="Simple;FMXReport;SimpleThreaded;NOXMon;Patcher;TorrentReaderDemo;vnStatDemo"/>
