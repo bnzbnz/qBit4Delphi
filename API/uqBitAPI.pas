@@ -484,7 +484,12 @@ begin
   Result := nil;
   var Body := Format('rid=%d', [ Rid ]);
   if  qBPost('/sync/maindata', Body) = 200 then
+  begin
     Result := TJson.JsonToObject<TqBitMainDataType>(Body, []);
+    if assigned(Result) then
+      for var T in Result.Ftorrents do
+            TqBitTorrentType(T.Value)._FKey := T.Key;
+  end;
   FDuration := GetTickcount - FDuration;
 end;
 
