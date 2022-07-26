@@ -38,7 +38,7 @@ type
     function DecreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function MaximalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function MainimalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
-    function SetfilesPriority(Hash: string; Ids: TStringList; Priority: integer): boolean; overload; virtual;
+    function SetFilePriority(Hash: string; Ids: TStringList; Priority: integer): boolean; overload; virtual;
     function GetTorrentDownloadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType; overload; virtual;
     function SetTorrentDownloadLimit(Hashes: TStringList; Limit: integer): boolean; overload; virtual;
     function SetTorrentShareLimit(Hashes: TStringList; RatioLimit: double; SeedingTimeLimit: integer): boolean; overload; virtual;
@@ -213,10 +213,10 @@ begin
   Result := DecreaseTorrentPriority(Hashes.DelimitedText);
 end;
 
-function TqBitObject.SetfilesPriority(Hash: string; Ids: TStringList; Priority: integer): boolean;
+function TqBitObject.SetFilePriority(Hash: string; Ids: TStringList; Priority: integer): boolean;
 begin
   Ids.Delimiter := '|';
-  Result := SetfilesPriority(Hash, Ids.DelimitedText, Priority);
+  Result := SetFilePriority(Hash, Ids.DelimitedText, Priority);
 end;
 
 function TqBitObject.GetTorrentDownloadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType;
