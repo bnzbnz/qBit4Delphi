@@ -37,7 +37,7 @@ type
     function IncreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function DecreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function MaximalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
-    function MainimalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
+    function MinimalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function SetFilePriority(Hash: string; Ids: TStringList; Priority: integer): boolean; overload; virtual;
     function GetTorrentDownloadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType; overload; virtual;
     function SetTorrentDownloadLimit(Hashes: TStringList; Limit: integer): boolean; overload; virtual;
@@ -92,18 +92,19 @@ begin
   Result.FHTTPConnectionTimeout := FHTTPConnectionTimeout;
   Result.FHTTPSendTimeout := FHTTPSendTimeout;
   Result.FHTTPResponseTimeout := FHTTPResponseTimeout;
+  Result.FHTTPRetries := FHTTPRetries;
   Result.FUsername := FUsername;
   Result.FPassword := FPassword;
 end;
 
 class function TqBitObject.UTimestampMsToDateTime(Timestamp: int64): TDatetime;
 begin
-  result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp div 1000));
+  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp div 1000));
 end;
 
 class function TqBitObject.UTimestampToDateTime(Timestamp: int64): TDatetime;
 begin
-  result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp));
+  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp));
 end;
 
 class procedure TqBitObject.TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
@@ -201,16 +202,16 @@ begin
   Result := DecreaseTorrentPriority(Hashes.DelimitedText);
 end;
 
-function TqBitObject.MainimalTorrentPriority(Hashes: TStringList): boolean;
+function TqBitObject.MinimalTorrentPriority(Hashes: TStringList): boolean;
 begin
   Hashes.Delimiter := '|';
-  Result := DecreaseTorrentPriority(Hashes.DelimitedText);
+  Result := MinimalTorrentPriority(Hashes.DelimitedText);
 end;
 
 function TqBitObject.MaximalTorrentPriority(Hashes: TStringList): boolean;
 begin
   Hashes.Delimiter := '|';
-  Result := DecreaseTorrentPriority(Hashes.DelimitedText);
+  Result := MaximalTorrentPriority(Hashes.DelimitedText);
 end;
 
 function TqBitObject.SetFilePriority(Hash: string; Ids: TStringList; Priority: integer): boolean;

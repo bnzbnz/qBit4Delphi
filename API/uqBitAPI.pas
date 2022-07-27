@@ -103,6 +103,7 @@ type
     function ReannounceTorrents(Hashes: string): boolean; overload; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-torrent
     function AddNewTorrentUrls(NewTorrentUrls: TqBitNewTorrentUrlsType): boolean; virtual;
+        // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-new-torrent
     function AddNewTorrentFile(NewTorrentFile: TqBitNewTorrentFileType): boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#add-trackers-to-torrent
     function AddTrackersToTorrent(Hash: string; Urls: string): boolean; overload; virtual;
@@ -215,7 +216,7 @@ begin
   FHostPath := HostPath;
   FHTTPConnectionTimeout := 1000;
   FHTTPSendTimeout := 2000;
-  FHTTPResponseTimeout := 4000;
+  FHTTPResponseTimeout := 5000;
   FHTTPRetries := 3;
 end;
 function TqBitAPI.qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer;
