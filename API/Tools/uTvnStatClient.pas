@@ -3,8 +3,8 @@
 ///  version: 1.0.0
 //
 ///  https://humdi.net/vnstat/
-///  https://en.wikipedia.org/wiki/VnStat
-///
+///  Doc: https://en.wikipedia.org/wiki/VnStat
+///  Converter: https://mtp.tools/converters/data-storage    Converter
 
 // usage:
 // use a server running vnstat, a webserver(nginx, lighthttpd, apache...), php
@@ -33,17 +33,17 @@ type
   end;
 
   TvnsDateCtx = class
-     Fdate: TvnsDate;
-     destructor Destroy; override;
-     function GetDate: TDate;
+    Fdate: TvnsDate;
+    destructor Destroy; override;
+    function GetDate: TDate;
   end;
 
-  TVNrxtx = class
+  TvnsRxTx = class
     Frx: Int64;
     Ftx: Int64;
   end;
 
-  TvnsInfo= class(TVNrxtx)
+  TvnsInfo= class(TvnsRxTx)
     Fid: Int64;
     Fdate: TvnsDate;
     Ftime: TvnsTime;
@@ -54,7 +54,7 @@ type
   end;
 
   TvnsTraffic = class
-    Ftotal: TVNrxtx;
+    Ftotal: TvnsRxTx;
     Ffiveminute: TArray<TvnsInfo>;
     Fhour: TArray<TvnsInfo>;
     Fday: TArray<TvnsInfo>;
@@ -82,8 +82,12 @@ type
 
     class function FromJSON(JSONStr: string): TvnStatClient;
     class function FromURL(URL: string): TvnStatClient;
-    class function BtoTiB(Byte: Int64): real;
-    class function BtoTB(Byte: Int64): real;
+    class function BtoMiB(Bytes: Int64): real;
+    class function BtoMB(Bytes: Int64): real;
+    class function BtoGiB(Bytes: Int64): real;
+    class function BtoGB(Bytes: Int64): real;
+    class function BtoTiB(Bytes: Int64): real;
+    class function BtoTB(Bytes: Int64): real;
     destructor Destroy; override;
     function GetInterface(NetInterface: string): TvnsInterface;
     function GetYear(Intf: string; Year: Int64): TvnsInfo;
@@ -173,14 +177,34 @@ begin
   Result := GetDay(Intf, AYear, AMonth, ADay);
 end;
 
-class function TvnStatClient.BtoTB(Byte: Int64): real;
+class function TvnStatClient.BtoMB(Bytes: Int64): real;
 begin
-  Result := Byte / 1000000000000;
+  Result := Bytes / 1000000;
 end;
 
-class function TvnStatClient.BtoTiB(Byte: Int64): real;
+class function TvnStatClient.BtoMiB(Bytes: Int64): real;
 begin
-  Result := Byte / 1099511627776;
+  Result := Bytes / 1048576;
+end;
+
+class function TvnStatClient.BtoGB(Bytes: Int64): real;
+begin
+  Result := Bytes / 1000000000;
+end;
+
+class function TvnStatClient.BtoGiB(Bytes: Int64): real;
+begin
+  Result := Bytes / 1073741824
+end;
+
+class function TvnStatClient.BtoTB(Bytes: Int64): real;
+begin
+  Result := Bytes / 1000000000000;
+end;
+
+class function TvnStatClient.BtoTiB(Bytes: Int64): real;
+begin
+  Result := Bytes / 1099511627776;
 end;
 
 destructor TvnStatClient.Destroy;
@@ -258,7 +282,6 @@ begin
   try
     ReqSS := TStringStream.Create('');
     Http := THTTPClient.Create;
-    Http.ConnectionTimeout := 500;
     var Res :=  Http.Get(URL, ReqSS);
     if Res.StatusCode = 200 then
     begin

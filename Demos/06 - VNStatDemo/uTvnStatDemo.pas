@@ -47,7 +47,10 @@ begin
   end;
   Memo1.Lines.Add(Format('tx: %8.2f TiB',[TvnStatClient.BtoTiB(M.Ftx)]));
   Memo1.Lines.Add(Format('rx: %8.2f TiB',[TvnStatClient.BtoTiB(M.Frx)]));
-  Memo1.Lines.Add(Format('Toral: %8.2f TiB',[TvnStatClient.BtoTiB(M.Ftx + M.Frx)]));
+  Memo1.Lines.Add(Format('Total: %8.2f TiB, %8.2f TB', [
+    TvnStatClient.BtoTiB(M.Ftx + M.Frx),
+    TvnStatClient.BtoTB(M.Ftx + M.Frx)
+  ]));
   Memo1.lines.Add('');
   Memo1.lines.Add('Raw Data : copy/paste in https://jsonformatter.curiousconcept.com/ to get a cute view :');
   Memo1.Lines.Add(Vns.Fraw);
