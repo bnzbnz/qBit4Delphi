@@ -29,8 +29,6 @@ type
     procedure ClonePropertiesTo(T : TqBitTorrentBaseType); virtual;
     procedure MergePropertiesFrom(T: TqBitTorrentBaseType);
   public
-    [JsonMarshalled(false)]
-    _FKey: variant;
     function Clone: TqBitTorrentBaseType; virtual;
     constructor Create; overload;
     destructor Destroy; override;
@@ -366,6 +364,7 @@ type
     Feta: variant;
     Ff_l_piece_prio: variant;
     Fforce_start: variant;
+    Fhash: variant;
     Flast_activity: variant;
     Fmagnet_uri: variant;
     Fmax_ratio: variant;

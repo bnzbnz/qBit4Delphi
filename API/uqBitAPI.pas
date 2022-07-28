@@ -376,9 +376,6 @@ begin
   begin
     SaveStringToFile(Body, 'd:\trace.json');
     Result := TJson.JsonToObject<TqBitMainDataType>(Body, []);
-    if assigned(Result) then
-      for var T in Result.Ftorrents do
-            TqBitTorrentType(T.Value)._FKey := T.Key;
   end;
   FDuration := GetTickcount - FDuration;
 end;
