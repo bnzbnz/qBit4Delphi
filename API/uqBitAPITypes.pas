@@ -13,8 +13,8 @@ uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types
      System.Generics.Defaults, Classes;
 
 const
-  Const_qBitAPI_Implemented_Version = 'v2.8.3.dev.025';
-  Const_qBitAPI_Developer = 'Laurent Meyer, qBit4Delphi@ea4d.com';
+  qBitAPI_Version = '2.8.3';
+  qBitAPI_Developer = 'Laurent Meyer, qBit4Delphi@ea4d.com';
 
 type
 

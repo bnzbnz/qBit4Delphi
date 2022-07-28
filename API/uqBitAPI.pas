@@ -232,7 +232,7 @@ begin
     Http.UserAgent :=
       Format(
         'qBittorrent WebAPI for Delphi (qBit4Delphi) %s - Laurent Meyer - qBit4Delphi@ea4d.com',
-        [Const_qBitAPI_Implemented_Version]
+        [qBitAPI_Version]
       );
     Http.CustomHeaders['Content-type'] := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
