@@ -1,11 +1,14 @@
 unit uqBitObject;
-interface
+
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
 ///  API v2.8.3 + Hidden/Missing Fields
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
+
+interface
+
 uses classes, uqBitAPI, uqBitAPITypes;
 
 type
@@ -192,6 +195,8 @@ begin
     FreeAndNil(Result);
 end;
 
+// Helpers
+
 function TqBitObject.Clone: TqBitObject;
 begin
   Result := TqBitObject.Create(FHostPath);
@@ -229,7 +234,7 @@ end;
 
 function TqBitObject.qBitAPIVersion: string;
 begin
-  Result := qBitAPI_Version;
+  Result := qBitAPI_APIVersion;
 end;
 
 function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;

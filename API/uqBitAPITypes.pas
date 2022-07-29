@@ -13,16 +13,20 @@ uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types
      System.Generics.Defaults, Classes;
 
 const
-  qBitAPI_Version = '2.8.3';
-  qBitAPI_Developer = 'Laurent Meyer, qBit4Delphi@ea4d.com';
+
+  qBitAPI_APIVersion = '2.8.3';
+  qBitAPI_LibMajorVersion = 1;
+  qBitAPI_LibMinorVersion = 100;
+  qBitAPI_Developer = 'Laurent Meyer (qBit4Delphi@ea4d.com)';
 
 type
 
-  // Parent Type :
   TqBitTorrentBaseType = class
   private
     [JsonMarshalled(false)]
     _RawJsonData: TDictionary<string, string>;
+    [JsonMarshalled(false)]
+    _UserStr: string;
     function RawJsonDecode(RawJson: string): string;
     function RawJsonEncode(Header, Value, Footer: string): string;
   protected
@@ -74,7 +78,7 @@ type
     constructor Create; overload;
   end;
 
-  {$ENDREGION}
+  {$ENDREGION} // Custom Types Intf.
 
   {$REGION 'JSON Interceptor Types Intf.'}
 
@@ -108,7 +112,7 @@ type
     function StringConverter(Data: TObject; Field: string): string; override;
   end;
 
-  {$ENDREGION}
+  {$ENDREGION} // JSON Interceptor Types Intf.
 
   {$REGION 'Generic Types Intf.'}
 
@@ -117,7 +121,6 @@ type
     function Merge(From: TqBitList<A>): variant; overload;
     function Merge(From: TqBitList<A>; var  Added: TqBitList<variant>): variant; overload;
   end;
-
 
   TqBitObjectDictionary<A, B>= class(TObjectDictionary<variant, TqBitTorrentBaseType>)
     function Clone: TqBitObjectDictionary<A, B>;
@@ -141,7 +144,7 @@ type
     function Merge(From: TqBitObjectList<A>; var Added, Modified, Removed: TqBitObjectList<A>): variant; overload;
   end;
 
-  {$ENDREGION}
+  {$ENDREGION} // 'Generic Types Intf.'
 
   {$REGION 'JSON Types Intf.'}
 
@@ -323,7 +326,6 @@ type
     Ftype: variant;
     // inherited Merge/Clone
   end;
-
   TqBitLogsType = class(TqBitTorrentBaseType)
     [JsonReflect(ctstring, rtString, TqBitObjectListInterceptor)]
     Flogs: TqBitObjectList<TqBitLogType>;
@@ -437,7 +439,6 @@ type
     Ffull_update: variant;
     Frid: variant;
     Fserver_state: TqBitserver_stateType;
-
     [JsonReflect(ctString, rtString, TqBitObjectDictionaryInterceptor)]
     Fcategories: TqBitObjectDictionary<variant, TqBitCategoryType>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
@@ -450,7 +451,6 @@ type
     _Fcategories_changed: variant; // Custom Internal
     [JsonMarshalled(false)]
     _Fcategories_count_changed: variant; // Custom Internal
-
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
     Ftags: TqBitList<variant>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
@@ -463,7 +463,6 @@ type
     _Ftags_changed: variant; // Custom Internal
     [JsonMarshalled(false)]
     _Ftags_count_changed: variant; // Custom Internal
-
     [JsonReflect(ctString, rtString, TqBitObjectDictionaryInterceptor)]
     Ftorrents: TqBitObjectDictionary<variant, TqBitTorrentType>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
@@ -476,7 +475,6 @@ type
     _Ftorrents_changed: variant; // Custom Internal
     [JsonMarshalled(false)]
     _Ftorrents_count_changed: variant; // Custom Internal
-
     [JsonReflect(ctString, rtString, TqBitObjectDictionaryInterceptor)]
     Ftrackers: TqBitStringListDictionary<variant, TStringList>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
@@ -489,7 +487,6 @@ type
     _Ftrackers_changed: variant; // Custom Internal
     [JsonMarshalled(false)]
     _Ftrackers_count_changed: variant; // Custom Internal
-
     destructor Destroy; override;
     procedure Merge(From: TqBitTorrentBaseType); override;
     function Clone: TqBitTorrentBaseType; override;
@@ -521,7 +518,6 @@ type
     Fpeers: TqBitObjectDictionary<variant, TqBitTorrentPeerDataType>;
     [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
     Fpeers_removed: TqBitList<variant>;
-
     [JsonMarshalled(false)]
     _Fpeers_added: TqBitList<variant>;  // Custom Internal
     [JsonMarshalled(false)]
@@ -530,7 +526,6 @@ type
     _Fpeers_changed: variant; // Custom Internal
     [JsonMarshalled(false)]
     _Fpeers_count_changed: variant; // Custom Internal
-
     Fshow_flags: variant;
     destructor Destroy; override;
     procedure Merge(From: TqBitTorrentBaseType); override;
@@ -776,7 +771,7 @@ type
     procedure Merge(From: TqBitTorrentBaseType); override;
   end;
 
-  {$ENDREGION}
+  {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
 uses SysUtils, REST.Json, NetEncoding, Variants, RTTI;
@@ -784,15 +779,14 @@ uses SysUtils, REST.Json, NetEncoding, Variants, RTTI;
 {$REGION 'Helpers Impl.'}
 
 const
-  bstr: array[boolean] of string = ('false','true');
+  BoolStr: array[boolean] of string = ('false','true');
 
-procedure VarMrg(var src: variant; dst, def: variant);
+procedure VarMrg(var src: variant; dst, def: variant); inline;
 begin
-  if not VarIsEmpty(dst) then src := dst else
-    if not VarIsNull(def) then src := def;
+  if not VarIsEmpty(dst) then src := dst else if not VarIsNull(def) then src := def;
 end;
 
-{$ENDREGION}
+{$ENDREGION} // 'Helpers Impl.'
 
 {$REGION 'JSON Interceptor Impl.'}
 
@@ -1172,7 +1166,6 @@ end;
 
 procedure TqBitRSSObjectDictionaryInterceptor.StringReverter(Data: TObject;
   Field, Arg: string);
-
   procedure RSSRecurse(Dic: TqBitObjectDictionary<variant, TqBitRSSItemType>; JsonStr: string; var Path: string);//; var Item: TqBitRSSItemType );
   begin
     var JSONObj := TJSONObject.ParseJSONValue(JsonStr) as TJSONObject;
@@ -1191,7 +1184,6 @@ procedure TqBitRSSObjectDictionaryInterceptor.StringReverter(Data: TObject;
     end;
     JSONObj.Free;
   end;
-
 begin
   if (Data is TqBitRSSAllItemsType) and (Field = 'Fitems') then
   begin
@@ -1221,105 +1213,7 @@ begin
       ));
 end;
 
-{$ENDREGION}
-
-{$REGION 'TqBitTorrentBaseType Impl.'}
-
-{ TqBitTorrentBaseType }
-
-constructor TqBitTorrentBaseType.Create;
-begin
-  _RawJsonData := TDictionary<string, string>.Create;
-  _RawJsonData.Clear;
-end;
-
-destructor TqBitTorrentBaseType.Destroy;
-begin
-  _RawJsonData.Free;
-  inherited;
-end;
-
-procedure TqBitTorrentBaseType.ClonePropertiesTo(T : TqBitTorrentBaseType);
-begin
-  if T = nil then exit;
-  var rttictx := TRttiContext.Create();
-  var rttitype := rttictx.GetType(Self.ClassType);
-  for var field in rttitype.GetFields do
-    if field.FieldType.TypeKind = tkVariant then
-    begin
-      var v :=  field.GetValue(Self);
-      if not VarIsEmpty(v.AsVariant) then field.SetValue(T, v);
-    end;
-  rttictx.Free;
-end;
-
-procedure TqBitTorrentBaseType.MergePropertiesFrom(T: TqBitTorrentBaseType);
-begin
-  if T = nil then exit;
-  if Self.ClassType <> T.ClassType then exit;
-  var rttictx := TRttiContext.Create();
-  var rttitype := rttictx.GetType(T.ClassType);
-  for var field in rttitype.GetFields do
-    if field.FieldType.TypeKind = tkVariant then
-    begin
-      var v :=  field.GetValue(T);
-      if not VarIsEmpty(v.AsVariant) then field.SetValue(Self, v);
-    end;
-  rttictx.Free;
-end;
-
-procedure TqBitTorrentBaseType.Merge(T: TqBitTorrentBaseType);
-begin
-  MergePropertiesFrom(T);
-end;
-
-function TqBitTorrentBaseType.Clone: TqBitTorrentBaseType;
-begin
-  Result := TqBitTorrentBaseType(Self.ClassType.Create);
-  Self.ClonePropertiesTo(Result);
-  // Debug :
-  // raise Exception.Create(Format('%s.Clone is not Implemented',[Self.ClassName]));
-end;
-
-function TqBitTorrentBaseType.RawJsonEncode(Header, Value, Footer: string): string;
-var
-  MyGuid0: TGUID;
-begin
-  CreateGUID(MyGuid0);
-  Result := Format(
-       '%0.8X%0.4X%0.4X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X',
-       [MyGuid0.D1, MyGuid0.D2, MyGuid0.D3,
-       MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
-       MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]);
-  _RawJsonData.Add(Header + Result + Footer, Value);
-end;
-
-function TqBitTorrentBaseType.RawJsonDecode(RawJson: string): string;
-begin
-  Result := RawJson;
-  for var Tag in _RawJsonData do
-    if Tag.Key <> '' then
-      Result := StringReplace(Result, Tag.Key, Tag.Value, []);
-end;
-
-function TqBitTorrentBaseType.toJSON: string;
-begin
-  _RawJsonData.Clear;
-  Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
-  Result := RawJsonDecode(Result);
-end;
-
-procedure TqBitTorrentBaseType.Clear;
-begin
-  //
-end;
-
-function TqBitTorrentBaseType.toParams: string;
-begin
-  Result := '';
-end;
-
-{$ENDREGION}
+{$ENDREGION} // 'JSON Interceptor Impl.'
 
 {$REGION 'Generic Types Impl.'}
 
@@ -1416,8 +1310,37 @@ begin
   end;
 end;
 
-{ TqBitObjectList<A> }
+{ TqBitVariantDictionary<A, B> }
 
+function TqBitVariantDictionary<A, B>.Clone: TqBitVariantDictionary<A, B>;
+begin
+  Result := TqBitVariantDictionary<A, B>.Create([doOwnsValues]);
+  for var v in Self do
+    Result.Add(v.Key, v.Value.clone);
+end;
+
+function TqBitVariantDictionary<A, B>.Merge(From: TqBitVariantDictionary<A, B>;
+  var Added, Modified: TqBitList<variant>): variant;
+begin
+  Result := False;
+  if not assigned(From) then exit;
+  for var p in From do
+  if Self.ContainsKey(p.key) then
+  begin
+    var v := Self.Items[p.key];
+    v.Assign(p.Value);
+    if not assigned(Modified) then Modified := TqBitList<variant>.Create;
+    Modified.add(p.Key);
+    Result := True;
+  end else begin
+    Self.Add(p.Key, p.Value);
+    if not assigned(Added) then Added := TqBitList<variant>.Create;
+    Added.Add(p.Key);
+    Result := True;
+  end;
+end;
+
+{ TqBitObjectList<A> }
 function TqBitObjectList<A>.Merge(From: TqBitObjectList<A>; var Added: TqBitObjectList<A>): variant;
 begin
   Result := False;
@@ -1450,14 +1373,12 @@ function TqBitObjectList<A>.Merge(From: TqBitObjectList<A>; var Added, Modified,
 begin
   Result := False;
   if not assigned(From) then exit;
-
   for var v in Self do // Removed
     if not From.IndexOf(v) = -1 then
     begin
       if not assigned(Removed) then Removed := TqBitObjectList<A>.Create;
       Removed.Add(v.Clone);
     end;
-
   for var v in From do
   begin
     Self.Add(v.Clone);
@@ -1466,8 +1387,103 @@ begin
     Result := True;
   end;;
 end;
-
 {$ENDREGION}
+
+{$REGION 'JSON Types Impl.'}
+
+{ TqBitTorrentBaseType }
+
+constructor TqBitTorrentBaseType.Create;
+begin
+  _RawJsonData := TDictionary<string, string>.Create;
+  _RawJsonData.Clear;
+end;
+
+destructor TqBitTorrentBaseType.Destroy;
+begin
+  _RawJsonData.Free;
+  inherited;
+end;
+
+procedure TqBitTorrentBaseType.ClonePropertiesTo(T : TqBitTorrentBaseType);
+begin
+  if T = nil then exit;
+  var rttictx := TRttiContext.Create();
+  var rttitype := rttictx.GetType(Self.ClassType);
+  for var field in rttitype.GetFields do
+    if field.FieldType.TypeKind = tkVariant then
+    begin
+      var v :=  field.GetValue(Self);
+      if not VarIsEmpty(v.AsVariant) then field.SetValue(T, v);
+    end;
+  rttictx.Free;
+end;
+
+procedure TqBitTorrentBaseType.MergePropertiesFrom(T: TqBitTorrentBaseType);
+begin
+  if T = nil then exit;
+  if Self.ClassType <> T.ClassType then exit;
+  var rttictx := TRttiContext.Create();
+  var rttitype := rttictx.GetType(T.ClassType);
+  for var field in rttitype.GetFields do
+    if field.FieldType.TypeKind = tkVariant then
+    begin
+      var v :=  field.GetValue(T);
+      if not VarIsEmpty(v.AsVariant) then field.SetValue(Self, v);
+    end;
+  rttictx.Free;
+end;
+
+procedure TqBitTorrentBaseType.Merge(T: TqBitTorrentBaseType);
+begin
+  MergePropertiesFrom(T);
+end;
+
+function TqBitTorrentBaseType.Clone: TqBitTorrentBaseType;
+begin
+  Result := TqBitTorrentBaseType(Self.ClassType.Create);
+  Self.ClonePropertiesTo(Result);
+  // Debug :
+  // raise Exception.Create(Format('%s.Clone is not Implemented',[Self.ClassName]));
+end;
+
+function TqBitTorrentBaseType.RawJsonEncode(Header, Value, Footer: string): string;
+var
+  MyGuid0: TGUID;
+begin
+  CreateGUID(MyGuid0);
+  Result := Format(
+       '%0.8X%0.4X%0.4X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X',
+       [MyGuid0.D1, MyGuid0.D2, MyGuid0.D3,
+       MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
+       MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]);
+  _RawJsonData.Add(Header + Result + Footer, Value);
+end;
+
+function TqBitTorrentBaseType.RawJsonDecode(RawJson: string): string;
+begin
+  Result := RawJson;
+  for var Tag in _RawJsonData do
+    if Tag.Key <> '' then
+      Result := StringReplace(Result, Tag.Key, Tag.Value, []);
+end;
+
+function TqBitTorrentBaseType.toJSON: string;
+begin
+  _RawJsonData.Clear;
+  Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
+  Result := RawJsonDecode(Result);
+end;
+
+procedure TqBitTorrentBaseType.Clear;
+begin
+  //
+end;
+
+function TqBitTorrentBaseType.toParams: string;
+begin
+  Result := '';
+end;
 
 { TqBitPreferencesType }
 
@@ -1497,7 +1513,6 @@ begin
   Self.Flogs.Free;
   inherited Destroy;
 end;
-
 procedure TqBitLogsType.Merge(From: TqBitTorrentBaseType);
 begin
   var T := TqBitLogsType(From);
@@ -1547,16 +1562,13 @@ end;
 function TqBitMainDataType.Clone: TqBitTorrentBaseType;
 begin
   var M := TqBitMainDataType.Create;
-
   /// Common Properties
   ///
   Self.ClonePropertiesTo(M);
-
   /// Fserver_state
   ///
   if Self.Fserver_state <> nil then
     M.Fserver_state := TqBitserver_stateType( Self.Fserver_state.Clone );
-
   //// Fcategories
   ///
   if Self.Fcategories <> nil then
@@ -1569,7 +1581,6 @@ begin
     M.Fcategories_removed := Self.Fcategories_removed.Clone;
   M._Fcategories_count_changed := Self._Fcategories_count_changed;
   M._Fcategories_changed := Self._Fcategories_changed;
-
   //// Ftags
   ///
   if Self.FTags <> nil then
@@ -1580,7 +1591,6 @@ begin
     M.Ftags_removed := Self.Ftags_removed.Clone;
   M._Ftags_count_changed := Self._Ftags_count_changed;
   M._Ftags_changed := Self._Ftags_changed;
-
   //// Ftorrents
   ///
   if Self.Ftorrents <> nil then
@@ -1593,7 +1603,6 @@ begin
     M.Ftorrents_removed := Self.Ftorrents_removed.Clone;
   M._Ftorrents_count_changed := Self._Ftorrents_count_changed;
   M._Ftorrents_changed := Self._Ftorrents_changed;
-
   //// Ftrackers
   ///
   if Self.FTrackers <> nil then
@@ -1602,7 +1611,6 @@ begin
     M.Ftrackers_removed := Self.Ftrackers_removed.Clone;
   M._Ftrackers_count_changed := Self._Ftrackers_count_changed;
   M._Ftrackers_changed := Self._Ftrackers_changed;
-
   Result := M;
 end;
 
@@ -1612,22 +1620,18 @@ begin
   Self._Ftrackers_modified.Free;
   Self.Ftrackers_Removed.Free;
   Self.Ftrackers.Free;
-
   Self._Ftorrents_added.Free;
   Self._Ftorrents_modified.Free;
   Self.Ftorrents_removed.Free;
   Self.Ftorrents.Free;
-
   Self._Fcategories_added.Free;
   Self._Fcategories_modified.Free;
   Self.Fcategories_removed.Free;
   Self.Fcategories.Free;
-
   Self._Ftags_added.Free;
   Self._Ftags_modified.Free;
   Self.Ftags_removed.Free;
   Self.FTags.Free;
-
   Self.Fserver_state.Free;
   inherited Destroy;
 end;
@@ -1636,18 +1640,15 @@ procedure TqBitMainDataType.Merge(From: TqBitTorrentBaseType);
 var
   M: TqBitMainDataType;
 begin
-
   if From = Nil then Exit;
   inherited Merge(From);
   M := TqBitMainDataType(From);
   VarMrg(Self.Ffull_update, M.Ffull_update, False);
-
   if M.Fserver_state <> nil then
   begin
     if Self.Fserver_state = nil then Fserver_state := TqBitserver_stateType.Create;
     Self.Fserver_state.Merge(M.Fserver_state);
   end;
-
   //// Fcategories
   ///
   FreeAndNil(Self._Fcategories_added);
@@ -1667,7 +1668,6 @@ begin
   end;
   _Fcategories_count_changed := assigned(Self._Fcategories_added) or assigned(Self.Fcategories_removed);
   _Fcategories_changed := _Fcategories_count_changed or assigned(Self._Fcategories_modified);
-
   //// Ftags
   ///
   FreeAndNil(Self._Ftags_added);
@@ -1687,7 +1687,6 @@ begin
   end;
   _Ftags_count_changed := assigned(Self._Ftags_added) or assigned(Self.Ftags_removed);
   _Ftags_changed := _Ftags_count_changed or assigned(Self._Ftags_modified);
-
   //// Ftorrents
   ///
   FreeAndNil(Self._Ftorrents_added);
@@ -1707,7 +1706,6 @@ begin
   end;
   _Ftorrents_count_changed := assigned(Self._Ftorrents_added) or assigned(Self.Ftorrents_removed);
   _Ftorrents_changed :=  _Ftorrents_count_changed or assigned(Self._Ftorrents_modified);
-
   //// Ftrackers
   ///
   FreeAndNil(Self._Ftrackers_added);
@@ -2049,7 +2047,6 @@ begin
   inherited Merge(From);
   P := TqBitTorrentPeersDataType(From);
   VarMrg(Self.Ffull_update, P.Ffull_update, False);
-
   //// Fpeers
   FreeAndNil(Self._Fpeers_added);
   FreeAndNil(Self._Fpeers_modified);
@@ -2279,36 +2276,6 @@ begin
   Result := T;
 end;
 
-{ TqBitVariantDictionary<A, B> }
-
-function TqBitVariantDictionary<A, B>.Clone: TqBitVariantDictionary<A, B>;
-begin
-  Result := TqBitVariantDictionary<A, B>.Create([doOwnsValues]);
-  for var v in Self do
-    Result.Add(v.Key, v.Value.clone);
-end;
-
-function TqBitVariantDictionary<A, B>.Merge(From: TqBitVariantDictionary<A, B>;
-  var Added, Modified: TqBitList<variant>): variant;
-begin
-  Result := False;
-  if not assigned(From) then exit;
-  for var p in From do
-  if Self.ContainsKey(p.key) then
-  begin
-    var v := Self.Items[p.key];
-    v.Assign(p.Value);
-    if not assigned(Modified) then Modified := TqBitList<variant>.Create;
-    Modified.add(p.Key);
-    Result := True;
-  end else begin
-    Self.Add(p.Key, p.Value);
-    if not assigned(Added) then Added := TqBitList<variant>.Create;
-    Added.Add(p.Key);
-    Result := True;
-  end;
-end;
-
+{$ENDREGION} // 'JSON Types Intf.'
 
 end.
-
