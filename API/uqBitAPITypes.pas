@@ -33,6 +33,7 @@ type
     constructor Create; overload;
     destructor Destroy; override;
     procedure Merge(T: TqBitTorrentBaseType); virtual;
+    procedure Clear; virtual;
     function ToJSON: string; virtual;
     function ToParams: string; virtual;
   end;
@@ -560,6 +561,8 @@ type
     Flimit: variant;
     Foffset: variant;
     Fhashes : variant;
+    FhashesList: TStringList;
+    procedure Clear; override;
     function ToParams: string; override;
      // inherited Merge/Clone
   end;
@@ -1306,6 +1309,11 @@ begin
   Result := RawJsonDecode(Result);
 end;
 
+procedure TqBitTorrentBaseType.Clear;
+begin
+  //
+end;
+
 function TqBitTorrentBaseType.toParams: string;
 begin
   Result := '';
@@ -1733,10 +1741,26 @@ end;
 
 { TqBitTorrentListRequestType }
 
+procedure TqBitTorrentListRequestType.Clear;
+begin
+  Ffilter := Unassigned;
+  Fcategory := Unassigned;;
+  Ftag := Unassigned;
+  Fsort := Unassigned;
+  Freverse := Unassigned;
+  Flimit := Unassigned;
+  Foffset := Unassigned;
+  Fhashes := Unassigned;
+  FhashesList := Nil;
+end;
+
 function TqBitTorrentListRequestType.ToParams: string;
 begin
   Result := '';
-  var sl := TStringList.Create; sl.StrictDelimiter := true; sl.QuoteChar := #0; sl.Delimiter:='&';
+  var sl := TStringList.Create;
+  sl.StrictDelimiter :=True;
+  sl.QuoteChar := #0;
+  sl.Delimiter:='&';
   if not VarIsEmpty(Self.Ffilter) then
     sl.Add( 'filter='+  TNetEncoding.URL.Encode(Self.Ffilter) );
   if not VarIsEmpty(Self.Fcategory) then
@@ -1753,6 +1777,14 @@ begin
     sl.Add( 'offset='+  TNetEncoding.URL.Encode(Self.Foffset) );
   if not VarIsEmpty(Self.Fhashes) then
     sl.Add( 'hashes='+  TNetEncoding.URL.Encode(Self.Fhashes) );
+  if assigned(Self.FhashesList) then
+  begin
+    Self.Fhashes := Unassigned;
+    FhashesList.StrictDelimiter := True;
+    FhashesList.QuoteChar := #0;
+    FhashesList.Delimiter:='|';
+    sl.Add( 'hashes='+  TNetEncoding.URL.Encode(Self.FhashesList.DelimitedText) );
+  end;
   Result := sl.DelimitedText;
   sl.Free;
 end;
