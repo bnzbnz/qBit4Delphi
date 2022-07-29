@@ -7,7 +7,7 @@ unit uqBitAPI;
 ///
 ///  ToDo : RSS & Search
 interface
-uses uqBitAPITypes, windows, classes, LMRutils;
+uses uqBitAPITypes, windows, classes;
 type
   TqBitAPI = class(TObject)
   private
@@ -373,10 +373,7 @@ begin
   Result := nil;
   var Body := Format('rid=%d', [ Rid ]);
   if  qBPost('/sync/maindata', Body) = 200 then
-  begin
-    SaveStringToFile(Body, 'd:\trace.json');
     Result := TJson.JsonToObject<TqBitMainDataType>(Body, []);
-  end;
   FDuration := GetTickcount - FDuration;
 end;
 function TqBitAPI.GetTorrentPeersData(Hash: string;
