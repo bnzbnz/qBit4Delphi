@@ -33,9 +33,9 @@ type
     function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
     function qBPost(MethodPath: string): integer; overload; virtual;
 
-        ///////////////////////////////////////////////////////////////////////////////////////
-        // FROM: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
-        ///////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////
+    // FROM: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
+    ///////////////////////////////////////////////////////////////////////////////////////
 
   // Authentication :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#login
@@ -400,7 +400,12 @@ begin
   Result := nil;
   var Body := Format('rid=%d', [ Rid ]);
   if  qBPost('/sync/maindata', Body) = 200 then
+  begin
     Result := TJson.JsonToObject<TqBitMainDataType>(Body, []);
+    if Result <> nil then
+      for var DicVal in Result.Ftorrents do
+        TqBitTorrentType(DicVal.Value).Fhash := DicVal.Key;
+  end;
   FDuration := GetTickcount - FDuration;
 end;
 

@@ -555,8 +555,9 @@ type
     Freverse: variant;
     Flimit: variant;
     Foffset: variant;
-    Fhashes : variant;
-    FhashesList: TStringList;
+    Fhashes: TStringList;
+    constructor Create; overload;
+    destructor Destroy; override;
     procedure Clear; override;
     function ToParams: string; override;
      // inherited Merge/Clone
@@ -1748,8 +1749,22 @@ begin
   Freverse := Unassigned;
   Flimit := Unassigned;
   Foffset := Unassigned;
-  Fhashes := Unassigned;
-  FhashesList := Nil;
+  Fhashes.Clear;
+end;
+
+constructor TqBitTorrentListRequestType.Create;
+begin
+  inherited;
+  FHashes := TStringList.Create;
+  FHashes.StrictDelimiter := True;
+  FHashes.QuoteChar := #0;
+  FHashes.Delimiter:='|';
+end;
+
+destructor TqBitTorrentListRequestType.Destroy;
+begin
+  FHashes.Free;
+  inherited;
 end;
 
 function TqBitTorrentListRequestType.ToParams: string;
@@ -1759,30 +1774,22 @@ begin
   sl.StrictDelimiter :=True;
   sl.QuoteChar := #0;
   sl.Delimiter:='&';
-  if not VarIsEmpty(Self.Ffilter) then
-    sl.Add( 'filter='+  TNetEncoding.URL.Encode(Self.Ffilter) );
-  if not VarIsEmpty(Self.Fcategory) then
-    sl.Add( 'category='+  TNetEncoding.URL.Encode(Self.Fcategory) );
-  if not VarIsEmpty(Self.Ftag) then
-    sl.Add( 'tag='+  TNetEncoding.URL.Encode(Self.Ftag) );
+  if not VarIsEmpty(Ffilter) then
+    sl.Add( 'filter='+  TNetEncoding.URL.Encode(Ffilter) );
+  if not VarIsEmpty(Fcategory) then
+    sl.Add( 'category='+  TNetEncoding.URL.Encode(Fcategory) );
+  if not VarIsEmpty(Ftag) then
+    sl.Add( 'tag='+  TNetEncoding.URL.Encode(Ftag) );
   if not VarIsEmpty(Self.Fsort) then
-    sl.Add( 'sort='+  TNetEncoding.URL.Encode(Self.Fsort) );
-  if not VarIsEmpty(Self.Freverse) then
-    sl.Add( 'reverse='+  TNetEncoding.URL.Encode(Self.Freverse) );
-  if not VarIsEmpty(Self.Flimit) then
-    sl.Add( 'limit='+  TNetEncoding.URL.Encode(Self.Flimit) );
-  if not VarIsEmpty(Self.Foffset) then
-    sl.Add( 'offset='+  TNetEncoding.URL.Encode(Self.Foffset) );
-  if not VarIsEmpty(Self.Fhashes) then
-    sl.Add( 'hashes='+  TNetEncoding.URL.Encode(Self.Fhashes) );
-  if assigned(Self.FhashesList) then
-  begin
-    Self.Fhashes := Unassigned;
-    FhashesList.StrictDelimiter := True;
-    FhashesList.QuoteChar := #0;
-    FhashesList.Delimiter:='|';
-    sl.Add( 'hashes='+  TNetEncoding.URL.Encode(Self.FhashesList.DelimitedText) );
-  end;
+    sl.Add( 'sort='+  TNetEncoding.URL.Encode(Fsort) );
+  if not VarIsEmpty(Freverse) then
+    sl.Add( 'reverse='+  TNetEncoding.URL.Encode(Freverse) );
+  if not VarIsEmpty(Flimit) then
+    sl.Add( 'limit='+  TNetEncoding.URL.Encode(Flimit) );
+  if not VarIsEmpty(Foffset) then
+    sl.Add( 'offset='+  TNetEncoding.URL.Encode(Foffset) );
+  if Fhashes.Count > 0 then
+    sl.Add( 'hashes='+  TNetEncoding.URL.Encode(Fhashes.DelimitedText) );
   Result := sl.DelimitedText;
   sl.Free;
 end;
