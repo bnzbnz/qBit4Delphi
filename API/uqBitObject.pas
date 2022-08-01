@@ -278,7 +278,7 @@ function TqBitObject.TorrentsToHashesList(Torrents: TqBitTorrentListType): TStri
 begin
   Result := TStringList.Create;
   for var Torrent in Torrents.Ftorrents do
-    Result.Add(TqBitTorrentType(Torrent).Fhash);
+    Result.Add(TqBitTorrentType(Torrent).Fid);
 end;
 
 function TqBitObject.TTHL(Torrents: TqBitMainDataType): TStringList;

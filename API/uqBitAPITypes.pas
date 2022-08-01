@@ -359,6 +359,9 @@ type
   end;
 
   TqBitTorrentType = class(TqBitTorrentBaseType)
+    Fid: variant;
+    Finfohash_v1: variant;
+    Finfohash_v2: variant;
     Fadded_on: variant;
     Famount_left: variant;
     Fauto_tmm: variant;
@@ -374,7 +377,6 @@ type
     Feta: variant;
     Ff_l_piece_prio: variant;
     Fforce_start: variant;
-    Fhash: variant;
     Flast_activity: variant;
     Fmagnet_uri: variant;
     Fmax_ratio: variant;
@@ -1063,9 +1065,9 @@ begin
     var JSONObj := TJSONObject.ParseJSONValue(Arg) as TJSONObject;
     for var JSONPair in JSONObj do
     begin
-      // Fix Missing Hash in TqBitTorrentType
+      // Fix Missing Fid in TqBitTorrentType
       var Torrent := TJson.JsonToObject<TqBitTorrentType>(JSONPair.JsonValue.toString);
-      Torrent.Fhash := JSONPair.JsonString.Value;
+      Torrent.Fid := JSONPair.JsonString.Value;
       TqBitMainDataType(Data).Ftorrents.Add(JSONPair.JsonString.Value, Torrent);
     end;
     JSONObj.Free;
