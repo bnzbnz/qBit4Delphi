@@ -20,7 +20,6 @@ const
 type
   TTorrentReaderOptions = set of (
     trRaiseException,     // Will raise Exception on error (Default), silent otherwise will return nil on error
-    trProcessHybridAsV2,  // ProcessHybrid torrent as V2 (Default is V1)
     trDoNotCalcHashes    // Do Not Calculate Hashes (Default is False)
   );
 
@@ -299,14 +298,10 @@ begin
     FData.Info.MetaVersion := 1;
     Enc := Info.ListData.FindElement('meta version');
     if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
-    if FData.Info.MetaVersion >2 then RaiseException('Unknown Format : ' +  FData.Info.MetaVersion.ToString);
 
-    // IsHybrid
-    FData.Info.IsHybrid := (Info.ListData.FindElement('files') <> nil)
-                            and (Info.ListData.FindElement('file tree') <> nil);
-
-    if (FData.Info.IsHybrid) then FData.Info.MetaVersion := 1;
-    if (FData.Info.IsHybrid) and (trProcessHybridAsV2 in Options) then FData.Info.MetaVersion := 2;
+    //IsHybrid
+    FData.Info.IsHybrid := (FData.Info.MetaVersion = 2)
+                            and (Info.ListData.FindElement('pieces') <> nil);
 
     //Announce
     Enc := Be.ListData.FindElement('announce');
@@ -352,9 +347,9 @@ begin
     Enc := Be.ListData.FindElement('creation date');
     if assigned(Enc) then FData.CreationDate := TTimeZone.Local.ToLocalTime(UnixToDateTime(Enc.IntegerData));
 
-    // Hash
-    if (FData.Info.MetaVersion = 1) and (not (trDoNotCalcHashes in Options)) then FData.HashV1 := GetSHA1(Info);
-    if (FData.Info.MetaVersion = 2) and (not (trDoNotCalcHashes in Options)) then FData.HashV2 := GetSHA2(Info);
+    // Hashes
+    if ((FData.Info.MetaVersion = 1) or FData.Info.IsHybrid) and (not (trDoNotCalcHashes in Options)) then FData.HashV1 := GetSHA1(Info);
+    if ((FData.Info.MetaVersion = 2) or FData.Info.IsHybrid) and (not (trDoNotCalcHashes in Options)) then FData.HashV2 := GetSHA2(Info);
 
     // Name:
     Enc := Info.ListData.FindElement('name') as TBEncoded;
