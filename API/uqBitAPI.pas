@@ -13,7 +13,13 @@ unit uqBitAPI;
 interface
 uses uqBitAPITypes, windows, classes;
 
+const
+
+  qBitAPI_MajorVersion = 1;
+  qBitAPI_MinorVersion = 100;
+
 type
+
   TqBitAPI = class(TObject)
   private
   protected
@@ -247,8 +253,8 @@ begin
     Http := THTTPClient.Create;
     Http.UserAgent :=
       Format(
-        'qBittorrent WebAPI for Delphi (qBit4Delphi) - Version: %s.%d.%d - Laurent Meyer qBit4Delphi@ea4d.com',
-        [qBitAPI_APIVersion, qBitAPI_LibMajorVersion, qBitAPI_LibMinorVersion]
+        'qBittorrent WebAPI for Delphi (qBit4Delphi) - Version: %s.%d.%.*d - Laurent Meyer qBit4Delphi@ea4d.com',
+        [qBitAPI_WebAPIVersion, qBitAPI_MajorVersion, 3, qBitAPI_MinorVersion]
       );
     Http.CustomHeaders['Content-type'] := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
@@ -260,10 +266,10 @@ begin
     var Retries := FHTTPRetries;
     repeat
       Dec(Retries);
-      var url := Format('%s/api/v2%s?%s',[FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
+      var Url := Format('%s/api/v2%s?%s',[FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
       ReqST.Position := 0;
       ResST.Position := 0;
-      Res := Http.Post(url, ReqST, ResST);
+      Res := Http.Post(Url, ReqST, ResST);
     until (Res.StatusCode <> 502) or (Retries <= 0); // Server did not respond...
     FHTTPStatus := Res.StatusCode;
     if Res.StatusCode <> 200 then Exit;

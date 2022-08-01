@@ -13,24 +13,31 @@ uses classes, uqBitAPI, uqBitAPITypes;
 
 type
 
-  TqBitObject = class(TqBitAPI)
+  TqBitObject = class(TqBitAPI)  // as TqBitTorrent, TqBit, TqNOX
   public
     class function Connect(HostPath, Username, Password : string): TqBitObject;
 
      // Helpers
-    function Clone: TqBitObject;
-    function qBitAPIVersion: string;
+
     class function UTimestampToDateTime(Timestamp: int64): TDatetime;
     class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
     class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
+    function Clone: TqBitObject;
+    function WebAPIVersion: string;
+    function MajorVersion: Integer;
+    function MinorVersion: Integer;
+    function Version: string;
 
-    // API Helpers
+    // TqBitObject Helpers
+
     function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
     function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
     function TTHL(Torrents: TqBitMainDataType): TStringList; overload; virtual; //Shortcut to TorrentsToHashList
     function TTHL(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
 
     function GetAllTorrentList: TqBitTorrentListType;
+
+    // API Helpers
 
     function PauseTorrents(Hashes: TStringList): boolean; overload; virtual;
     function PauseTorrents(Torrents: TqBitMainDataType): boolean; overload; virtual;
@@ -185,6 +192,12 @@ type
     property HTTPRetries: integer read FHTTPRetries;
   end;
 
+  // Place Holder
+
+  TqBitTorrent = class(TqBitObject);
+  TqBit = class(TqBitObject);
+  TqNOX = class(TqBitObject);
+
 implementation
 uses SysUtils, DateUtils;
 
@@ -197,17 +210,6 @@ end;
 
 // Helpers
 
-function TqBitObject.Clone: TqBitObject;
-begin
-  Result := TqBitObject.Create(FHostPath);
-  Result.FSID := FSID;
-  Result.FHTTPConnectionTimeout := FHTTPConnectionTimeout;
-  Result.FHTTPSendTimeout := FHTTPSendTimeout;
-  Result.FHTTPResponseTimeout := FHTTPResponseTimeout;
-  Result.FHTTPRetries := FHTTPRetries;
-  Result.FUsername := FUsername;
-  Result.FPassword := FPassword;
-end;
 
 class function TqBitObject.UTimestampToDateTime(Timestamp: int64): TDatetime;
 begin
@@ -232,9 +234,37 @@ begin
   secs := diff;
 end;
 
-function TqBitObject.qBitAPIVersion: string;
+
+function TqBitObject.Clone: TqBitObject;
 begin
-  Result := qBitAPI_APIVersion;
+  Result := TqBitObject.Create(FHostPath);
+  Result.FSID := FSID;
+  Result.FHTTPConnectionTimeout := FHTTPConnectionTimeout;
+  Result.FHTTPSendTimeout := FHTTPSendTimeout;
+  Result.FHTTPResponseTimeout := FHTTPResponseTimeout;
+  Result.FHTTPRetries := FHTTPRetries;
+  Result.FUsername := FUsername;
+  Result.FPassword := FPassword;
+end;
+
+function TqBitObject.WebAPIVersion: string;
+begin
+  Result := qBitAPI_WebAPIVersion;
+end;
+
+function TqBitObject.MajorVersion: Integer;
+begin
+  Result := qBitAPI_MajorVersion;
+end;
+
+function TqBitObject.MinorVersion: Integer;
+begin
+  Result := qBitAPI_MinorVersion;
+end;
+
+function TqBitObject.Version: string;
+begin
+  Result := Format('%d.%.*d', [MajorVersion, 3,MinorVersion]);
 end;
 
 function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;
