@@ -359,7 +359,7 @@ type
   end;
 
   TqBitTorrentType = class(TqBitTorrentBaseType)
-    Fid: variant;
+    Fhash: string;
     Finfohash_v1: variant;
     Finfohash_v2: variant;
     Fadded_on: variant;
@@ -1067,7 +1067,7 @@ begin
     begin
       // Fix Missing Fid in TqBitTorrentType
       var Torrent := TJson.JsonToObject<TqBitTorrentType>(JSONPair.JsonValue.toString);
-      Torrent.Fid := JSONPair.JsonString.Value;
+      Torrent.Fhash := JSONPair.JsonString.Value;
       TqBitMainDataType(Data).Ftorrents.Add(JSONPair.JsonString.Value, Torrent);
     end;
     JSONObj.Free;
