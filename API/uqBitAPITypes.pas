@@ -413,6 +413,7 @@ type
   TqBitCategoryType = class(TqBitTorrentBaseType)
     Fname: variant;
     FsavePath: variant;
+    Fdownload_path: variant; // Default = null, No = false, Yes = string value
      // inherited Merge/Clone
   end;
 
