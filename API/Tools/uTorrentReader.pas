@@ -6,10 +6,13 @@
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///  https://www.nayuki.io/page/bittorrent-bencode-format-tools
+///  https://chocobo1.github.io/bencode_online/
 ///
 
 unit uTorrentReader;
+
 interface
+
 uses
   System.Classes, System.Generics.Collections, System.Generics.Defaults,
   uBEncode, DateUtils, SysUtils;
@@ -59,6 +62,7 @@ type
     HashV1: string;
     HashV2: string;
     Info: TTorrentDataInfo;
+    PieceLayers: TStringList; // V2 Only
     WebSeeds: TStringList;
     constructor Create; overload;
     destructor Destroy; override;
@@ -146,6 +150,7 @@ begin
   inherited;
   Info := TTorrentDataInfo.Create;
   AnnouncesDict := TDictionary<Integer, TStringList>.Create;
+  PieceLayers := TStringList.Create;
   WebSeeds := TStringList.Create;
   Comment := TStringList.Create;
   Comment.QuoteChar := #0;
@@ -155,6 +160,7 @@ end;
 
 destructor TTorrentData.Destroy;
 begin
+  PieceLayers.Free;
   Comment.Free;
   WebSeeds.Free;
   for var Tier in AnnouncesDict do Tier.Value.Free;
@@ -300,7 +306,7 @@ begin
     if assigned(Enc) then FData.Info.MetaVersion:= Enc.IntegerData;
 
     //IsHybrid
-    FData.Info.IsHybrid := (FData.Info.MetaVersion = 2)
+    FData.Info.IsHybrid :=  (Be.ListData.FindElement('piece layers') <> nil)
                             and (Info.ListData.FindElement('pieces') <> nil);
 
     //Announce
@@ -369,6 +375,16 @@ begin
     begin
       FData.Info.Pieces := Enc.StringData;
       FData.Info.PiecesCount := Length(FData.Info.Pieces) div 20;
+    end;
+
+    //PieceLayers
+    if (Be.ListData.FindElement('piece layers') <> nil) then
+    begin
+      var PieceLayerList :=  Be.ListData.FindElement('piece layers').ListData;
+      if Be.ListData.FindElement('piece layers').Format = befDictionary then
+        if PieceLayerList.Count > 0 then
+          for var PieceLayer in PieceLayerList do
+            FData.PieceLayers.Add(PieceLayer.Data.StringData);
     end;
 
     //Private
