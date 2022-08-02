@@ -360,8 +360,6 @@ type
 
   TqBitTorrentType = class(TqBitTorrentBaseType)
     Fhash: string;
-    Finfohash_v1: variant;
-    Finfohash_v2: variant;
     Fadded_on: variant;
     Famount_left: variant;
     Fauto_tmm: variant;
@@ -377,6 +375,8 @@ type
     Feta: variant;
     Ff_l_piece_prio: variant;
     Fforce_start: variant;
+    Finfohash_v1: variant;
+    Finfohash_v2: variant;
     Flast_activity: variant;
     Fmagnet_uri: variant;
     Fmax_ratio: variant;
