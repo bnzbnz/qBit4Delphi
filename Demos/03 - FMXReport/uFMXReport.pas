@@ -98,7 +98,7 @@ begin
      var rttitype3 := rttictx.GetType(TqBitCategoryType);
      for var C in M.Fcategories do
      begin
-       Memo1.Lines.Add(Format('  ************* Categorie : %s *******************',[TqBitTorrentType(C.Value).Fname]));
+       Memo1.Lines.Add(Format('  ************* Categorie : %s *******************',[TqBitCategoryType(C.Value).Fname]));
        for var field in rttitype3.GetFields do
         if field.FieldType.TypeKind = tkVariant then
         begin
