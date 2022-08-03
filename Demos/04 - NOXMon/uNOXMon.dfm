@@ -5,11 +5,13 @@ object NOXMonDlg: TNOXMonDlg
   ClientHeight = 159
   ClientWidth = 1118
   Color = clBtnFace
+  DefaultMonitor = dmMainForm
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Position = poScreenCenter
   OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13

@@ -32,8 +32,8 @@ object FrmSimple: TFrmSimple
     Height = 326
     Lines.Strings = (
       
-        'WARNING... WARNING... WARNING... (this is said) : THIS A WORK IN' +
-        ' PROGRESS'
+        'WARNING... WARNING... WARNING... (this is said) : THIS IS A WORK' +
+        ' IN PROGRESS'
       ''
       
         'In order to build and use qBit4Delphi some Embarcadero units nee' +

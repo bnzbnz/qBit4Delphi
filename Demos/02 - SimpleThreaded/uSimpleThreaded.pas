@@ -15,8 +15,7 @@ type
     destructor Destroy; override;
   end;
 
-  TSimpleThreadedDlg = class(TForm)
-    Warning: TMemo;
+  TFrmSimpleThreaded = class(TForm)
     LBTorrents: TListBox;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -32,13 +31,13 @@ type
   end;
 
 var
-  SimpleThreadedDlg: TSimpleThreadedDlg;
+  FrmSimpleThreaded: TFrmSimpleThreaded;
 
 implementation
 
 {$R *.dfm}
 
-uses uSelectServer, uPatcherChecker;
+uses uqBitSelectServerDlg;
 
 { TqBitThread }
 
@@ -60,7 +59,7 @@ begin
     Synchronize(
       procedure
       begin
-        SimpleThreadedDlg.SyncThread(Self);
+        FrmSimpleThreaded.SyncThread(Self);
       end
     );
     while
@@ -72,21 +71,19 @@ begin
   qBMainTh.Free;
 end;
 
-procedure TSimpleThreadedDlg.FormShow(Sender: TObject);
+procedure TFrmSimpleThreaded.FormShow(Sender: TObject);
 begin
-  Warning.Visible := False;
-  ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know what to do...');
-  if SelectServerDlg.ShowModal = mrOk then
+  if qBitSelectServerDlg.ShowModal = mrOk then
   begin
-    var Server := SelectServerDlg.GetServer;
+    var Server := qBitSelectServerDlg.GetServer;
     qB := TqBitObject.Connect( Server.FHP, Server.FUN, Server.FPW);
     Th := TqBitThread.Create;
     Th.qB := qB.Clone; // We clone qB for the Thread, in this demo this is not necessary
   end else
-    Close;
+    PostMessage(Handle, WM_CLOSE, 0, 0);
 end;
 
-procedure TSimpleThreadedDlg.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFrmSimpleThreaded.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if not Assigned(qB) then Exit;
   Th.Terminate;
@@ -95,13 +92,13 @@ begin
   qB.Free;
 end;
 
-procedure TSimpleThreadedDlg.SyncThread(Sender: TqBitThread);
+procedure TFrmSimpleThreaded.SyncThread(Sender: TqBitThread);
 begin
   qBMain := Sender.qBMainTh;
   UpdateUI;
 end;
 
-procedure TSimpleThreadedDlg.UpdateUI;
+procedure TFrmSimpleThreaded.UpdateUI;
 begin
   ////////////////  Few Properties...
   Caption := Format('Torrents : %d', [qBMain.Ftorrents.Count]);
@@ -115,6 +112,4 @@ begin
       LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname );
 end;
 
-initialization
-  PatcherChecker; // Check if JSON Libs have been patched
 end.

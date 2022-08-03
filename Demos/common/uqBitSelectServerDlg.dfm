@@ -47,6 +47,7 @@ object qBitSelectServerDlg: TqBitSelectServerDlg
     Top = 19
     Width = 225
     Height = 163
+    ExtendedSelect = False
     ItemHeight = 13
     TabOrder = 2
     OnClick = LBSrvClick

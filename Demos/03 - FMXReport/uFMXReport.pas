@@ -18,9 +18,7 @@ type
     Edit3: TEdit;
     Button1: TButton;
     Memo1: TMemo;
-    Warning: TMemo;
     procedure Button1Click(Sender: TObject);
-    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
   public
@@ -117,11 +115,6 @@ begin
 
   M.Free;
   qB.Free;
-end;
-
-procedure TFrmFMXReport.FormShow(Sender: TObject);
-begin
-  Warning.Visible := False;
 end;
 
 end.

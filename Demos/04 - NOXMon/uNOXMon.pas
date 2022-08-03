@@ -34,7 +34,8 @@ var
   NOXMonDlg: TNOXMonDlg;
 
 implementation
-uses uPatcherChecker, uSelectServer, Math;
+uses uqBitSelectServerDlg, Math;
+
 {$R *.dfm}
 
 procedure TNOXMonDlg.FormShow(Sender: TObject);
@@ -42,12 +43,12 @@ var
   Srvs: TObjectList<TqBitServer>;
   Th : TqBitThread;
 begin
-  SelectServerDlg.MultiSelect := True;
-  if SelectServerDlg.ShowModal = mrOk then
+  qBitSelectServerDlg.MultiSelect := True;
+  if qBitSelectServerDlg.ShowModal = mrOk then
   begin
     UpdateHeaders;
     ThList := TObjectList<TqBitThread>.Create(False);
-    Srvs :=  SelectServerDlg.GetMultiServers;
+    Srvs :=  qBitSelectServerDlg.GetMultiServers;
     var RowIndex := 1;
     for var Srv in Srvs do
     begin
@@ -59,7 +60,8 @@ begin
       Th.Start;
     end;
     Srvs.Free;
-  end;
+  end else
+    PostMessage(Handle, WM_CLOSE, 0,0);
 end;
 
 procedure TNOXMonDlg.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -151,6 +153,4 @@ begin
   qB.Free;
 end;
 
-initialization
-  PatcherChecker; // Check if JSON Libs have been patched
 end.
