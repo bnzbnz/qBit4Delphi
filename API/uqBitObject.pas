@@ -23,10 +23,10 @@ type
     class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
     class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
     function Clone: TqBitObject;
-    function WebAPIVersion: string;
-    function MajorVersion: Integer;
-    function MinorVersion: Integer;
-    function Version: string;
+    class function WebAPIVersion: string;
+    class function MajorVersion: Integer;
+    class function MinorVersion: Integer;
+    class function Version: string;
 
     // TqBitObject Helpers
 
@@ -247,22 +247,22 @@ begin
   Result.FPassword := FPassword;
 end;
 
-function TqBitObject.WebAPIVersion: string;
+class function TqBitObject.WebAPIVersion: string;
 begin
   Result := qBitAPI_WebAPIVersion;
 end;
 
-function TqBitObject.MajorVersion: Integer;
+class function TqBitObject.MajorVersion: Integer;
 begin
   Result := qBitAPI_MajorVersion;
 end;
 
-function TqBitObject.MinorVersion: Integer;
+class function TqBitObject.MinorVersion: Integer;
 begin
   Result := qBitAPI_MinorVersion;
 end;
 
-function TqBitObject.Version: string;
+class function TqBitObject.Version: string;
 begin
   Result := Format('%d.%.*d.%s', [MajorVersion, 3,MinorVersion, qBitAPI_WebAPIVersion]);
 end;
