@@ -264,7 +264,7 @@ end;
 
 function TqBitObject.Version: string;
 begin
-  Result := Format('%d.%.*d', [MajorVersion, 3,MinorVersion]);
+  Result := Format('%d.%.*d.%s', [MajorVersion, 3,MinorVersion, qBitAPI_WebAPIVersion]);
 end;
 
 function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;

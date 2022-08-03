@@ -10,8 +10,7 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Position = poDesktopCenter
-  PixelsPerInch = 96
+  Position = poScreenCenter
   TextHeight = 13
   object Button1: TButton
     Left = 0
@@ -49,6 +48,5 @@ object Form2: TForm2
       'Laurent Meyer / qBit4Delphi@ea4d.com'
       '')
     TabOrder = 1
-    ExplicitTop = -6
   end
 end

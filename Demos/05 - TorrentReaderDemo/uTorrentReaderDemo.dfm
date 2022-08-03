@@ -10,6 +10,7 @@ object Form2: TForm2
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  Position = poScreenCenter
   TextHeight = 13
   object Button1: TButton
     Left = 0
