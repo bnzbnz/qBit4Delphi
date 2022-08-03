@@ -8,6 +8,7 @@ uses
   uqBitAPITypes, uqBitAPI, uqBitObject, Vcl.Mask;
 
 type
+
   TqBitAddServerDlg = class(TForm)
     Bevel1: TBevel;
     BtnOK: TButton;

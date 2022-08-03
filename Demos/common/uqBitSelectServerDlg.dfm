@@ -1,4 +1,4 @@
-object qBitServerSelectDlg: TqBitServerSelectDlg
+object qBitSelectServerDlg: TqBitSelectServerDlg
   Left = 0
   Top = 0
   BorderStyle = bsDialog
@@ -11,9 +11,9 @@ object qBitServerSelectDlg: TqBitServerSelectDlg
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  Position = poScreenCenter
-  OnClose = FormClose
+  Position = poOwnerFormCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   TextHeight = 13
   object Bevel1: TBevel
@@ -47,7 +47,6 @@ object qBitServerSelectDlg: TqBitServerSelectDlg
     Top = 19
     Width = 225
     Height = 163
-    ExtendedSelect = False
     ItemHeight = 13
     TabOrder = 2
     OnClick = LBSrvClick

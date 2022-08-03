@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 0
   Top = 0
   Caption = 'Simple'
-  ClientHeight = 299
+  ClientHeight = 342
   ClientWidth = 635
   Color = clBtnFace
   DefaultMonitor = dmMainForm
@@ -20,16 +20,17 @@ object Form2: TForm2
     Left = 0
     Top = 0
     Width = 635
-    Height = 299
+    Height = 342
     Align = alClient
     ItemHeight = 13
     TabOrder = 1
+    ExplicitHeight = 299
   end
   object Warning: TMemo
     Left = 8
     Top = 8
     Width = 619
-    Height = 283
+    Height = 326
     Lines.Strings = (
       
         'WARNING... WARNING... WARNING... (this is said) : THIS A WORK IN' +
@@ -44,7 +45,24 @@ object Form2: TForm2
       ''
       'TO DO SO EXECUTE : Patcher.exe in the main directory'
       'The patched units will be located in JSON/21 and/or JSON/22'
-      'Please add these units in you project.'
+      'Please add these units in you project :'
+      ''
+      '  {$IFDEF VER340}'
+      '    REST.Json.Types in '#39'..\..\API\JSON\21\REST.Json.Types.pas'#39','
+      
+        '    REST.JsonReflect in '#39'..\..\API\JSON\21\REST.JsonReflect.pas'#39 +
+        ','
+      '    System.JSON in '#39'..\..\API\JSON\21\System.JSON.pas'#39','
+      '    REST.Json in '#39'..\..\API\JSON\21\REST.Json.pas'#39','
+      '  {$ENDIF }'
+      '  {$IFDEF VER350}'
+      '    REST.Json.Types in '#39'..\..\API\JSON\22\REST.Json.Types.pas'#39','
+      
+        '    REST.JsonReflect in '#39'..\..\API\JSON\22\REST.JsonReflect.pas'#39 +
+        ','
+      '    System.JSON in '#39'..\..\API\JSON\22\System.JSON.pas'#39','
+      '    REST.Json in '#39'..\..\API\JSON\22\REST.Json.pas'#39','
+      '  {$ENDIF}'
       ''
       'Any questions : qBit4Delphi@ea4d.com'
       'Laurent Meyer.')
@@ -53,7 +71,7 @@ object Form2: TForm2
   object Timer1: TTimer
     Enabled = False
     OnTimer = Timer1Timer
-    Left = 16
-    Top = 16
+    Left = 520
+    Top = 112
   end
 end

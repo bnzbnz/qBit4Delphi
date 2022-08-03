@@ -31,7 +31,7 @@ implementation
 
 {$R *.dfm}
 
-uses uqBitSelectServerDlg, uPatcherChecker, uSelectServer;
+uses uqBitSelectServerDlg, uqBitPatchChecker;
 
 procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -43,9 +43,9 @@ procedure TForm2.FormShow(Sender: TObject);
 begin
   Warning.Visible := False;
   ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know what to do...');
-  if SelectServerDlg.ShowModal = mrOk then
+  if qBitSelectServerDlg.ShowModal = mrOk then
   begin
-    var Server := SelectServerDlg.GetServer;
+    var Server := qBitSelectServerDlg.GetServer;
     qB := TqBitObject.Connect(Server.FHP, Server.FUN, Server.FPW);
     qBMain := qB.GetMainData(0); // >> Full Data
     UpdateUI;

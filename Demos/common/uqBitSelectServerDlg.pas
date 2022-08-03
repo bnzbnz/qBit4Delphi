@@ -21,7 +21,7 @@ type
     destructor Destroy; override;
   end;
 
-  TqBitServerSelectDlg = class(TForm)
+  TqBitSelectServerDlg = class(TForm)
     BtnSel: TButton;
     BtnCancel: TButton;
     LBSrv: TListBox;
@@ -32,6 +32,7 @@ type
     TabSheet1: TTabSheet;
     SGInfo: TStringGrid;
     procedure btnAddClick(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
     procedure LBSrvClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -40,7 +41,6 @@ type
     procedure SGInfoSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
     procedure LBSrvDblClick(Sender: TObject);
-    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -52,14 +52,14 @@ type
   end;
 
 var
-  qBitServerSelectDlg: TqBitServerSelectDlg;
+  qBitSelectServerDlg: TqBitSelectServerDlg;
 
 implementation
 uses uqBitAddServerDlg, IOUtils, REst.JSON;
 
 {$R *.dfm}
 
-procedure TqBitServerSelectDlg.BtnSelClick(Sender: TObject);
+procedure TqBitSelectServerDlg.BtnSelClick(Sender: TObject);
 begin
   if LBSrv.ItemIndex = -1  then Exit;
   BtnSel.Caption := '...Checking...'; BtnSel.Enabled := False;
@@ -74,7 +74,7 @@ begin
   BtnSel.Caption := 'Select'; BtnSel.Enabled := True;
 end;
 
-procedure TqBitServerSelectDlg.btnAddClick(Sender: TObject);
+procedure TqBitSelectServerDlg.btnAddClick(Sender: TObject);
 begin
   if qBitAddServerDlg.ShowModal = mrOk then
   begin
@@ -88,7 +88,7 @@ begin
   end;
 end;
 
-procedure TqBitServerSelectDlg.BtnDelClick(Sender: TObject);
+procedure TqBitSelectServerDlg.BtnDelClick(Sender: TObject);
 begin
   if LBSrv.ItemIndex = -1  then Exit;
   LBSrv.items.Objects[ LBSrv.ItemIndex ].Free;
@@ -106,8 +106,12 @@ begin
   FPW := P;
 end;
 
-procedure TqBitServerSelectDlg.FormClose(Sender: TObject;
-  var Action: TCloseAction);
+procedure TqBitSelectServerDlg.FormCreate(Sender: TObject);
+begin
+  CfgFileName := TPath.GetFileNameWithoutExtension(Application.ExeName) + '.json';
+end;
+
+procedure TqBitSelectServerDlg.FormDestroy(Sender: TObject);
 begin
   var SrvLst := TqBitServers.Create;
   for var i := 0 to LBSrv.Items.Count -1 do
@@ -119,19 +123,13 @@ begin
   SrvLst.Free;
 end;
 
-procedure TqBitServerSelectDlg.FormCreate(Sender: TObject);
-begin
-  CfgFileName := TPath.GetFileNameWithoutExtension(Application.ExeName) + '.json';
-  Left := (Monitor.Width  - Width)  div 2;
-end;
-
-procedure TqBitServerSelectDlg.FormShow(Sender: TObject);
+procedure TqBitSelectServerDlg.FormShow(Sender: TObject);
 const
   NoSelection: TGridRect = (Left: 0; Top: -1; Right: 0; Bottom: -1);
 begin
   Self.LBSrv.MultiSelect := MultiSelect;
   if MultiSelect then Caption :='Select multiple servers (Shift/Ctrl+Click) :';
-  SGInfo.Selection := NoSelection;
+  SGInfo.Selection:= NoSelection;
   SGInfo.Cells[0, 0] := 'Server Version :';
   SGInfo.Cells[0, 1] := 'API Version :';
   SGInfo.Cells[0, 2] := 'libtorrent';
@@ -156,7 +154,7 @@ begin
   end;
 end;
 
-function TqBitServerSelectDlg.GetMultiServers: TObjectList<TqBitServer>;
+function TqBitSelectServerDlg.GetMultiServers: TObjectList<TqBitServer>;
 begin
   Result := Nil;
   if not Self.MultiSelect then Exit;
@@ -165,14 +163,14 @@ begin
     if LBSrv.Selected[i] then Result.Add(TqBitServer(LBSrv.Items.Objects[i]));
 end;
 
-function TqBitServerSelectDlg.GetServer: TqBitServer;
+function TqBitSelectServerDlg.GetServer: TqBitServer;
 begin
   Result := Nil;
   if LBSrv.ItemIndex = -1 then Exit;
   Result := TqBitServer(LBSrv.Items.Objects[LBSrv.ItemIndex]);
 end;
 
-procedure TqBitServerSelectDlg.LBSrvClick(Sender: TObject);
+procedure TqBitSelectServerDlg.LBSrvClick(Sender: TObject);
 begin
   for var i := 0 to 5 do SGInfo.Cells[1 ,i] := '';
   BtnSel.Enabled := not (LBSrv.ItemIndex = -1);
@@ -193,12 +191,12 @@ begin
   qB.Free;
 end;
 
-procedure TqBitServerSelectDlg.LBSrvDblClick(Sender: TObject);
+procedure TqBitSelectServerDlg.LBSrvDblClick(Sender: TObject);
 begin
   BtnSelClick(Self);
 end;
 
-procedure TqBitServerSelectDlg.SGInfoSelectCell(Sender: TObject; ACol,
+procedure TqBitSelectServerDlg.SGInfoSelectCell(Sender: TObject; ACol,
   ARow: Integer; var CanSelect: Boolean);
 begin
   CanSelect := False;
