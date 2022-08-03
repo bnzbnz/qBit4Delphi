@@ -125,6 +125,14 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\common\uPatcherChecker.pas"/>
+        <DCCReference Include="..\common\uqBitSelectServerDlg.pas">
+            <Form>qBitServerSelectDlg</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\common\uqBitAddServerDlg.pas">
+            <Form>qBitAddServerDlg</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -151,7 +159,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="..\..\Simple.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\Simple.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Simple.exe</RemoteName>
                         <Overwrite>true</Overwrite>

@@ -5,11 +5,14 @@ object Form2: TForm2
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace
+  DefaultMonitor = dmMainForm
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
+  FormStyle = fsStayOnTop
+  Position = poScreenCenter
   OnClose = FormClose
   OnShow = FormShow
   TextHeight = 13

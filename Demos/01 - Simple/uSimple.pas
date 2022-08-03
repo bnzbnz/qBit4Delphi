@@ -31,7 +31,7 @@ implementation
 
 {$R *.dfm}
 
-uses uSelectServer, uPatcherChecker;
+uses uqBitSelectServerDlg, uPatcherChecker, uSelectServer;
 
 procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -41,18 +41,18 @@ end;
 
 procedure TForm2.FormShow(Sender: TObject);
 begin
- Warning.Visible := False;
- ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know what to do...');
- if SelectServerDlg.ShowModal = mrOk then
- begin
-  var Server := SelectServerDlg.GetServer;
-  qB := TqBitObject.Connect( Server.FHP, Server.FUN, Server.FPW);
-  qBMain :=qB.GetMainData(0); // >> Full Data
-  UpdateUI;
-  Timer1.Interval := qBMain.Fserver_state.Frefresh_interval; // The update interval is defined by the server
-  Timer1.Enabled := True;
- end else
-  close;
+  Warning.Visible := False;
+  ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know what to do...');
+  if SelectServerDlg.ShowModal = mrOk then
+  begin
+    var Server := SelectServerDlg.GetServer;
+    qB := TqBitObject.Connect(Server.FHP, Server.FUN, Server.FPW);
+    qBMain := qB.GetMainData(0); // >> Full Data
+    UpdateUI;
+    Timer1.Interval := qBMain.Fserver_state.Frefresh_interval; // The update interval is defined by the server
+    Timer1.Enabled := True;
+  end else
+    PostMessage(Handle, WM_CLOSE,0 ,0);
 end;
 
 procedure TForm2.UpdateUI;
@@ -71,7 +71,7 @@ end;
 
 procedure TForm2.Timer1Timer(Sender: TObject);
 begin
-  var Update := qb.GetMainData(qBMain.Frid); // >> Get The Data since the last getMain;
+  var Update := qb.GetMainData(qBMain.Frid); // >> Get The Data since the last getMainData
   qBMain.Merge(Update); // we merge the update : qBMain is now up to date
   Update.Free;
   UpdateUI;

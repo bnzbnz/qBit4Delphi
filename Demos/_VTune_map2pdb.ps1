@@ -1,13 +1,14 @@
-function mzp2pdb {
+function map2pdb {
 	param ( $AppName )
 	Write-Host "$AppName.exe : ";
 	.\map2pdb.exe -bind:"$AppName.exe" "$AppName.map"
 }
-mzp2pdb "TorrentReaderDemo"
-mzp2pdb "FMXReport"
-mzp2pdb "NOXMon"
-mzp2pdb "Simple"
-mzp2pdb "SimpleThreaded"
-mzp2pdb "VnStatDemo"
+map2pdb "TorrentReaderDemo"
+map2pdb "FMXReport"
+map2pdb "NOXMon"
+map2pdb "Simple"
+map2pdb "SimpleThreaded"
+map2pdb "VnStatDemo"
+map2pdb "ExternalIPDemo"
 
 pause
