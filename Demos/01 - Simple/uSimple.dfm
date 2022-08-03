@@ -1,4 +1,4 @@
-object Form2: TForm2
+object FrmSimple: TFrmSimple
   Left = 0
   Top = 0
   Caption = 'Simple'
@@ -24,7 +24,6 @@ object Form2: TForm2
     Align = alClient
     ItemHeight = 13
     TabOrder = 1
-    ExplicitHeight = 299
   end
   object Warning: TMemo
     Left = 8

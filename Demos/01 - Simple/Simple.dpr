@@ -1,5 +1,6 @@
 program Simple;
 uses
+
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
     REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
@@ -17,17 +18,18 @@ uses
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
-  uSimple in 'uSimple.pas' {Form2},
+  uSimple in 'uSimple.pas' {FrmSimple},
   uqBitPatchChecker in '..\common\uqBitPatchChecker.pas',
   uqBitAddServerDlg in '..\common\uqBitAddServerDlg.pas' {qBitAddServerDlg},
   uqBitSelectServerDlg in '..\common\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
+
 begin
   ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TForm2, Form2);
+  Application.CreateForm(TFrmSimple, FrmSimple);
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.CreateForm(TqBitSelectServerDlg, qBitSelectServerDlg);
   Application.Run;

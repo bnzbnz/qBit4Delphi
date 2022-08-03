@@ -114,7 +114,7 @@
         <DCCReference Include="..\..\API\uqBitAPI.pas"/>
         <DCCReference Include="..\..\API\uqBitObject.pas"/>
         <DCCReference Include="uSimple.pas">
-            <Form>Form2</Form>
+            <Form>FrmSimple</Form>
         </DCCReference>
         <DCCReference Include="..\common\uqBitPatchChecker.pas"/>
         <DCCReference Include="..\common\uqBitAddServerDlg.pas">
@@ -122,7 +122,6 @@
         </DCCReference>
         <DCCReference Include="..\common\uqBitSelectServerDlg.pas">
             <Form>qBitSelectServerDlg</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

@@ -8,7 +8,7 @@ uses
   Vcl.ExtCtrls, Vcl.StdCtrls;
 
 type
-  TForm2 = class(TForm)
+  TFrmSimple = class(TForm)
     Timer1: TTimer;
     Warning: TMemo;
     LBTorrents: TListBox;
@@ -25,7 +25,7 @@ type
   end;
 
 var
-  Form2: TForm2;
+  FrmSimple: TFrmSimple;
 
 implementation
 
@@ -33,13 +33,13 @@ implementation
 
 uses uqBitSelectServerDlg, uqBitPatchChecker;
 
-procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
+procedure TFrmSimple.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   qBMain.Free;
   qB.Free;
 end;
 
-procedure TForm2.FormShow(Sender: TObject);
+procedure TFrmSimple.FormShow(Sender: TObject);
 begin
   Warning.Visible := False;
   ShowMessage('In order to run this demo locally, start qBittorrent.exe -> Parameters -> Web UI -> ENABLE : "WebUI Remote Interface (Remote Control)" and "bypass atuhentification for clients on localhost"' + #$D#$A + 'NOX users know what to do...');
@@ -55,7 +55,7 @@ begin
     PostMessage(Handle, WM_CLOSE,0 ,0);
 end;
 
-procedure TForm2.UpdateUI;
+procedure TFrmSimple.UpdateUI;
 begin
   ////////////////  Few Properties...
   Caption := Format('Torrents : %d', [qBMain.Ftorrents.Count]);
@@ -69,7 +69,7 @@ begin
       LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname );
 end;
 
-procedure TForm2.Timer1Timer(Sender: TObject);
+procedure TFrmSimple.Timer1Timer(Sender: TObject);
 begin
   var Update := qb.GetMainData(qBMain.Frid); // >> Get The Data since the last getMainData
   qBMain.Merge(Update); // we merge the update : qBMain is now up to date
@@ -77,7 +77,4 @@ begin
   UpdateUI;
 end;
 
-
-initialization
-  PatcherChecker; // Check if JSON Libs have been patched
 end.

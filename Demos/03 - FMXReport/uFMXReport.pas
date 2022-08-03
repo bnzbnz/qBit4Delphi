@@ -9,7 +9,7 @@ uses
   uqBitObject, uqBitAPI, uqBitAPITypes, FMX.Memo.Types, FMX.ScrollBox, FMX.Memo;
 
 type
-  TForm1 = class(TForm)
+  TFrmFMXReport = class(TForm)
     Edit1: TEdit;
     Label1: TLabel;
     Label2: TLabel;
@@ -28,14 +28,14 @@ type
   end;
 
 var
-  Form1: TForm1;
+  FrmFMXReport: TFrmFMXReport;
 
 implementation
-uses RTTI, uPatcherChecker;
+uses RTTI, uqBitPatchChecker;
 
 {$R *.fmx}
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TFrmFMXReport.Button1Click(Sender: TObject);
 var
   qB: TqBitObject;
   M: TqBitMainDataType;
@@ -49,7 +49,7 @@ begin
   M := qB.GetMainData;
 
   Memo1.ClearContent;
-  Memo1.Lines.Add(Format('qBit4Delphi : %s ==>', [qB.WebAPIVersion]));
+  Memo1.Lines.Add(Format('qBit4Delphi : %s ==>', [qB.Version]));
   Memo1.Lines.Add(Format('******************* Server : %s *******************',[qB.HostPath]));
 
   Memo1.Lines.Add(Format('  Version : %s', [qB.GetVersion]));
@@ -119,12 +119,9 @@ begin
   qB.Free;
 end;
 
-
-procedure TForm1.FormShow(Sender: TObject);
+procedure TFrmFMXReport.FormShow(Sender: TObject);
 begin
   Warning.Visible := False;
 end;
 
-initialization
-  PatcherChecker;
 end.

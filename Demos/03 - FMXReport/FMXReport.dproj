@@ -145,9 +145,9 @@
         <DCCReference Include="..\..\API\uqBitAPI.pas"/>
         <DCCReference Include="..\..\API\uqBitObject.pas"/>
         <DCCReference Include="uFMXReport.pas">
-            <Form>Form1</Form>
+            <Form>FrmFMXReport</Form>
         </DCCReference>
-        <DCCReference Include="..\common\uPatcherChecker.pas"/>
+        <DCCReference Include="..\common\uqBitPatchChecker.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -189,7 +189,7 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Win32\Debug\FMXReport.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\FMXReport.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>FMXReport.exe</RemoteName>
                         <Overwrite>true</Overwrite>
