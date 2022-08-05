@@ -21,7 +21,9 @@ object FrmSimpleThreaded: TFrmSimpleThreaded
     Width = 635
     Height = 299
     Align = alClient
+    DoubleBuffered = True
     ItemHeight = 13
+    ParentDoubleBuffered = False
     TabOrder = 0
   end
 end

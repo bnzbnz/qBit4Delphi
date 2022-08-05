@@ -1469,6 +1469,8 @@ begin
   Result._UserRec.Str := Self._UserRec.Str;
   Result._UserRec.Bool := Self._UserRec.Bool;
   Result._UserRec.Int := Self._UserRec.Int;
+  Result._UserRec.OwnObj := False;
+  Result._UserRec.Obj := Self._UserRec.Obj;
 end;
 
 function TqBitTorrentBaseType.RawJsonEncode(Header, Value, Footer: string): string;

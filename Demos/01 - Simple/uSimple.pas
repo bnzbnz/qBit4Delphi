@@ -72,7 +72,8 @@ end;
 procedure TFrmSimple.Timer1Timer(Sender: TObject);
 begin
   var Update := qb.GetMainData(qBMain.Frid); // >> Get The Data since the last getMainData
-  qBMain.Merge(Update); // we merge the update : qBMain is now up to date
+  if Update <> Nil then
+    qBMain.Merge(Update); // we merge the update : qBMain is now up to date
   Update.Free;
   UpdateUI;
 end;

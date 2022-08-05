@@ -54,7 +54,10 @@ begin
   begin
     var tme := GetTickCount;
     var U := qB.GetMainData(qBMainTh.Frid); // get differebtial data from last call
-    qBMainTh.Merge(U); // Merge to qBMain to be uodate to date
+    if U = Nil then
+      Terminate
+    else
+      qBMainTh.Merge(U); // Merge to qBMain to be uodate to date
     U.Free;
     Synchronize(
       procedure

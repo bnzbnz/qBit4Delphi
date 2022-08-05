@@ -22,7 +22,9 @@ object FrmSimple: TFrmSimple
     Width = 635
     Height = 342
     Align = alClient
+    DoubleBuffered = True
     ItemHeight = 13
+    ParentDoubleBuffered = False
     TabOrder = 1
   end
   object Warning: TMemo
