@@ -16,7 +16,7 @@ uses uqBitAPITypes, windows, classes;
 const
 
   qBitAPI_MajorVersion = 1;
-  qBitAPI_MinorVersion = 100;
+  qBitAPI_MinorVersion = 101;
 
 type
 
