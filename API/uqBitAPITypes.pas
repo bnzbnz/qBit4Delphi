@@ -20,9 +20,7 @@ const
 type
 
   TqBitUserRec = record
-    Str: string;
-    Bool: Boolean;
-    Int: Int64;
+    Val: variant;
     OwnObj: Boolean;
     Obj: TObject;
     procedure SetObject(aObject: TObject; aOwnObject: Boolean = False);
@@ -30,16 +28,15 @@ type
 
   TqBitTorrentBaseType = class
   private
-    [JsonMarshalled(false)]
-    _RawJsonData: TDictionary<string, string>;
+    RawJsonData: TDictionary<string, string>;
     function RawJsonDecode(RawJson: string): string;
     function RawJsonEncode(Header, Value, Footer: string): string;
   protected
     procedure ClonePropertiesTo(T : TqBitTorrentBaseType); virtual;
     procedure MergePropertiesFrom(T: TqBitTorrentBaseType);
   public
-    [JsonMarshalled(false)]
-    _UserRec: TqBitUserRec;
+    Key: variant;
+    UserRec: TqBitUserRec;
     function Clone: TqBitTorrentBaseType; virtual;
     constructor Create; overload;
     destructor Destroy; override;
@@ -1048,6 +1045,8 @@ begin
           TJson.JsonToObject<TqBitRSSRuleType>(JSONPair.JsonValue.toString)
 		    );
     JSONObj.Free;
+    for var Element in TqBitAutoDownloadingRulesType(Data).Frules do
+      TqBitTorrentBaseType(Element.Value).Key := Element.Key;
   end else
   if (Data is TqBitMainDataType) and (Field = 'Fcategories') then
   begin
@@ -1059,19 +1058,24 @@ begin
           TJson.JsonToObject<TqBitCategoryType>(JSONPair.JsonValue.toString)
 		    );
     JSONObj.Free;
+    for var Element in TqBitMainDataType(Data).Fcategories do
+      TqBitTorrentBaseType(Element.Value).Key := Element.Key;
   end else
   if (Data is TqBitMainDataType) and (Field = 'Ftorrents') then
   begin
     TqBitMainDataType(Data).Ftorrents := TqBitObjectDictionary<variant, TqBitTorrentType>.Create([doOwnsValues]);
     var JSONObj := TJSONObject.ParseJSONValue(Arg) as TJSONObject;
     for var JSONPair in JSONObj do
-    begin
-      // Fix Missing Fid in TqBitTorrentType
-      var Torrent := TJson.JsonToObject<TqBitTorrentType>(JSONPair.JsonValue.toString);
-      Torrent.Fhash := JSONPair.JsonString.Value;
-      TqBitMainDataType(Data).Ftorrents.Add(JSONPair.JsonString.Value, Torrent);
-    end;
+      TqBitMainDataType(Data).Ftorrents.Add(
+        JSONPair.JsonString.Value,
+        TJson.JsonToObject<TqBitTorrentType>(JSONPair.JsonValue.toString)
+      );
     JSONObj.Free;
+    for var Element in TqBitMainDataType(Data).Ftorrents do
+    begin
+      TqBitTorrentBaseType(Element.Value).Key := Element.Key;
+      TqBitTorrentType(Element.Value).Fhash := Element.Key;
+    end;
   end else
   if (Data is TqBitTorrentPeersDataType) and (Field = 'Fpeers') then
   begin
@@ -1082,6 +1086,8 @@ begin
           JSONPair.JsonString.Value,
           TJson.JsonToObject<TqBitTorrentPeerDataType>(JSONPair.JsonValue.toString)
 		    );
+    for var Element in TqBitTorrentPeersDataType(Data).Fpeers do
+      TqBitTorrentBaseType(Element.Value).Key := Element.Key;
     JSONObj.Free;
   end else
   if (Data is TqBitMainDataType) and (Field = 'Ftrackers') then
@@ -1106,7 +1112,9 @@ begin
           JSONPair.JsonString.Value,
           TJson.JsonToObject<TqBitCategoryType>(JSONPair.JsonValue.toString)
 		    );
-    JSONObj.Free
+    JSONObj.Free;
+    for var Element in TqBitCategoriesType(Data).Fcategories do
+      TqBitTorrentBaseType(Element.Value).Key := Element.Key;
   end else
   if (Data is TqBitTorrentSpeedsLimitType) and (Field = 'Fspeeds') then
   begin
@@ -1414,17 +1422,16 @@ end;
 
 constructor TqBitTorrentBaseType.Create;
 begin
-  _RawJsonData := TDictionary<string, string>.Create;
-  _RawJsonData.Clear;
-  _UserRec.OwnObj := False;
-  _UserRec.Obj := nil;
+  RawJsonData := TDictionary<string, string>.Create;
+  RawJsonData.Clear;
+  UserRec.OwnObj := False;
+  UserRec.Obj := nil;
 end;
 
 destructor TqBitTorrentBaseType.Destroy;
 begin
-  if _UserRec.OwnObj then _UserRec.Obj.Free;
-
-  _RawJsonData.Free;
+  if UserRec.OwnObj then UserRec.Obj.Free;
+  RawJsonData.Free;
   inherited;
 end;
 
@@ -1466,11 +1473,9 @@ function TqBitTorrentBaseType.Clone: TqBitTorrentBaseType;
 begin
   Result := TqBitTorrentBaseType(Self.ClassType.Create);
   Self.ClonePropertiesTo(Result);
-  Result._UserRec.Str := Self._UserRec.Str;
-  Result._UserRec.Bool := Self._UserRec.Bool;
-  Result._UserRec.Int := Self._UserRec.Int;
-  Result._UserRec.OwnObj := False;
-  Result._UserRec.Obj := Self._UserRec.Obj;
+  Result.UserRec.Val := Self.UserRec.Val;
+  Result.UserRec.OwnObj := False;
+  Result.UserRec.Obj := Self.UserRec.Obj;
 end;
 
 function TqBitTorrentBaseType.RawJsonEncode(Header, Value, Footer: string): string;
@@ -1483,20 +1488,20 @@ begin
        [MyGuid0.D1, MyGuid0.D2, MyGuid0.D3,
        MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
        MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]);
-  _RawJsonData.Add(Header + Result + Footer, Value);
+  RawJsonData.Add(Header + Result + Footer, Value);
 end;
 
 function TqBitTorrentBaseType.RawJsonDecode(RawJson: string): string;
 begin
   Result := RawJson;
-  for var Tag in _RawJsonData do
+  for var Tag in RawJsonData do
     if Tag.Key <> '' then
       Result := StringReplace(Result, Tag.Key, Tag.Value, []);
 end;
 
 function TqBitTorrentBaseType.toJSON: string;
 begin
-  _RawJsonData.Clear;
+  RawJsonData.Clear;
   Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
   Result := RawJsonDecode(Result);
 end;
