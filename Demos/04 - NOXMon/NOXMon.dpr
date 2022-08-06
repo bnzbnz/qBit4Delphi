@@ -1,14 +1,19 @@
 program NOXMon;
 uses
+
   {$IFDEF VER340}
-  REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
+    REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
+    REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
+    System.JSON in '..\..\API\JSON\21\System.JSON.pas',
+    REST.Json in '..\..\API\JSON\21\REST.Json.pas',
   {$ENDIF }
   {$IFDEF VER350}
-  REST.Json.Types in '..\..\API\JSON\22\REST.Json.Types.pas',
-  REST.JsonReflect in '..\..\API\JSON\22\REST.JsonReflect.pas',
-  System.JSON in '..\..\API\JSON\22\System.JSON.pas',
-  REST.Json in '..\..\API\JSON\22\REST.Json.pas',
-  {$ENDIF }
+    REST.Json.Types in '..\..\API\JSON\22\REST.Json.Types.pas',
+    REST.JsonReflect in '..\..\API\JSON\22\REST.JsonReflect.pas',
+    System.JSON in '..\..\API\JSON\22\System.JSON.pas',
+    REST.Json in '..\..\API\JSON\22\REST.Json.pas',
+  {$ENDIF}
+
   Vcl.Forms,
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
@@ -28,3 +33,16 @@ begin
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.Run;
 end.
+
+  {$IFDEF VER340}
+    REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
+    REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
+    System.JSON in '..\..\API\JSON\21\System.JSON.pas',
+    REST.Json in '..\..\API\JSON\21\REST.Json.pas',
+  {$ENDIF }
+  {$IFDEF VER350}
+    REST.Json.Types in '..\..\API\JSON\22\REST.Json.Types.pas',
+    REST.JsonReflect in '..\..\API\JSON\22\REST.JsonReflect.pas',
+    System.JSON in '..\..\API\JSON\22\System.JSON.pas',
+    REST.Json in '..\..\API\JSON\22\REST.Json.pas',
+  {$ENDIF}

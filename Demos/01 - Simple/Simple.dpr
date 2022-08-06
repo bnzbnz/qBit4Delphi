@@ -34,6 +34,7 @@ begin
   Application.CreateForm(TqBitSelectServerDlg, qBitSelectServerDlg);
   Application.Run;
 end.
+
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
     REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
