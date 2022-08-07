@@ -23,9 +23,9 @@ uses
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
   uSimple in 'uSimple.pas' {FrmSimple},
-  uqBitPatchChecker in '..\common\uqBitPatchChecker.pas',
-  uqBitAddServerDlg in '..\common\uqBitAddServerDlg.pas' {qBitAddServerDlg},
-  uqBitSelectServerDlg in '..\common\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
+  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
+  uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
+  uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
 

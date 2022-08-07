@@ -8,7 +8,7 @@ uses
 
   Vcl.Forms,
   uTvnStatDemo in 'uTvnStatDemo.pas' {vnStatDemoFrm},
-  uTvnStatClient in '..\..\API\Tools\uTvnStatClient.pas';
+  uTvnStatClient in '..\..\Common\uTvnStatClient.pas';
 
 {$R *.res}
 

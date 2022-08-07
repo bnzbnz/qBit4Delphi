@@ -22,10 +22,11 @@ uses
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
-  uqBitFormat in '..\common\uqBitFormat.pas',
   uNOXMon in 'uNOXMon.pas' {NOXMonDlg},
-  uqBitSelectServerDlg in '..\common\uqBitSelectServerDlg.pas' {qBitSelectServerDlg},
-  uqBitAddServerDlg in '..\common\uqBitAddServerDlg.pas' {qBitAddServerDlg};
+  uqBitFormat in '..\..\Common\uqBitFormat.pas',
+  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
+  uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
+  uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
 begin

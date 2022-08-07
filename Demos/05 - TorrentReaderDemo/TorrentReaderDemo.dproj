@@ -4,7 +4,7 @@
         <ProjectVersion>19.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -133,8 +133,8 @@
         <DCCReference Include="uTorrentReaderDemo.pas">
             <Form>Form2</Form>
         </DCCReference>
-        <DCCReference Include="..\..\API\Tools\uTorrentReader.pas"/>
-        <DCCReference Include="..\..\API\Tools\uBEncode.pas"/>
+        <DCCReference Include="..\..\Common\uTorrentReader.pas"/>
+        <DCCReference Include="..\..\Common\uBEncode.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

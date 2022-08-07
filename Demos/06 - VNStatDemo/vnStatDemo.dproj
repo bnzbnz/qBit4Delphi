@@ -114,7 +114,7 @@
             <Form>vnStatDemoFrm</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\API\Tools\uTvnStatClient.pas"/>
+        <DCCReference Include="..\..\Common\uTvnStatClient.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

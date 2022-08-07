@@ -5,9 +5,9 @@ uses
   {$ENDIF}
   Vcl.Forms,
   uTorrentReaderDemo in 'uTorrentReaderDemo.pas' {Form2},
-  uTorrentReader in '..\..\API\Tools\uTorrentReader.pas',
-  uBEncode in '..\..\API\Tools\uBEncode.pas';
-{$R *.res} 
+  uTorrentReader in '..\..\Common\uTorrentReader.pas',
+  uBEncode in '..\..\Common\uBEncode.pas';
+{$R *.res}
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;

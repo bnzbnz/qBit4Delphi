@@ -109,7 +109,7 @@
             <Form>Form1</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\API\Tools\uExternalIP.pas"/>
+        <DCCReference Include="..\..\Common\uExternalIP.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

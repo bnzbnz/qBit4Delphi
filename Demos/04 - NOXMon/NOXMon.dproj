@@ -110,16 +110,16 @@
         <DCCReference Include="..\..\API\uqBitAPITypes.pas"/>
         <DCCReference Include="..\..\API\uqBitAPI.pas"/>
         <DCCReference Include="..\..\API\uqBitObject.pas"/>
-        <DCCReference Include="..\common\uqBitFormat.pas"/>
         <DCCReference Include="uNOXMon.pas">
             <Form>NOXMonDlg</Form>
         </DCCReference>
-        <DCCReference Include="..\common\uqBitSelectServerDlg.pas">
-            <Form>qBitSelectServerDlg</Form>
-        </DCCReference>
-        <DCCReference Include="..\common\uqBitAddServerDlg.pas">
+        <DCCReference Include="..\..\Common\uqBitFormat.pas"/>
+        <DCCReference Include="..\..\Common\uqBitPatchChecker.pas"/>
+        <DCCReference Include="..\..\Common\Dialogs\uqBitAddServerDlg.pas">
             <Form>qBitAddServerDlg</Form>
-            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\..\Common\Dialogs\uqBitSelectServerDlg.pas">
+            <Form>qBitSelectServerDlg</Form>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

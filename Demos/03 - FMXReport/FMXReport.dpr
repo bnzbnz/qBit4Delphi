@@ -24,7 +24,7 @@ uses
   uqBitObject in '..\..\API\uqBitObject.pas',
   System.StartUpCopy,
   uFMXReport in 'uFMXReport.pas' {FrmFMXReport},
-  uqBitPatchChecker in '..\common\uqBitPatchChecker.pas';
+  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas';
 
 {$R *.res}
 begin

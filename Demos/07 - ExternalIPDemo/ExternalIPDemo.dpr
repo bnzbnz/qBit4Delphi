@@ -8,7 +8,7 @@ uses
 
   Vcl.Forms,
   uExternalIPDemo in 'uExternalIPDemo.pas' {Form1},
-  uExternalIP in '..\..\API\Tools\uExternalIP.pas';
+  uExternalIP in '..\..\Common\uExternalIP.pas';
 
 {$R *.res}
 
