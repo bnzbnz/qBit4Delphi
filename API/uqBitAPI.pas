@@ -91,9 +91,9 @@ type
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#set-global-upload-limit
     function GetGlobalUploadLimit: integer; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-global-upload-limit
-    function SetGlobalUploadLimit(GlobalUploafimit: integer): boolean;
+    function SetGlobalUploadLimit(GlobalUploafimit: integer): boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#ban-peers
-    function BanPeers(PeerListStr: string): boolean; virtual;
+    function BanPeers(PeerListStr: string): boolean; overload; virtual;
 
   // Torrent management :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-list
@@ -215,7 +215,7 @@ type
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-articles-matching-a-rule
     function RSSGetMatchingArticles(RuleName: string): TqBitRSSArticles;
 
-  // Search : will be implemented if reauested.
+  // Search : will be implemented if requested.
 
   end;
 
@@ -256,7 +256,8 @@ begin
         'qBittorrent WebAPI for Delphi (qBit4Delphi) - Version: %s.%d.%.*d - Laurent Meyer qBit4Delphi@ea4d.com',
         [qBitAPI_WebAPIVersion, qBitAPI_MajorVersion, 3, qBitAPI_MinorVersion]
       );
-    Http.CustomHeaders['Content-type'] := ContentType;
+    Http.AutomaticDecompression := [THTTPCompressionMethod.Any];
+    Http.ContentType := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
     Http.CookieManager.Clear;
     if FSID <>'' then Http.CookieManager.AddServerCookie('SID='+FSID, FHostPath);

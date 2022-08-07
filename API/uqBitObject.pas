@@ -73,6 +73,8 @@ type
     function AddPeers(Torrents: TqBitTorrentListType; Peers: TStringList): boolean; overload; virtual;
     function AddAllPeers(Peers: TStringList): boolean; overload; virtual;
 
+    function BanPeers(Peers: TStringList): boolean; overload; virtual;
+
     function IncreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function IncreaseTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
     function IncreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean; overload; virtual;
@@ -485,6 +487,12 @@ begin
   if Res = Nil then exit;
   Result := AddPeers(Res, Peers);
   Res.Free;
+end;
+
+function TqBitObject.BanPeers(Peers: TStringList): boolean;
+begin
+  Peers.Delimiter := '|';
+  Result := BanPeers(Peers);
 end;
 
 // IncreaseTorrentPriority
