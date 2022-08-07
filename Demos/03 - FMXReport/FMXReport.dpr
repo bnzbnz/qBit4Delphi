@@ -1,6 +1,10 @@
 program FMXReport;
 uses
 
+  {$IFDEF DEBUG}
+    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$ENDIF}
+
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
     REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
@@ -30,6 +34,11 @@ begin
   Application.Run;
 end.
 
+
+  {$IFDEF DEBUG}
+    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$ENDIF}
+
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
     REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
@@ -42,4 +51,5 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
+
 

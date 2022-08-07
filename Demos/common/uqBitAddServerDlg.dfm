@@ -1,6 +1,7 @@
 object qBitAddServerDlg: TqBitAddServerDlg
   Left = 0
   Top = 0
+  ActiveControl = HP
   BorderStyle = bsDialog
   Caption = 'Add a qBittorrent Server :'
   ClientHeight = 204
@@ -25,6 +26,7 @@ object qBitAddServerDlg: TqBitAddServerDlg
     Width = 75
     Height = 25
     Caption = 'Ok'
+    Default = True
     ModalResult = 1
     TabOrder = 3
     OnClick = BtnOKClick

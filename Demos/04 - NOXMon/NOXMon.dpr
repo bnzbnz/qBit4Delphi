@@ -1,6 +1,10 @@
 program NOXMon;
 uses
 
+  {$IFDEF DEBUG}
+    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$ENDIF}
+
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
     REST.JsonReflect in '..\..\API\JSON\21\REST.JsonReflect.pas',
@@ -25,7 +29,6 @@ uses
 
 {$R *.res}
 begin
-  ReportMemoryLeaksOnShutdown := True;
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TNOXMonDlg, NOXMonDlg);
@@ -33,6 +36,10 @@ begin
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.Run;
 end.
+
+  {$IFDEF DEBUG}
+    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$ENDIF}
 
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
