@@ -60,9 +60,9 @@ begin
       Th.Start;
     end;
     Srvs.Free;
-  end else
-    PostMessage(Handle, WM_CLOSE, 0,0);
+  end else Close;
 end;
+
 
 procedure TNOXMonDlg.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -135,7 +135,12 @@ begin
   begin
     var tme := GetTickCount;
     var U := qB.GetMainData(qBMainTh.Frid); // get differebtial data from last call
-    qBMainTh.Merge(U); // Merge to qBMain to be uodated to date
+    if U = nil then
+    begin
+      qBMainTh.Fserver_state.Fconnection_status := 'disconnected';
+      Terminate;
+    end else
+      qBMainTh.Merge(U); // Merge to qBMain to be uodated to date
     U.Free;
     Synchronize(
       procedure
