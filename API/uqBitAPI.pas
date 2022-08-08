@@ -29,6 +29,7 @@ type
     FPassword: string;
     FDuration: cardinal;
     FHTTPStatus: integer;
+    FHTTPResponse: string;
     FHTTPConnectionTimeout: integer;
     FHTTPSendTimeout: integer;
     FHTTPResponseTimeout: integer;
@@ -45,7 +46,7 @@ type
 
   // Authentication :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#login
-    function Login(Username, Password: string): Boolean; virtual;
+    function Login(Username, Password: string; Retries: Integer = 1): Boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#logout
     function Logout: Boolean; virtual;
   // Application :
@@ -221,7 +222,7 @@ type
 
 implementation
 uses REST.Json, NetEncoding, SysUtils, wininet, zLib, System.Net.URLClient,
-     System.Net.HttpClient, System.Net.HttpClientComponent, System.Hash;
+     System.Net.HttpClient, System.Net.HttpClientComponent, NetConsts, System.Hash;
 
 const
   bstr: array[boolean] of string = ('false','true');
@@ -235,10 +236,11 @@ begin
   inherited Create;
   FSID := '';
   FHostPath := HostPath;
-  FHTTPConnectionTimeout := 1000;
-  FHTTPSendTimeout := 2000;
-  FHTTPResponseTimeout := 5000;
+  FHTTPConnectionTimeout := 250;
+  FHTTPSendTimeout := 500;
+  FHTTPResponseTimeout := 1000;
   FHTTPRetries := 3;
+  FHTTPResponse := '';
 end;
 
 function TqBitAPI.qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer;
@@ -246,14 +248,15 @@ var
   Res: IHTTPResponse;
   Http: THTTPClient;
 begin
-  Result := -1;
   Http := nil;
+  FHTTPResponse := '';
+  FHTTPStatus := -1;
   try
   try
     Http := THTTPClient.Create;
     Http.UserAgent :=
       Format(
-        'qBittorrent WebAPI for Delphi (qBit4Delphi) - Version: %s.%d.%.*d - Laurent Meyer qBit4Delphi@ea4d.com',
+        'qBittorrent WebAPI for Delphi (qBit4Delphi, qB4D) - Version: %s.%d.%.*d - Laurent Meyer qBit4Delphi@ea4d.com',
         [qBitAPI_WebAPIVersion, qBitAPI_MajorVersion, 3, qBitAPI_MinorVersion]
       );
     Http.AutomaticDecompression := [THTTPCompressionMethod.Any];
@@ -262,25 +265,26 @@ begin
     Http.CookieManager.Clear;
     if FSID <>'' then Http.CookieManager.AddServerCookie('SID='+FSID, FHostPath);
     Http.ConnectionTimeout := FHTTPConnectionTimeout;
-    Http.SendTimeout := FHTTPSendTimeout;
-    Http.ResponseTimeout := FHTTPResponseTimeout;
+    Http.SendTimeout :=FHTTPSendTimeout;
+    Http.ResponseTimeout := FHTTPConnectionTimeout;;
     var Retries := FHTTPRetries;
     repeat
       Dec(Retries);
       var Url := Format('%s/api/v2%s?%s',[FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
       ReqST.Position := 0;
       ResST.Position := 0;
-      Res := Http.Post(Url, ReqST, ResST);
-    until (Res.StatusCode <> 502) or (Retries <= 0); // Server did not respond...
+      try Res := Http.Post(Url, ReqST, ResST);  except end;
+    until ((Res <> nil) or (Retries <= 0));
+    if Res = nil then Exit; // disconnected;
     FHTTPStatus := Res.StatusCode;
-    if Res.StatusCode <> 200 then Exit;
+    FHTTPResponse := ResST.DataString;
     for var Cookie in  Http.CookieManager.Cookies do
-      if Cookie.Name = 'SID' then FSID := Cookie.Value;
-    Result := FHTTPStatus;
-  except
-    Result := -1;
+      if Cookie.Name = 'SID' then
+         FSID := Cookie.Value;
+  except 
   end;
   finally
+    Result := FHTTPStatus;
     HTTP.Free;
   end;
 end;
@@ -306,17 +310,22 @@ begin
     ReqSS.Free;
   end;
 end;
+
 function TqBitAPI.qBPost(MethodPath: string): integer;
 begin
   var NoBody := '';
   Result := qBPost(MethodPath, NoBody);
 end;
-function TqBitAPI.Login(Username, Password: string): Boolean;
+
+function TqBitAPI.Login(Username, Password: string; Retries: Integer): Boolean;
 begin
   FUsername := Username;
   FPassword := Password;
   var Body := Format('username=%s&password=%s',[ URLEncode(Username), URLEncode(Password) ]);
+  var CurRetries := Self.FHTTPRetries;
+  Self.FHTTPRetries := Retries;
   Result := (qBPost('/auth/login', Body) = 200)  and (Body = 'Ok.');
+  Self.FHTTPRetries := CurRetries;
 end;
 
 function TqBitAPI.Logout: Boolean;

@@ -73,6 +73,7 @@ object qBitAddServerDlg: TqBitAddServerDlg
     EditLabel.Height = 13
     EditLabel.Caption = 'Password :'
     EditLabel.DragMode = dmAutomatic
+    PasswordChar = '*'
     TabOrder = 2
     Text = ''
   end

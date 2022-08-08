@@ -206,8 +206,9 @@ uses SysUtils, DateUtils;
 class function TqBitObject.Connect(HostPath, Username, Password : string): TqBitObject;
 begin
   Result := TqBitObject.Create(HostPath);
-  if not Result.Login(Username, Password) then
-    FreeAndNil(Result);
+  if not Result.Login(Username, Password, 1) then
+    FreeAndNil(Result)
+
 end;
 
 // Helpers
