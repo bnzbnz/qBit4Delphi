@@ -188,10 +188,10 @@ type
     property Password: string read FPassword;
     property Duration: cardinal read FDuration;
     property HTTPStatus: integer read FHTTPStatus;
-    property HTTPConnectionTimeout: integer read FHTTPConnectionTimeout;
-    property HTTPSendTimeout: integer read FHTTPSendTimeout;
-    property HTTPResponseTimeout: integer read FHTTPResponseTimeout;
-    property HTTPRetries: integer read FHTTPRetries;
+    property HTTPConnectionTimeout: integer read FHTTPConnectionTimeout write FHTTPConnectionTimeout;
+    property HTTPSendTimeout: integer read FHTTPSendTimeout write FHTTPSendTimeout;
+    property HTTPResponseTimeout: integer read FHTTPResponseTimeout write FHTTPResponseTimeout;
+    property HTTPRetries: integer read FHTTPRetries write FHTTPRetries;
   end;
 
   // Place Holder
