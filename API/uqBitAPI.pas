@@ -23,6 +23,7 @@ type
   TqBitAPI = class(TObject)
   private
   protected
+
     FSID: string;
     FHostPath: string;
     FUsername: string;
@@ -34,6 +35,12 @@ type
     FHTTPSendTimeout: integer;
     FHTTPResponseTimeout: integer;
     FHTTPRetries: integer;
+
+    constructor Create(HostPath: string); overload;
+    function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
+    function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
+    function qBPost(MethodPath: string): integer; overload; virtual;
+
   public
 
     class function MajorVersion: Integer;
@@ -41,10 +48,6 @@ type
     class function Version: string;
     class function WebAPIVersion: string;
 
-    constructor Create(HostPath: string); overload;
-    function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
-    function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
-    function qBPost(MethodPath: string): integer; overload; virtual;
 
     /////////////////////////////////////////////////////////////////////////////////////////
     // WebAPI: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
@@ -55,6 +58,7 @@ type
     function Login(Username, Password: string): Boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#logout
     function Logout: Boolean; virtual;
+
   // Application :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-application-version
     function GetVersion: string; virtual;
@@ -70,7 +74,10 @@ type
     function SetPreferences(Prefs: TqBitPreferencesType): boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-default-save-path
     function GetDefaultSavePath: string; virtual;
-
+        // UNDOCUMENTED
+    function GetNetworkInterfaces: TqBitNetworkInterfaces;
+        // UNDOCUMENTED
+    function GetNetworkInterfaceAddress(Iface: string = ''): TqBitNetworkInterfaceAddresses;
   // Log :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#log
     function GetLog(LastKnownId: int64 = -1; Normal: boolean = false;
@@ -221,6 +228,7 @@ type
     function RSSGetAllAutoDownloadingRules: TqBitAutoDownloadingRulesType;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-articles-matching-a-rule
     function RSSGetMatchingArticles(RuleName: string): TqBitRSSArticles;
+
 
   // Search : will be implemented if requested.
 
@@ -523,6 +531,26 @@ begin
   var Body := Format('peers=%s', [URLEncode(PeerListStr)]);
   Result := qBPost('/transfer/banPeers', Body) = 200;
   FDuration := GetTickcount - FDuration;
+end;
+
+function TqBitAPI.GetNetworkInterfaces: TqBitNetworkInterfaces;
+begin
+  FDuration := GetTickCount;
+  Result := nil;
+  var Body := '';
+  if (qBPost('/app/networkInterfaceList', Body) = 200) and (Body <> '')  then
+    Result := TJson.JsonToObject<TqBitNetworkInterfaces>('{"ifaces":' + Body + '}', []);
+  FDuration := GetTickcount - FDuration;
+end;
+
+function TqBitAPI.GetNetworkInterfaceAddress(Iface: string): TqBitNetworkInterfaceAddresses;
+begin
+  FDuration := GetTickCount;
+  Result := nil;
+  var Body := Format('iface=%s', [URLEncode(Iface)]);
+  if (qBPost('/app/networkInterfaceAddressList', Body) = 200) and (Body <> '')  then
+    Result := TJson.JsonToObject<TqBitNetworkInterfaceAddresses>('{"adresses":' + Body + '}', []);
+  FDuration := GetTickcount - FDuration
 end;
 
 function TqBitAPI.GetTorrentList(TorrentListRequest: TqBitTorrentListRequestType): TqBitTorrentListType;
@@ -1268,3 +1296,4 @@ end;
 
 
 end.
+

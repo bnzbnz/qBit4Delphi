@@ -779,6 +779,24 @@ type
     procedure Merge(From: TqBitTorrentBaseType); override;
   end;
 
+
+  TqBitNetworkInterface = class(TqBitTorrentBaseType)
+    Fname: variant;
+    Fvalue: variant;
+  end;
+
+  TqBitNetworkInterfaces = class(TqBitTorrentBaseType)
+   [JsonReflect(ctstring, rtString, TqBitObjectListInterceptor)]
+    Fifaces: TqBitObjectList<TqBitNetworkInterface>;
+    destructor Destroy; override;
+  end;
+
+  TqBitNetworkInterfaceAddresses = class(TqBitTorrentBaseType)
+    [JsonReflect(ctString, rtString, TqBitVariantListInterceptor)]
+    Fadresses: TqBitList<variant>;
+    destructor Destroy; override;
+  end;
+
   {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
@@ -808,6 +826,17 @@ end;
 
 procedure TqBitObjectListInterceptor.StringReverter(Data: TObject; Field, Arg: string);
 begin
+  if (Data is TqBitNetworkInterfaces) and (Field = 'Fifaces') then
+  begin
+    TqBitNetworkInterfaces(Data).Fifaces := TqBitObjectList<TqBitNetworkInterface>.Create(True);
+    var JSONArr := TJSONObject.ParseJSONValue(Arg) as TJSONArray;
+    for var i:= 0 to JSONArr.Count -1 do
+      TqBitNetworkInterfaces(Data).Fifaces.Add(
+        TJSON.JsonToObject<TqBitNetworkInterface>( JSONArr.Items[i] as TJSONObject )
+      );
+    JSONArr.Free;
+  end else
+
   if (Data is TqBitRSSItemType) and (Field = 'Farticles') then
   begin
     TqBitRSSItemType(Data).Farticles := TqBitObjectList<TqBitRSSArticleType>.Create(True);
@@ -906,6 +935,14 @@ end;
 
 procedure TqBitVariantListInterceptor.StringReverter(Data: TObject; Field, Arg: string);
 begin
+  if (Data is TqBitNetworkInterfaceAddresses) and (Field = 'Fadresses') then
+  begin
+    TqBitNetworkInterfaceAddresses(Data).Fadresses := TqBitList<variant>.Create;
+    var JSONArr := TJSONObject.ParseJSONValue(arg) as TJSONArray;
+    for var i:= 0 to JSONArr.Count -1 do
+      TqBitNetworkInterfaceAddresses(Data).Fadresses.Add(  JSONArr.Items[i].Value );
+    JSONArr.Free;
+  end else
   if (Data is TqBitRSSRuleType) and (Field = 'FaffectedFeeds') then
   begin
     TqBitRSSRuleType(Data).FaffectedFeeds := TqBitList<variant>.Create;
@@ -2314,7 +2351,22 @@ begin
   Result := T;
 end;
 
-{$ENDREGION} // 'JSON Types Intf.'
+{ TqBitNetworkInterfaceAddresses }
 
+destructor TqBitNetworkInterfaceAddresses.Destroy;
+begin
+  FreeAndNil(Self.Fadresses);
+  inherited;
+end;
+
+{ TqBitNetworkInterfaces }
+
+destructor TqBitNetworkInterfaces.Destroy;
+begin
+  FreeAndNil(Self.Fifaces);
+  inherited;
+end;
+
+{$ENDREGION} // 'JSON Types Intf.'
 
 end.
