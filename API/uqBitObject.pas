@@ -15,27 +15,10 @@ type
 
   TqBitObject = class(TqBitAPI)  // as TqBitTorrent, TqBit, TqNOX
   public
+
+    // Main
+
     class function Connect(HostPath, Username, Password : string): TqBitObject;
-
-     // Helpers
-
-    class function UTimestampToDateTime(Timestamp: int64): TDatetime;
-    class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
-    class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
-    function Clone: TqBitObject;
-    class function WebAPIVersion: string;
-    class function MajorVersion: Integer;
-    class function MinorVersion: Integer;
-    class function Version: string;
-
-    // TqBitObject Helpers
-
-    function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
-    function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
-    function TTHL(Torrents: TqBitMainDataType): TStringList; overload; virtual; //Shortcut to TorrentsToHashList
-    function TTHL(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
-
-    function GetAllTorrentList: TqBitTorrentListType;
 
     // API Helpers
 
@@ -183,15 +166,33 @@ type
     function SetSuperSeeding(Torrents: TqBitTorrentListType; Value: boolean): boolean; overload; virtual;
     function SetAllSuperSeeding(Value: boolean): boolean; overload; virtual;
 
+    function GetAllTorrentList: TqBitTorrentListType; virtual;
+
+    //
+
+    function Clone: TqBitObject;
+
+    // Helpers
+
+    class function UTimestampToDateTime(Timestamp: int64): TDatetime;
+    class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
+    class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
+    class function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
+    class function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
+
+    // Properties
+
     property HostPath: string read FHostPath;
     property Username: string read FUsername;
     property Password: string read FPassword;
     property Duration: cardinal read FDuration;
     property HTTPStatus: integer read FHTTPStatus;
+    property HTTPResponse: string read FHTTPResponse;
     property HTTPConnectionTimeout: integer read FHTTPConnectionTimeout write FHTTPConnectionTimeout;
     property HTTPSendTimeout: integer read FHTTPSendTimeout write FHTTPSendTimeout;
     property HTTPResponseTimeout: integer read FHTTPResponseTimeout write FHTTPResponseTimeout;
     property HTTPRetries: integer read FHTTPRetries write FHTTPRetries;
+
   end;
 
   // Place Holder
@@ -206,13 +207,11 @@ uses SysUtils, DateUtils;
 class function TqBitObject.Connect(HostPath, Username, Password : string): TqBitObject;
 begin
   Result := TqBitObject.Create(HostPath);
-  if not Result.Login(Username, Password, 1) then
+  if not Result.Login(Username, Password) then
     FreeAndNil(Result)
-
 end;
 
 // Helpers
-
 
 class function TqBitObject.UTimestampToDateTime(Timestamp: int64): TDatetime;
 begin
@@ -237,7 +236,6 @@ begin
   secs := diff;
 end;
 
-
 function TqBitObject.Clone: TqBitObject;
 begin
   Result := TqBitObject.Create(FHostPath);
@@ -250,48 +248,18 @@ begin
   Result.FPassword := FPassword;
 end;
 
-class function TqBitObject.WebAPIVersion: string;
-begin
-  Result := qBitAPI_WebAPIVersion;
-end;
-
-class function TqBitObject.MajorVersion: Integer;
-begin
-  Result := qBitAPI_MajorVersion;
-end;
-
-class function TqBitObject.MinorVersion: Integer;
-begin
-  Result := qBitAPI_MinorVersion;
-end;
-
-class function TqBitObject.Version: string;
-begin
-  Result := Format('%d.%.*d.%s', [MajorVersion, 3,MinorVersion, qBitAPI_WebAPIVersion]);
-end;
-
-function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;
+class function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;
 begin
   Result := TStringList.Create;
   for var Torrent in Torrents.Ftorrents do
     Result.Add(Torrent.Key)
 end;
 
-function TqBitObject.TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList;
+class function TqBitObject.TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList;
 begin
   Result := TStringList.Create;
   for var Torrent in Torrents.Ftorrents do
     Result.Add(TqBitTorrentType(Torrent).Fhash);
-end;
-
-function TqBitObject.TTHL(Torrents: TqBitMainDataType): TStringList;
-begin
-  Result := TorrentsToHashesList(Torrents);
-end;
-
-function TqBitObject.TTHL(Torrents: TqBitTorrentListType): TStringList;
-begin
-  Result := TorrentsToHashesList(Torrents);
 end;
 
 function TqBitObject.GetAllTorrentList: TqBitTorrentListType;

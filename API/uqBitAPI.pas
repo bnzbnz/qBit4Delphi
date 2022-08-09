@@ -6,7 +6,7 @@ unit uqBitAPI;
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
-///  ToDo : RSS & Search
+///  ToDo : Search (if requested)
 ///
 ///
 
@@ -35,18 +35,24 @@ type
     FHTTPResponseTimeout: integer;
     FHTTPRetries: integer;
   public
+
+    class function MajorVersion: Integer;
+    class function MinorVersion: Integer;
+    class function Version: string;
+    class function WebAPIVersion: string;
+
     constructor Create(HostPath: string); overload;
     function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
     function qBPost(MethodPath: string; var Body: string): integer; overload; virtual;
     function qBPost(MethodPath: string): integer; overload; virtual;
 
-    ///////////////////////////////////////////////////////////////////////////////////////
-    // FROM: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
-    ///////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////
+    // WebAPI: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
+    /////////////////////////////////////////////////////////////////////////////////////////
 
   // Authentication :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#login
-    function Login(Username, Password: string; Retries: Integer = 1): Boolean; virtual;
+    function Login(Username, Password: string): Boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#logout
     function Logout: Boolean; virtual;
   // Application :
@@ -231,15 +237,36 @@ function URLEncode(Url: string): string; inline;
 begin
   Result := TNetEncoding.URL.Encode(Url);
 end;
+
+class function TqBitAPI.WebAPIVersion: string;
+begin
+  Result := qBitAPI_WebAPIVersion;
+end;
+
+class function TqBitAPI.MajorVersion: Integer;
+begin
+  Result := qBitAPI_MajorVersion;
+end;
+
+class function TqBitAPI.MinorVersion: Integer;
+begin
+  Result := qBitAPI_MinorVersion;
+end;
+
+class function TqBitAPI.Version: string;
+begin
+  Result := Format('%d.%.*d.%s', [MajorVersion, 3,MinorVersion, qBitAPI_WebAPIVersion]);
+end;
+
 constructor TqBitAPI.Create(HostPath: string);
 begin
   inherited Create;
   FSID := '';
   FHostPath := HostPath;
-  FHTTPConnectionTimeout := 250;
-  FHTTPSendTimeout := 500;
-  FHTTPResponseTimeout := 1000;
-  FHTTPRetries := 3;
+  FHTTPConnectionTimeout := 500;
+  FHTTPSendTimeout := 1000;
+  FHTTPResponseTimeout := 2000;
+  FHTTPRetries := 1;
   FHTTPResponse := '';
 end;
 
@@ -317,15 +344,12 @@ begin
   Result := qBPost(MethodPath, NoBody);
 end;
 
-function TqBitAPI.Login(Username, Password: string; Retries: Integer): Boolean;
+function TqBitAPI.Login(Username, Password: string): Boolean;
 begin
   FUsername := Username;
   FPassword := Password;
   var Body := Format('username=%s&password=%s',[ URLEncode(Username), URLEncode(Password) ]);
-  var CurRetries := Self.FHTTPRetries;
-  Self.FHTTPRetries := Retries;
   Result := (qBPost('/auth/login', Body) = 200)  and (Body = 'Ok.');
-  Self.FHTTPRetries := CurRetries;
 end;
 
 function TqBitAPI.Logout: Boolean;
