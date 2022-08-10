@@ -1,8 +1,8 @@
 program Simple;
 uses
 
-  {$IFDEF DEBUG}
-    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$IFDEF FASTMM4}
+    FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
   {$ENDIF}
 
   {$IFDEF VER340}
@@ -17,11 +17,11 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-
-  Vcl.Forms,
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
+
+  Vcl.Forms,
   uSimple in 'uSimple.pas' {FrmSimple},
   uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
   uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
@@ -38,8 +38,8 @@ begin
   Application.Run;
 end.
 
-  {$IFDEF DEBUG}
-    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$IFDEF FASTMM4}
+    FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
   {$ENDIF}
 
   {$IFDEF VER340}
@@ -53,7 +53,7 @@ end.
     REST.JsonReflect in '..\..\API\JSON\22\REST.JsonReflect.pas',
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
-  {$ENDIF}}
+  {$ENDIF}
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',

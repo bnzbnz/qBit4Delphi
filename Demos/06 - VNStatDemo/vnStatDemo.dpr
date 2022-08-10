@@ -2,8 +2,8 @@ program vnStatDemo;
 
 uses
 
-  {$IFDEF DEBUG}
-    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$IFDEF FASTMM4}
+    FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
   {$ENDIF}
 
   Vcl.Forms,
@@ -18,3 +18,7 @@ begin
   Application.CreateForm(TvnStatDemoFrm, vnStatDemoFrm);
   Application.Run;
 end.
+
+  {$IFDEF FASTMM4}
+    FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
+  {$ENDIF}
