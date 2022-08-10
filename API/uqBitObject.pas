@@ -13,12 +13,24 @@ uses classes, uqBitAPI, uqBitAPITypes;
 
 type
 
-  TqBitObject = class(TqBitAPI)  // as TqBitTorrent, TqBit, TqNOX
+  TqBitObject = class(TqBitAPI)
+  private
+    FHTTPStatus: integer;
+    FHTTPResponseTimeout: integer;
+    FDuration: cardinal;
+    FHTTPConnectionTimeout: integer;
+    FHTTPRetries: integer;
+    FHTTPResponse: string;
+    FPassword: string;
+    FHostPath: string;
+    FHTTPSendTimeout: integer;
+    FUsername: string;  // as TqBitTorrent, TqBit, TqNOX
   public
 
     // Main
 
     class function Connect(HostPath, Username, Password : string): TqBitObject;
+    function Clone: TqBitObject;
 
     // API Helpers
 
@@ -57,6 +69,9 @@ type
     function AddAllPeers(Peers: TStringList): boolean; overload; virtual;
 
     function BanPeers(Peers: TStringList): boolean; overload; virtual;
+    function GetBanPeersList: TStringList;
+    function SetBanPeersList(PeersList: TStringList): Boolean; overload;
+    function SetBanPeersList(PeersStr: string): Boolean; overload;
 
     function IncreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function IncreaseTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
@@ -168,10 +183,6 @@ type
 
     function GetAllTorrentList: TqBitTorrentListType; virtual;
 
-    //
-
-    function Clone: TqBitObject;
-
     // Helpers
 
     class function UTimestampToDateTime(Timestamp: int64): TDatetime;
@@ -179,6 +190,13 @@ type
     class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
     class function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
     class function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
+
+    class function qBitMajorVersion: Integer; virtual;
+    class function qBitMinorVersion: Integer; virtual;
+    class function qBitVersion: string; virtual;
+    class function qBitWebAPIVersion: string; virtual;
+    class function qBitCheckWebAPICompatibility(RemoteWebAPIVersion: string): Boolean; overload; virtual;
+    function qBitCheckWebAPICompatibility: Boolean; overload; virtual;
 
     // Properties
 
@@ -188,6 +206,7 @@ type
     property Duration: cardinal read FDuration;
     property HTTPStatus: integer read FHTTPStatus;
     property HTTPResponse: string read FHTTPResponse;
+    property HTTPDuration: cardinal read FHTTPDuration;
     property HTTPConnectionTimeout: integer read FHTTPConnectionTimeout write FHTTPConnectionTimeout;
     property HTTPSendTimeout: integer read FHTTPSendTimeout write FHTTPSendTimeout;
     property HTTPResponseTimeout: integer read FHTTPResponseTimeout write FHTTPResponseTimeout;
@@ -260,20 +279,6 @@ begin
   Result := TStringList.Create;
   for var Torrent in Torrents.Ftorrents do
     Result.Add(TqBitTorrentType(Torrent).Fhash);
-end;
-
-function TqBitObject.GetAllTorrentList: TqBitTorrentListType;
-var
-  Req: TqBitTorrentListRequestType;
-begin
-  Req:= Nil;
-  try
-    Req := TqBitTorrentListRequestType.Create;
-    Req.FFilter := 'all';
-    Result := GetTorrentList(Req);
-  finally
-    Req.Free;
-  end;
 end;
 
 // PauseTorrents
@@ -462,6 +467,30 @@ function TqBitObject.BanPeers(Peers: TStringList): boolean;
 begin
   Peers.Delimiter := '|';
   Result := BanPeers(Peers);
+end;
+
+function TqBitObject.GetBanPeersList: TStringList;
+begin
+  Result := nil;
+  var Prefs := Self.GetPreferences;
+  if Prefs = nil then Exit;
+  Result := TStringList.Create;
+  Result.Delimiter := #$A;
+  Result.DelimitedText := Prefs.Fbanned_IPs;
+  Prefs.Free;
+end;
+
+function TqBitObject.SetBanPeersList(PeersStr: string): Boolean;
+begin
+  var Prefs := TqBitPreferencesType.Create;
+  Prefs.Fbanned_IPs := PeersStr;
+  Result := SetPreferences(Prefs);
+end;
+
+function TqBitObject.SetBanPeersList(PeersList: TStringList): Boolean;
+begin
+   PeersList.Delimiter := #$A;
+   Result := SetBanPeersList(PeersList.DelimitedText);
 end;
 
 // IncreaseTorrentPriority
@@ -1046,6 +1075,52 @@ begin
   if Res = Nil then exit;
   Result := SetSuperSeeding(Res, Value);
   Res.Free;
+end;
+
+function TqBitObject.GetAllTorrentList: TqBitTorrentListType;
+var
+  Req: TqBitTorrentListRequestType;
+begin
+  Req:= Nil;
+  try
+    Req := TqBitTorrentListRequestType.Create;
+    Req.FFilter := 'all';
+    Result := GetTorrentList(Req);
+  finally
+    Req.Free;
+  end;
+end;
+
+class function TqBitObject.qBitVersion: string;
+begin
+  Result := Format('%d.%.*d.%s', [qBitMajorVersion, 3,qBitMinorVersion, qBitAPI_WebAPIVersion]);
+end;
+
+class function TqBitObject.qBitWebAPIVersion: string;
+begin
+  Result := qBitAPI_WebAPIVersion;
+end;
+
+class function TqBitObject.qBitMajorVersion: Integer;
+begin
+  Result := qBitAPI_MajorVersion;
+end;
+
+class function TqBitObject.qBitMinorVersion: Integer;
+begin
+  Result := qBitAPI_MinorVersion;
+end;
+
+class function TqBitObject.qBitCheckWebAPICompatibility(RemoteWebAPIVersion: string): Boolean;
+begin
+  var DigitsR := RemoteWebAPIVersion.Split(['.']);
+  var DigitsL := qBitAPI_WebAPIVersion.Split(['.']);
+  Result :=  CompareText(RemoteWebAPIVersion, qBitAPI_WebAPIVersion)  >= 0;
+end;
+
+function TqBitObject.qBitCheckWebAPICompatibility: Boolean;
+begin
+  Result := qBitCheckWebAPICompatibility(GetAPIVersion);
 end;
 
 

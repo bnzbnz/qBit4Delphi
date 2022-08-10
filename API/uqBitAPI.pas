@@ -2,7 +2,7 @@ unit uqBitAPI;
 
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  API v2.8.3 + Hidden/Missing Fields
+///  API v2.8.3 + Hidden/Missing Functions/Fields
 ///
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
@@ -35,6 +35,7 @@ type
     FHTTPSendTimeout: integer;
     FHTTPResponseTimeout: integer;
     FHTTPRetries: integer;
+    FHTTPDuration: cardinal;
 
     constructor Create(HostPath: string); overload;
     function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
@@ -42,12 +43,6 @@ type
     function qBPost(MethodPath: string): integer; overload; virtual;
 
   public
-
-    class function MajorVersion: Integer;
-    class function MinorVersion: Integer;
-    class function Version: string;
-    class function WebAPIVersion: string;
-
 
     /////////////////////////////////////////////////////////////////////////////////////////
     // WebAPI: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1) //
@@ -78,6 +73,7 @@ type
     function GetNetworkInterfaces: TqBitNetworkInterfaces;
         // UNDOCUMENTED
     function GetNetworkInterfaceAddress(Iface: string = ''): TqBitNetworkInterfaceAddresses;
+
   // Log :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#log
     function GetLog(LastKnownId: int64 = -1; Normal: boolean = false;
@@ -246,26 +242,6 @@ begin
   Result := TNetEncoding.URL.Encode(Url);
 end;
 
-class function TqBitAPI.WebAPIVersion: string;
-begin
-  Result := qBitAPI_WebAPIVersion;
-end;
-
-class function TqBitAPI.MajorVersion: Integer;
-begin
-  Result := qBitAPI_MajorVersion;
-end;
-
-class function TqBitAPI.MinorVersion: Integer;
-begin
-  Result := qBitAPI_MinorVersion;
-end;
-
-class function TqBitAPI.Version: string;
-begin
-  Result := Format('%d.%.*d.%s', [MajorVersion, 3,MinorVersion, qBitAPI_WebAPIVersion]);
-end;
-
 constructor TqBitAPI.Create(HostPath: string);
 begin
   inherited Create;
@@ -283,44 +259,39 @@ var
   Res: IHTTPResponse;
   Http: THTTPClient;
 begin
-  Http := nil;
   FHTTPResponse := '';
   FHTTPStatus := -1;
+  FHTTPDuration := GetTickCount;
+  Http := THTTPClient.Create;
   try
-  try
-    Http := THTTPClient.Create;
     Http.UserAgent :=
       Format(
-        'qBittorrent WebAPI for Delphi (qBit4Delphi, qB4D) - Version: %s.%d.%.*d - Laurent Meyer qBit4Delphi@ea4d.com',
+        'qBittorrent WebAPI for Delphi (qBit4Delphi, qB4D) - Version: %s.%d.%.*d - Laurent Meyer (qBit4Delphi@ea4d.com)',
         [qBitAPI_WebAPIVersion, qBitAPI_MajorVersion, 3, qBitAPI_MinorVersion]
       );
     Http.AutomaticDecompression := [THTTPCompressionMethod.Any];
     Http.ContentType := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
-    Http.CookieManager.Clear;
-    if FSID <>'' then Http.CookieManager.AddServerCookie('SID='+FSID, FHostPath);
+    Http.CookieManager.AddServerCookie(Format('SID=%s', [FSID]), FHostPath);
     Http.ConnectionTimeout := FHTTPConnectionTimeout;
-    Http.SendTimeout :=FHTTPSendTimeout;
-    Http.ResponseTimeout := FHTTPConnectionTimeout;;
+    Http.SendTimeout := FHTTPSendTimeout;
+    Http.ResponseTimeout := FHTTPConnectionTimeout;
     var Retries := FHTTPRetries;
     repeat
       Dec(Retries);
-      var Url := Format('%s/api/v2%s?%s',[FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
-      ReqST.Position := 0;
-      ResST.Position := 0;
+      var Url := Format('%s/api/v2%s?%s', [FHostPath, MethodPath, URLEncode(THash.GetRandomString)]);
+      ReqST.Position := 0; ResST.Position := 0;
       try Res := Http.Post(Url, ReqST, ResST);  except end;
     until ((Res <> nil) or (Retries <= 0));
-    if Res = nil then Exit; // disconnected;
+    if Res = nil then Exit;
     FHTTPStatus := Res.StatusCode;
     FHTTPResponse := ResST.DataString;
     for var Cookie in  Http.CookieManager.Cookies do
-      if Cookie.Name = 'SID' then
-         FSID := Cookie.Value;
-  except 
-  end;
+      if Cookie.Name = 'SID' then FSID := Cookie.Value;
   finally
     Result := FHTTPStatus;
     HTTP.Free;
+    FHTTPDuration := GetTickcount - FHTTPDuration;
   end;
 end;
 
@@ -352,6 +323,8 @@ begin
   Result := qBPost(MethodPath, NoBody);
 end;
 
+// WebAPI :
+
 function TqBitAPI.Login(Username, Password: string): Boolean;
 begin
   FUsername := Username;
@@ -362,7 +335,9 @@ end;
 
 function TqBitAPI.Logout: Boolean;
 begin
+  FDuration := GetTickCount;
   Result := qBPost('/auth/logout') = 200;
+  FDuration := GetTickcount - FDuration;
 end;
 
 function TqBitAPI.GetVersion: string;
