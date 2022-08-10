@@ -58,7 +58,6 @@ begin
   for var T in qBMain.Ftorrents do
       LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname );
 
-      Caption := qB.Duration.ToString;
 end;
 procedure TFrmSimple.Timer1Timer(Sender: TObject);
 begin
