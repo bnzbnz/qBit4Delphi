@@ -18,13 +18,13 @@
         <Projects Include="05 - TorrentReaderDemo\TorrentReaderDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="07 - IP-API\IPAPIDemo.dproj">
+            <Dependencies/>
+        </Projects>
         <Projects Include="06 - VNStatDemo\vnStatDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="..\Patcher\Patcher.dproj">
-            <Dependencies/>
-        </Projects>
-        <Projects Include="07 - IP-API\IPAPIDemo.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -80,6 +80,15 @@
     <Target Name="TorrentReaderDemo:Make">
         <MSBuild Projects="05 - TorrentReaderDemo\TorrentReaderDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="IPAPIDemo">
+        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj"/>
+    </Target>
+    <Target Name="IPAPIDemo:Clean">
+        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="IPAPIDemo:Make">
+        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="vnStatDemo">
         <MSBuild Projects="06 - VNStatDemo\vnStatDemo.dproj"/>
     </Target>
@@ -98,23 +107,14 @@
     <Target Name="Patcher:Make">
         <MSBuild Projects="..\Patcher\Patcher.dproj" Targets="Make"/>
     </Target>
-    <Target Name="IPAPIDemo">
-        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj"/>
-    </Target>
-    <Target Name="IPAPIDemo:Clean">
-        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="IPAPIDemo:Make">
-        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon;TorrentReaderDemo;vnStatDemo;Patcher;IPAPIDemo"/>
+        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon;TorrentReaderDemo;IPAPIDemo;vnStatDemo;Patcher"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean;TorrentReaderDemo:Clean;vnStatDemo:Clean;Patcher:Clean;IPAPIDemo:Clean"/>
+        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean;TorrentReaderDemo:Clean;IPAPIDemo:Clean;vnStatDemo:Clean;Patcher:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make;TorrentReaderDemo:Make;vnStatDemo:Make;Patcher:Make;IPAPIDemo:Make"/>
+        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make;TorrentReaderDemo:Make;IPAPIDemo:Make;vnStatDemo:Make;Patcher:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

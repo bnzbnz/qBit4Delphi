@@ -45,7 +45,7 @@ object vnStatDemoFrm: TvnStatDemoFrm
       
         'then provide the full php script URL and the interface name in w' +
         'hich '
-      'yourare  interrested in.')
+      'you are  interrested in.')
     ScrollBars = ssVertical
     TabOrder = 3
   end

@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 0
   Top = 0
   Caption = 'IP-API '
-  ClientHeight = 441
+  ClientHeight = 475
   ClientWidth = 399
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -15,9 +15,10 @@ object Form2: TForm2
     Left = 0
     Top = 81
     Width = 399
-    Height = 360
+    Height = 394
     Align = alClient
     TabOrder = 0
+    ExplicitHeight = 360
   end
   object Panel1: TPanel
     Left = 0
