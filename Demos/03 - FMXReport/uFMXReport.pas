@@ -47,7 +47,7 @@ begin
   M := qB.GetMainData;
 
   Memo1.ClearContent;
-  Memo1.Lines.Add(Format('qBit4Delphi : %s ==>', [qB.Version]));
+  Memo1.Lines.Add(Format('qBit4Delphi : %s ==>', [qB.qBitVersion]));
   Memo1.Lines.Add(Format('******************* Server : %s *******************',[qB.HostPath]));
 
   Memo1.Lines.Add(Format('  Version : %s', [qB.GetVersion]));
