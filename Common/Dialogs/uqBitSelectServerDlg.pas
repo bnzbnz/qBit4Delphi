@@ -67,8 +67,12 @@ begin
   var Srv := TqBitServer(LBSrv.Items.Objects[LBSrv.ItemIndex]);
   var qB := TqBitObject.Connect(Srv.FHP, Srv.FUN, Srv.FPW);
   if assigned(qB) then
-    ModalResult := mrOK
-  else
+  begin
+    if not qB.qBitCheckWebAPICompatibility then
+      ShowMessage('Server API version not compatible')
+    else
+      ModalResult := mrOK
+  end else
     ShowMessage('Can not connect to : ' + Srv.FHP);
   qB.Free;
   BtnSel.Caption := 'Select'; BtnSel.Enabled := True;

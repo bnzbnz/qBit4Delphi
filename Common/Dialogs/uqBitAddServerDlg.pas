@@ -36,9 +36,13 @@ begin
   ModalResult := mrNone;
   var qB := TqBitObject.Connect(HP.Text, UN.Text, PW.Text);
   if assigned(qB) then
-    ModalResult := mrOK
-  else
-    ShowMessage('Can not connect to : ' + HP.Text);
+  begin
+    if not qB.qBitCheckWebAPICompatibility then
+      ShowMessage('Server API version is not compatible...')
+    else
+      ModalResult := mrOK
+  end else
+    ShowMessage('Cannot connect to : ' + HP.Text);
   qB.Free;
   BtnOK.Caption := 'Ok'; BtnOK.Enabled := True;
 end;
