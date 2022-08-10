@@ -110,6 +110,7 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Common\uIP_API.pas"/>
+        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -136,7 +137,7 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win32\Debug\IPAPIDemo.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\IPAPIDemo.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>IPAPIDemo.exe</RemoteName>
                         <Overwrite>true</Overwrite>

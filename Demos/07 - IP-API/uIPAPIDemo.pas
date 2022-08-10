@@ -26,22 +26,21 @@ var
   Form2: TForm2;
 
 implementation
-uses uIP_API, RTTI, ShellAPI;
+uses uIP_API, uqBitUtils, ShellAPI;
 {$R *.dfm}
 
 procedure TForm2.Button1Click(Sender: TObject);
 begin
-  Memo1.Clear;
+
   var IP := TIP_API.FromURL(Self.LabeledEdit1.Text);
   if IP = nil then Exit;
-   var rttictx := TRttiContext.Create();
-   var rttitype := rttictx.GetType(TIP_API);
-    for var field in rttitype.GetFields do
-      begin
-       var v :=  field.GetValue(IP).asVariant;
-        Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
-      end;
-  rttictx.Free;
+
+  Memo1.Clear;
+  var Props := GetRTTIReadableValues(IP, TIP_API);
+  for var Prop in Props do
+    Memo1.Lines.Add('  ' + Prop.Key + ' : ' +  varToStr(Prop.Value));
+  Props.Free;
+
   IP.Free;
 end;
 

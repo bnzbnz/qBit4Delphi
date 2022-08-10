@@ -148,6 +148,7 @@
             <Form>FrmFMXReport</Form>
         </DCCReference>
         <DCCReference Include="..\..\Common\uqBitPatchChecker.pas"/>
+        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

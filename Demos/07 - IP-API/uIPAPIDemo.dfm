@@ -18,8 +18,6 @@ object Form2: TForm2
     Height = 360
     Align = alClient
     TabOrder = 0
-    ExplicitTop = 57
-    ExplicitHeight = 384
   end
   object Panel1: TPanel
     Left = 0
@@ -28,7 +26,6 @@ object Form2: TForm2
     Height = 81
     Align = alTop
     TabOrder = 1
-    ExplicitTop = -6
     object LabeledEdit1: TLabeledEdit
       Left = 11
       Top = 23

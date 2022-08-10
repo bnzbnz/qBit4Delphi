@@ -29,7 +29,7 @@ var
   FrmFMXReport: TFrmFMXReport;
 
 implementation
-uses RTTI, uqBitPatchChecker;
+uses RTTI, uqBitUtils, uqBitPatchChecker;
 
 {$R *.fmx}
 
@@ -46,72 +46,55 @@ begin
   end;
   M := qB.GetMainData;
 
-  Memo1.ClearContent;
-  Memo1.Lines.Add(Format('qBit4Delphi : %s ==>', [qB.qBitVersion]));
-  Memo1.Lines.Add(Format('******************* Server : %s *******************',[qB.HostPath]));
+    Memo1.ClearContent;
+    Memo1.Lines.Add(Format('qBit4Delphi : %s ==>', [qB.qBitVersion]));
+    Memo1.Lines.Add(Format('******************* Server : %s *******************',[qB.HostPath]));
 
-  Memo1.Lines.Add(Format('  Version : %s', [qB.GetVersion]));
-  Memo1.Lines.Add(Format('  API : %s', [qB.GetAPIVersion]));
-  var B := qB.GetBuildInfo;
-  Memo1.Lines.Add(Format('  Libtorrent : %s', [B.Flibtorrent]));
-  Memo1.Lines.Add(Format('  OpenSSL : %s', [B.Fopenssl]));
-  Memo1.Lines.Add(Format('  Qt : %s', [B.Fqt]));
-  Memo1.Lines.Add(Format('  Boost : %s', [B.Fboost]));
-  B.Free;
-  var rttictx := TRttiContext.Create();
-  try
-    var rttitype := rttictx.GetType(TqBitserver_stateType);
-    for var field in rttitype.GetFields do
-      if field.FieldType.TypeKind = tkVariant then
-      begin
-        var v :=  field.GetValue(M.Fserver_state).asVariant;
-        Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
-      end;
+    Memo1.Lines.Add(Format('  Version : %s', [qB.GetVersion]));
+    Memo1.Lines.Add(Format('  API : %s', [qB.GetAPIVersion]));
+    var B := qB.GetBuildInfo;
+    Memo1.Lines.Add(Format('  Libtorrent : %s', [B.Flibtorrent]));
+    Memo1.Lines.Add(Format('  OpenSSL : %s', [B.Fopenssl]));
+    Memo1.Lines.Add(Format('  Qt : %s', [B.Fqt]));
+    Memo1.Lines.Add(Format('  Boost : %s', [B.Fboost]));
+    B.Free;
 
-      Memo1.Lines.Add('******************* Preferences *******************');
-      var Q := qB.GetPreferences;
-        var rttitype4:= rttictx.GetType(TqBitPreferencesType);
-     for var field in rttitype4.GetFields do
-      if field.FieldType.TypeKind = tkVariant then
-      begin
-       var v :=  field.GetValue(Q).asVariant;
-        Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
-      end;
-      Q.Free;
+    var Props := GetRTTIReadableValues(M.Fserver_state, TqBitserver_stateType);
+    for var Prop in Props do
+      Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
+    Props.Free;
 
-     Memo1.Lines.Add(Format('******************* Torrents : %d *******************',[M.Ftorrents.Count]));
-     var rttitype2 := rttictx.GetType(TqBitTorrentType);
-     for var T in M.Ftorrents do
-     begin
-       Memo1.Lines.Add(Format('  ************* Torrent : %s *******************',[TqBitTorrentType(T.Value).Fname]));
-       for var field in rttitype2.GetFields do
-        if field.FieldType.TypeKind = tkVariant then
-        begin
-         var v :=  field.GetValue(T.Value).asVariant;
-          Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
-        end;
-     end;
+    Memo1.Lines.Add('******************* Preferences *******************');
+    var Q := qB.GetPreferences;
+    Props := GetRTTIReadableValues(Q, TqBitPreferencesType);
+    for var Prop in Props do
+      Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
+    Props.Free;
+    Q.Free;
 
-     Memo1.Lines.Add(Format('******************* Categories : %d *******************',[M.Fcategories.Count]));
-     var rttitype3 := rttictx.GetType(TqBitCategoryType);
-     for var C in M.Fcategories do
-     begin
-       Memo1.Lines.Add(Format('  ************* Categorie : %s *******************',[TqBitCategoryType(C.Value).Fname]));
-       for var field in rttitype3.GetFields do
-        if field.FieldType.TypeKind = tkVariant then
-        begin
-         var v :=  field.GetValue(C.Value).asVariant;
-          Memo1.Lines.Add('  ' + field.Name + ' : ' +  varToStr(v));
-        end;
-     end;
+    Memo1.Lines.Add(Format('******************* Torrents : %d *******************',[M.Ftorrents.Count]));
+    for var T in M.Ftorrents do
+    begin
+      Memo1.Lines.Add(Format('  ************* Torrent : %s *******************',[TqBitTorrentType(T.Value).Fname]));
+      Props := GetRTTIReadableValues(T.Value, TqBitTorrentType);
+      for var Prop in Props do
+      Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
+      Props.Free;
+    end;
 
-     Memo1.Lines.Add(Format('******************* Tags : %d *******************',[M.Ftags.Count]));
-     for var G in M.Ftags do
-      Memo1.Lines.Add('  ' + G);
+    Memo1.Lines.Add(Format('******************* Categories : %d *******************',[M.Fcategories.Count]));
+    for var C in M.Fcategories do
+    begin
+      Memo1.Lines.Add(Format('  ************* Categorie : %s *******************',[TqBitCategoryType(C.Value).Fname]));
+      Props := GetRTTIReadableValues(C.Value, TqBitCategoryType);
+      for var Prop in Props do
+      Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
+      Props.Free;
+    end;
 
-  finally
-    rttictx.Free;
-  end;
+    Memo1.Lines.Add(Format('******************* Tags : %d *******************',[M.Ftags.Count]));
+    for var G in M.Ftags do
+    Memo1.Lines.Add('  ' + G);
 
   M.Free;
   qB.Free;
