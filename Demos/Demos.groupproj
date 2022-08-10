@@ -6,16 +6,13 @@
         <Projects Include="01 - Simple\Simple.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="03 - FMXReport\FMXReport.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="02 - SimpleThreaded\SimpleThreaded.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="04 - NOXMon\NOXMon.dproj">
+        <Projects Include="03 - FMXReport\FMXReport.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="..\Patcher\Patcher.dproj">
+        <Projects Include="04 - NOXMon\NOXMon.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="05 - TorrentReaderDemo\TorrentReaderDemo.dproj">
@@ -24,7 +21,10 @@
         <Projects Include="06 - VNStatDemo\vnStatDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="07 - ExternalIPDemo\ExternalIPDemo.dproj">
+        <Projects Include="..\Patcher\Patcher.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="07 - IP-API\IPAPIDemo.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -44,15 +44,6 @@
     <Target Name="Simple:Make">
         <MSBuild Projects="01 - Simple\Simple.dproj" Targets="Make"/>
     </Target>
-    <Target Name="FMXReport">
-        <MSBuild Projects="03 - FMXReport\FMXReport.dproj"/>
-    </Target>
-    <Target Name="FMXReport:Clean">
-        <MSBuild Projects="03 - FMXReport\FMXReport.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="FMXReport:Make">
-        <MSBuild Projects="03 - FMXReport\FMXReport.dproj" Targets="Make"/>
-    </Target>
     <Target Name="SimpleThreaded">
         <MSBuild Projects="02 - SimpleThreaded\SimpleThreaded.dproj"/>
     </Target>
@@ -62,6 +53,15 @@
     <Target Name="SimpleThreaded:Make">
         <MSBuild Projects="02 - SimpleThreaded\SimpleThreaded.dproj" Targets="Make"/>
     </Target>
+    <Target Name="FMXReport">
+        <MSBuild Projects="03 - FMXReport\FMXReport.dproj"/>
+    </Target>
+    <Target Name="FMXReport:Clean">
+        <MSBuild Projects="03 - FMXReport\FMXReport.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="FMXReport:Make">
+        <MSBuild Projects="03 - FMXReport\FMXReport.dproj" Targets="Make"/>
+    </Target>
     <Target Name="NOXMon">
         <MSBuild Projects="04 - NOXMon\NOXMon.dproj"/>
     </Target>
@@ -70,15 +70,6 @@
     </Target>
     <Target Name="NOXMon:Make">
         <MSBuild Projects="04 - NOXMon\NOXMon.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="Patcher">
-        <MSBuild Projects="..\Patcher\Patcher.dproj"/>
-    </Target>
-    <Target Name="Patcher:Clean">
-        <MSBuild Projects="..\Patcher\Patcher.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="Patcher:Make">
-        <MSBuild Projects="..\Patcher\Patcher.dproj" Targets="Make"/>
     </Target>
     <Target Name="TorrentReaderDemo">
         <MSBuild Projects="05 - TorrentReaderDemo\TorrentReaderDemo.dproj"/>
@@ -98,23 +89,32 @@
     <Target Name="vnStatDemo:Make">
         <MSBuild Projects="06 - VNStatDemo\vnStatDemo.dproj" Targets="Make"/>
     </Target>
-    <Target Name="ExternalIPDemo">
-        <MSBuild Projects="07 - ExternalIPDemo\ExternalIPDemo.dproj"/>
+    <Target Name="Patcher">
+        <MSBuild Projects="..\Patcher\Patcher.dproj"/>
     </Target>
-    <Target Name="ExternalIPDemo:Clean">
-        <MSBuild Projects="07 - ExternalIPDemo\ExternalIPDemo.dproj" Targets="Clean"/>
+    <Target Name="Patcher:Clean">
+        <MSBuild Projects="..\Patcher\Patcher.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="ExternalIPDemo:Make">
-        <MSBuild Projects="07 - ExternalIPDemo\ExternalIPDemo.dproj" Targets="Make"/>
+    <Target Name="Patcher:Make">
+        <MSBuild Projects="..\Patcher\Patcher.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="IPAPIDemo">
+        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj"/>
+    </Target>
+    <Target Name="IPAPIDemo:Clean">
+        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="IPAPIDemo:Make">
+        <MSBuild Projects="07 - IP-API\IPAPIDemo.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="Simple;FMXReport;SimpleThreaded;NOXMon;Patcher;TorrentReaderDemo;vnStatDemo;ExternalIPDemo"/>
+        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon;TorrentReaderDemo;vnStatDemo;Patcher;IPAPIDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Simple:Clean;FMXReport:Clean;SimpleThreaded:Clean;NOXMon:Clean;Patcher:Clean;TorrentReaderDemo:Clean;vnStatDemo:Clean;ExternalIPDemo:Clean"/>
+        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean;TorrentReaderDemo:Clean;vnStatDemo:Clean;Patcher:Clean;IPAPIDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Simple:Make;FMXReport:Make;SimpleThreaded:Make;NOXMon:Make;Patcher:Make;TorrentReaderDemo:Make;vnStatDemo:Make;ExternalIPDemo:Make"/>
+        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make;TorrentReaderDemo:Make;vnStatDemo:Make;Patcher:Make;IPAPIDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

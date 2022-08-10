@@ -23,6 +23,8 @@ object FrmSimpleThreaded: TFrmSimpleThreaded
     Align = alClient
     DoubleBuffered = True
     ItemHeight = 13
+    Items.Strings = (
+      'Loading...')
     ParentDoubleBuffered = False
     TabOrder = 0
   end

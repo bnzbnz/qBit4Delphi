@@ -1,12 +1,9 @@
 unit uSimple;
-
 interface
-
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uqBitObject, uqBitAPI, uqBitAPITypes,
   Vcl.ExtCtrls, Vcl.StdCtrls;
-
 type
   TFrmSimple = class(TForm)
     Timer1: TTimer;
@@ -23,22 +20,16 @@ type
     qBMain: TqBitMainDataType;
     procedure UpdateUI;
   end;
-
 var
   FrmSimple: TFrmSimple;
-
 implementation
-
 {$R *.dfm}
-
-uses uqBitSelectServerDlg, uqBitPatchChecker;
-
+uses uqBitPatchChecker, uqBitSelectServerDlg;
 procedure TFrmSimple.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   qBMain.Free;
   qB.Free;
 end;
-
 procedure TFrmSimple.FormShow(Sender: TObject);
 begin
   Warning.Visible := False;
@@ -54,28 +45,34 @@ begin
   end else
     PostMessage(Handle, WM_CLOSE,0 ,0);
 end;
-
 procedure TFrmSimple.UpdateUI;
 begin
+
   ////////////////  Few Properties...
   Caption := Format('Torrents : %d', [qBMain.Ftorrents.Count]);
   Caption := Caption + ' / ';
   Caption := Caption + Format('Dl : %s KiB/s', [qBMain.Fserver_state.Fdl_info_speed div 1024 ]);
   Caption := Caption + ' / ';
   Caption := Caption + Format('Up : %s KiB/s', [qBMain.Fserver_state.FUp_info_speed div 1024 ]);
-
   LBTorrents.Clear;
-  for var T in qBMAin.Ftorrents do
+  for var T in qBMain.Ftorrents do
       LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname );
-end;
 
+      Caption := qB.Duration.ToString;
+end;
 procedure TFrmSimple.Timer1Timer(Sender: TObject);
 begin
   var Update := qb.GetMainData(qBMain.Frid); // >> Get The Data since the last getMainData
   if Update <> Nil then
+  begin
     qBMain.Merge(Update); // we merge the update : qBMain is now up to date
+  end else begin
+    Timer1.Enabled := False;
+    LBTorrents.Clear;
+    LBTorrents.Items.Add('Disconnected...');
+    Exit;
+  end;
   Update.Free;
   UpdateUI;
 end;
-
 end.

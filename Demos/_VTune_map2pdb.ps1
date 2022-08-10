@@ -9,6 +9,6 @@ map2pdb "NOXMon"
 map2pdb "Simple"
 map2pdb "SimpleThreaded"
 map2pdb "VnStatDemo"
-map2pdb "ExternalIPDemo"
+map2pdb "IPAPIDemo"
 
 pause
