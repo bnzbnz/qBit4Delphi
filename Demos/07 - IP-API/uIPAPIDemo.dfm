@@ -13,30 +13,30 @@ object Form2: TForm2
   TextHeight = 15
   object Memo1: TMemo
     Left = 0
-    Top = 57
+    Top = 81
     Width = 399
-    Height = 384
+    Height = 360
     Align = alClient
-    Lines.Strings = (
-      ''
-      'Documentation at : https://ip-api.com/docs/api:json')
     TabOrder = 0
+    ExplicitTop = 57
+    ExplicitHeight = 384
   end
   object Panel1: TPanel
     Left = 0
     Top = 0
     Width = 399
-    Height = 57
+    Height = 81
     Align = alTop
     TabOrder = 1
+    ExplicitTop = -6
     object LabeledEdit1: TLabeledEdit
       Left = 11
       Top = 23
       Width = 294
       Height = 23
-      EditLabel.Width = 292
+      EditLabel.Width = 291
       EditLabel.Height = 15
-      EditLabel.Caption = 'Enter an IP or a Domain (Empry means your external IP)'
+      EditLabel.Caption = 'Enter an IP or a Domain (Empty = your own external IP)'
       TabOrder = 0
       Text = ''
     end
@@ -49,6 +49,17 @@ object Form2: TForm2
       Default = True
       TabOrder = 1
       OnClick = Button1Click
+    end
+    object LinkLabel2: TLinkLabel
+      Left = 123
+      Top = 56
+      Width = 149
+      Height = 19
+      Caption = 
+        '<a href="https://ip-api.com/docs/api:json">IP-API Json Documenta' +
+        'tion</a>'
+      TabOrder = 2
+      OnLinkClick = LinkLabel2LinkClick
     end
   end
 end

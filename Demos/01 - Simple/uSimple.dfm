@@ -18,20 +18,22 @@ object FrmSimple: TFrmSimple
   TextHeight = 13
   object LBTorrents: TListBox
     Left = 0
-    Top = 0
+    Top = 26
     Width = 635
-    Height = 342
+    Height = 316
     Align = alClient
     DoubleBuffered = True
     ItemHeight = 13
     ParentDoubleBuffered = False
     TabOrder = 1
+    ExplicitTop = 40
+    ExplicitHeight = 302
   end
   object Warning: TMemo
     Left = 8
-    Top = 8
+    Top = 48
     Width = 619
-    Height = 326
+    Height = 286
     Lines.Strings = (
       
         'WARNING... WARNING... WARNING... (this is said) : THIS IS A WORK' +
@@ -68,6 +70,27 @@ object FrmSimple: TFrmSimple
       'Any questions : qBit4Delphi@ea4d.com'
       'Laurent Meyer.')
     TabOrder = 0
+  end
+  object Panel1: TPanel
+    Left = 0
+    Top = 0
+    Width = 635
+    Height = 26
+    Align = alTop
+    TabOrder = 2
+    ExplicitTop = -6
+    object LinkLabel1: TLinkLabel
+      Left = 208
+      Top = 6
+      Width = 224
+      Height = 17
+      Caption = 
+        '<a href="https://github.com/qbittorrent/qBittorrent/wiki/WebUI-A' +
+        'PI-(qBittorrent-4.1)">Documentation : WebUI-API-(qBittorrent-4.1' +
+        ')</a>'
+      TabOrder = 0
+      OnLinkClick = LinkLabel1LinkClick
+    end
   end
   object Timer1: TTimer
     Enabled = False

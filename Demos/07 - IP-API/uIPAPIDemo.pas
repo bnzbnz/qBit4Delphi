@@ -12,7 +12,10 @@ type
     Panel1: TPanel;
     LabeledEdit1: TLabeledEdit;
     Button1: TButton;
+    LinkLabel2: TLinkLabel;
     procedure Button1Click(Sender: TObject);
+    procedure LinkLabel2LinkClick(Sender: TObject; const Link: string;
+      LinkType: TSysLinkType);
   private
     { Private declarations }
   public
@@ -23,7 +26,7 @@ var
   Form2: TForm2;
 
 implementation
-uses uIP_API, RTTI;
+uses uIP_API, RTTI, ShellAPI;
 {$R *.dfm}
 
 procedure TForm2.Button1Click(Sender: TObject);
@@ -40,6 +43,12 @@ begin
       end;
   rttictx.Free;
   IP.Free;
+end;
+
+procedure TForm2.LinkLabel2LinkClick(Sender: TObject; const Link: string;
+  LinkType: TSysLinkType);
+begin
+  ShellExecute(0, 'Open', PChar(Link), PChar(''), nil, SW_SHOWNORMAL);
 end;
 
 end.

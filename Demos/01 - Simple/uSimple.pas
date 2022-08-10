@@ -1,17 +1,23 @@
 unit uSimple;
+
 interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, uqBitObject, uqBitAPI, uqBitAPITypes,
   Vcl.ExtCtrls, Vcl.StdCtrls;
+
 type
   TFrmSimple = class(TForm)
     Timer1: TTimer;
     Warning: TMemo;
     LBTorrents: TListBox;
+    Panel1: TPanel;
+    LinkLabel1: TLinkLabel;
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure Timer1Timer(Sender: TObject);
+    procedure LinkLabel1LinkClick(Sender: TObject; const Link: string;
+      LinkType: TSysLinkType);
   private
     { Private declarations }
   public
@@ -22,14 +28,22 @@ type
   end;
 var
   FrmSimple: TFrmSimple;
+
 implementation
 {$R *.dfm}
-uses uqBitPatchChecker, uqBitSelectServerDlg;
+uses ShellAPI, uqBitPatchChecker, uqBitSelectServerDlg;
+
+procedure TFrmSimple.LinkLabel1LinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
+begin
+ ShellExecute(0, 'Open', PChar(Link), PChar(''), nil, SW_SHOWNORMAL);
+end;
+
 procedure TFrmSimple.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   qBMain.Free;
   qB.Free;
 end;
+
 procedure TFrmSimple.FormShow(Sender: TObject);
 begin
   Warning.Visible := False;
@@ -45,9 +59,9 @@ begin
   end else
     PostMessage(Handle, WM_CLOSE,0 ,0);
 end;
+
 procedure TFrmSimple.UpdateUI;
 begin
-
   ////////////////  Few Properties...
   Caption := Format('Torrents : %d', [qBMain.Ftorrents.Count]);
   Caption := Caption + ' / ';
@@ -56,9 +70,9 @@ begin
   Caption := Caption + Format('Up : %s KiB/s', [qBMain.Fserver_state.FUp_info_speed div 1024 ]);
   LBTorrents.Clear;
   for var T in qBMain.Ftorrents do
-      LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname );
-
+    LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname );
 end;
+
 procedure TFrmSimple.Timer1Timer(Sender: TObject);
 begin
   var Update := qb.GetMainData(qBMain.Frid); // >> Get The Data since the last getMainData
@@ -74,4 +88,5 @@ begin
   Update.Free;
   UpdateUI;
 end;
+
 end.
