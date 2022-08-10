@@ -58,6 +58,8 @@ begin
       SetCurrentDir(CurDir);
       Reg.CloseKey;
     end;
+    Memo1.Lines.Add('');
+    Memo1.Lines.Add('==> Patch Successful');
   finally
     Reg.Free;
   end;

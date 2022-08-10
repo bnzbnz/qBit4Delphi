@@ -2,7 +2,7 @@ object Form2: TForm2
   Left = 0
   Top = 0
   Caption = 'qBit4Delphi Patcher'
-  ClientHeight = 299
+  ClientHeight = 340
   ClientWidth = 635
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -14,39 +14,54 @@ object Form2: TForm2
   TextHeight = 13
   object Button1: TButton
     Left = 0
-    Top = 274
+    Top = 315
     Width = 635
     Height = 25
     Align = alBottom
     Caption = 'Patch NOW'
     TabOrder = 0
     OnClick = Button1Click
+    ExplicitTop = 274
   end
   object Memo1: TMemo
     Left = 0
     Top = 0
     Width = 635
-    Height = 274
+    Height = 315
     Align = alClient
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Courier New'
+    Font.Style = [fsItalic]
     Lines.Strings = (
       'qBit4Delphi:'
       ''
       
+        'As Delphi source units are copyrighted, modified version counld ' +
+        'not be '
+      'distributed:'
+      ''
+      
         'In order to compile and run qBit4Delphi, some REST/JSON original' +
-        ' .pas unist must be patched (fix and '
-      'enhancements)'
+        ' units must'
+      'be patched (fixes and enhancements)'
       ''
       
         'This patcher will do the job for you. The patched files will be ' +
-        'copied in the JSON folder (21: Community/Sydney '
-      'Edition, 22: Alexendria).'
+        'copied in the '
+      'JSON folder (21: Community/Sydney Editions, 22: Alexendria).'
       ''
       
         'Remember to use these patched files in your projects (see demo'#39's' +
-        ' source project file)'
+        ' source '
+      'project file)'
       ''
       'Laurent Meyer / qBit4Delphi@ea4d.com'
+      ''
       '')
+    ParentFont = False
     TabOrder = 1
+    ExplicitHeight = 274
   end
 end
