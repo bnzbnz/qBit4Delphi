@@ -15,16 +15,6 @@ type
 
   TqBitObject = class(TqBitAPI)
   private
-    FHTTPStatus: integer;
-    FHTTPResponseTimeout: integer;
-    FDuration: cardinal;
-    FHTTPConnectionTimeout: integer;
-    FHTTPRetries: integer;
-    FHTTPResponse: string;
-    FPassword: string;
-    FHostPath: string;
-    FHTTPSendTimeout: integer;
-    FUsername: string;  // as TqBitTorrent, TqBit, TqNOX
   public
 
     // Main
