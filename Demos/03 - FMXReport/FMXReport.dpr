@@ -29,11 +29,13 @@ uses
 
 {$R *.res}
 begin
-  ReportMemoryLeaksOnShutdown := True;
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
   Application.Initialize;
   Application.CreateForm(TFrmFMXReport, FrmFMXReport);
   Application.Run;
 end.
+
+  // Place Holder :
 
   {$IFDEF FASTMM4}
     FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
@@ -55,4 +57,5 @@ end.
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
 
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
 

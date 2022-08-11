@@ -30,6 +30,7 @@ uses
 
 {$R *.res}
 begin
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TNOXMonDlg, NOXMonDlg);
@@ -37,6 +38,8 @@ begin
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.Run;
 end.
+
+  // Place Holder :
 
   {$IFDEF FASTMM4}
     FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
@@ -57,3 +60,6 @@ end.
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
+
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
+
