@@ -52,7 +52,7 @@ uses  REST.Json,
 class function TIP_API.FromJSON(JSONStr: string): TIP_API;
 begin
   try
-    Result := TJSon.JsonToObject<TIP_API>(UTF8ToString(JSONStr));
+    Result := TJSon.JsonToObject<TIP_API>(JSONStr);
   except
     Result := nil;
   end;

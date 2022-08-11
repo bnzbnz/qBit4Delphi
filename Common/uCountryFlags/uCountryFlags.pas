@@ -1,7 +1,7 @@
 // Thanks to : https://github.com/joielechong/iso-country-flags-svg-collection
 
 ///
-///  !!! PLEASE ADD FIRST >>>> CountryFlags.rc <<<< TO YOUR PROJECT !!!
+///  !!! PLEASE ADD >>>> CountryFlags.rc <<<< TO YOUR PROJECT !!!
 ///
 
 unit uCountryFlags;
@@ -9,23 +9,25 @@ unit uCountryFlags;
 interface
 uses Vcl.Graphics;
 
-procedure LoadCountryFlags(Picture: TPicture; CountryCode: string);
+function LoadCountryFlags(Picture: TPicture; CountryCode: string): Boolean;
 
 implementation
 uses Vcl.Imaging.pngimage, Classes, windows;
 
-procedure LoadCountryFlags(Picture: TPicture; CountryCode: string);
+function LoadCountryFlags(Picture: TPicture; CountryCode: string):Boolean;
 var
   RS: TResourceStream;
   JPGImage: TPNGImage;
 begin
+  Result := False;
   RS := Nil;
   JPGImage := TPNGImage.Create;
   try
   try
     RS := TResourceStream.Create(hInstance, CountryCode, RT_RCDATA);
-   JPGImage.LoadFromStream(RS);
-   Picture.Graphic := JPGImage;
+    JPGImage.LoadFromStream(RS);
+    Picture.Graphic := JPGImage;
+    Result := True;
   except end;
   finally
     RS.Free;

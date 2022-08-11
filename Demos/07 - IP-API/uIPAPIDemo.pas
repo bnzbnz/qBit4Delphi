@@ -13,6 +13,8 @@ type
     LabeledEdit1: TLabeledEdit;
     Button1: TButton;
     LinkLabel2: TLinkLabel;
+    Panel2: TPanel;
+    Image1: TImage;
     procedure Button1Click(Sender: TObject);
     procedure LinkLabel2LinkClick(Sender: TObject; const Link: string;
       LinkType: TSysLinkType);
@@ -26,7 +28,7 @@ var
   Form2: TForm2;
 
 implementation
-uses uIP_API, uqBitUtils, ShellAPI;
+uses uIP_API, uqBitUtils, uCountryFlags, ShellAPI;
 {$R *.dfm}
 
 procedure TForm2.Button1Click(Sender: TObject);
@@ -41,7 +43,10 @@ begin
     Memo1.Lines.Add('  ' + Prop.Key + ' : ' +  varToStr(Prop.Value));
   Props.Free;
 
+  LoadCountryFlags(Image1.Picture, IP.FcountryCode);
+
   IP.Free;
+
 end;
 
 procedure TForm2.LinkLabel2LinkClick(Sender: TObject; const Link: string;

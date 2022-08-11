@@ -36,6 +36,7 @@ type
     FHTTPResponseTimeout: integer;
     FHTTPRetries: integer;
     FHTTPDuration: cardinal;
+    FHTTPCompression: Boolean;
 
     constructor Create(HostPath: string); overload;
     function qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer; overload; virtual;
@@ -252,6 +253,9 @@ begin
   FHTTPResponseTimeout := 2000;
   FHTTPRetries := 1;
   FHTTPResponse := '';
+  FHTTPStatus := 0;
+  FDuration := 0;
+  FHTTPCompression := True;
 end;
 
 function TqBitAPI.qBPost(MethodPath: string; ReqST, ResST: TStringStream; ContentType: string): integer;
@@ -269,7 +273,7 @@ begin
         'qBittorrent WebAPI for Delphi (qBit4Delphi, qB4D) - Version: %s.%d.%.*d - Laurent Meyer (qBit4Delphi@ea4d.com)',
         [qBitAPI_WebAPIVersion, qBitAPI_MajorVersion, 3, qBitAPI_MinorVersion]
       );
-    Http.AutomaticDecompression := [THTTPCompressionMethod.Any];
+    if FHTTPCompression then Http.AutomaticDecompression := [THTTPCompressionMethod.Any];
     Http.ContentType := ContentType;
     Http.CustomHeaders['Referer'] := FHostPath;
     Http.CookieManager.AddServerCookie(Format('SID=%s', [FSID]), FHostPath);

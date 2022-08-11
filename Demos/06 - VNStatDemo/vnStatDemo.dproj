@@ -138,7 +138,6 @@
                 <Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="\\NAS\gDrive\Laurent\DelphiDev\EA4D\eBayAPIv4\D11A\eBayAPI4Delphi_D11A.bpl">File \\NAS\gDrive\Laurent\DelphiDev\EA4D\eBayAPIv4\D11A\eBayAPI4Delphi_D11A.bpl not found</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">

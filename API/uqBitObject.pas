@@ -14,13 +14,15 @@ uses classes, uqBitAPI, uqBitAPITypes;
 type
 
   TqBitObject = class(TqBitAPI)
-  private
-  public
+  Private
+  Protected
+  Public
 
     // Main
 
     class function Connect(HostPath, Username, Password : string): TqBitObject;
     function Clone: TqBitObject;
+    procedure SetHTTPParams(Retries: Integer; Compression: Boolean = True; ConnectionTimeout: Integer = 500; SendTimeout: Integer = 1000; ResponseTimeout: Integer = 2000);
 
     // API Helpers
 
@@ -188,7 +190,7 @@ type
     class function qBitCheckWebAPICompatibility(RemoteWebAPIVersion: string): Boolean; overload; virtual;
     function qBitCheckWebAPICompatibility: Boolean; overload; virtual;
 
-    // Properties
+  Published
 
     property HostPath: string read FHostPath;
     property Username: string read FUsername;
@@ -201,6 +203,7 @@ type
     property HTTPSendTimeout: integer read FHTTPSendTimeout write FHTTPSendTimeout;
     property HTTPResponseTimeout: integer read FHTTPResponseTimeout write FHTTPResponseTimeout;
     property HTTPRetries: integer read FHTTPRetries write FHTTPRetries;
+    property HTTPCompression: boolean read FHTTPCompression write FHTTPCompression;
 
   end;
 
@@ -253,8 +256,18 @@ begin
   Result.FHTTPSendTimeout := FHTTPSendTimeout;
   Result.FHTTPResponseTimeout := FHTTPResponseTimeout;
   Result.FHTTPRetries := FHTTPRetries;
+  Result.HTTPCompression := FHTTPCompression;
   Result.FUsername := FUsername;
   Result.FPassword := FPassword;
+end;
+
+procedure TqBitObject.SetHTTPParams(Retries: Integer; Compression: Boolean; ConnectionTimeout: Integer; SendTimeout: Integer; ResponseTimeout: Integer);
+begin
+  Self.HTTPRetries := Retries;
+  Self.HTTPConnectionTimeout := ConnectionTimeout;
+  Self.HTTPSendTimeout := SendTimeout;
+  Self.HTTPResponseTimeout := ResponseTimeout;
+  Self.HTTPCompression := Compression;
 end;
 
 class function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;

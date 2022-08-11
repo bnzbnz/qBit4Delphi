@@ -385,7 +385,7 @@ begin
       if Be.ListData.FindElement('piece layers').Format = befDictionary then
         if PieceLayerList.Count > 0 then
           for var PieceLayer in PieceLayerList do
-            FData.PieceLayers.Add(PieceLayer.Data.StringData);
+            FData.PieceLayers.Add(String(PieceLayer.Data.StringData));
     end;
 
     //Private

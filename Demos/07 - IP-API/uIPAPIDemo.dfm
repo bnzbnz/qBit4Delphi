@@ -10,15 +10,16 @@ object Form2: TForm2
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  Position = poScreenCenter
   TextHeight = 15
   object Memo1: TMemo
     Left = 0
     Top = 81
     Width = 399
-    Height = 394
+    Height = 319
     Align = alClient
+    ScrollBars = ssVertical
     TabOrder = 0
-    ExplicitHeight = 360
   end
   object Panel1: TPanel
     Left = 0
@@ -58,6 +59,27 @@ object Form2: TForm2
         'tion</a>'
       TabOrder = 2
       OnLinkClick = LinkLabel2LinkClick
+    end
+  end
+  object Panel2: TPanel
+    Left = 0
+    Top = 400
+    Width = 399
+    Height = 75
+    Align = alBottom
+    TabOrder = 2
+    object Image1: TImage
+      Left = 1
+      Top = 1
+      Width = 397
+      Height = 73
+      Align = alClient
+      Center = True
+      Proportional = True
+      ExplicitLeft = 160
+      ExplicitTop = 8
+      ExplicitWidth = 105
+      ExplicitHeight = 105
     end
   end
 end
