@@ -190,8 +190,6 @@ type
     class function qBitCheckWebAPICompatibility(RemoteWebAPIVersion: string): Boolean; overload; virtual;
     function qBitCheckWebAPICompatibility: Boolean; overload; virtual;
 
-  Published
-
     property HostPath: string read FHostPath;
     property Username: string read FUsername;
     property Password: string read FPassword;
