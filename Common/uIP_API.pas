@@ -67,7 +67,7 @@ begin
   Result := nil; Http := nil; ReqSS := nil;
   try
     try
-      ReqSS := TStringStream.Create('');
+      ReqSS := TStringStream.Create('', TEncoding.UTF8);
       Http := THTTPClient.Create;
       var Res := Http.Get(URL+ '/' + IPorDomain + '?fields=' + Fields, ReqSS);
       if Res.StatusCode = 200 then
