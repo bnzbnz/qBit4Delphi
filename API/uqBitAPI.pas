@@ -251,7 +251,7 @@ begin
   FHTTPConnectionTimeout := 500;
   FHTTPSendTimeout := 1000;
   FHTTPResponseTimeout := 2000;
-  FHTTPRetries := 1;
+  FHTTPRetries := 2;
   FHTTPResponse := '';
   FHTTPStatus := 0;
   FDuration := 0;
