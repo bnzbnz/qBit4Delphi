@@ -304,7 +304,8 @@ var
   ReqSS: TStringStream;
   ResSS: TStringStream;
 begin
-  ReqSS := nil; ResSS := nil;
+  ReqSS := nil;
+  ResSS := nil;
   try
   try
     ReqSS := TStringStream.Create(Body, TEncoding.UTF8);
@@ -331,10 +332,12 @@ end;
 
 function TqBitAPI.Login(Username, Password: string): Boolean;
 begin
+  FDuration := GetTickCount;
   FUsername := Username;
   FPassword := Password;
   var Body := Format('username=%s&password=%s',[ URLEncode(Username), URLEncode(Password) ]);
   Result := (qBPost('/auth/login', Body) = 200)  and (Body = 'Ok.');
+  FDuration := GetTickcount - FDuration;
 end;
 
 function TqBitAPI.Logout: Boolean;

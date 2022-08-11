@@ -30,7 +30,7 @@ var
   FrmSimpleThreaded: TFrmSimpleThreaded;
 implementation
 {$R *.dfm}
-uses uqBitSelectServerDlg;
+uses uqBitSelectServerDlg, uqBitFormat;
 { TqBitThread }
 destructor TqBitThread.Destroy;
 begin
@@ -105,9 +105,9 @@ begin
   ////////////////  Few Properties...
   Caption := Format('Torrents : %d', [qBMain.Ftorrents.Count]);
   Caption := Caption + ' / ';
-  Caption := Caption + Format('Dl : %s MiB/s', [qBMain.Fserver_state.Fdl_info_speed div (1024 * 1024) ]);
+  Caption := Caption + Format('Dl : %s', [VarFormatBKMPerSec(qBMain.Fserver_state.Fdl_info_speed)]);
   Caption := Caption + ' / ';
-  Caption := Caption + Format('Up : %s MiB/s', [qBMain.Fserver_state.FUp_info_speed div (1024 * 1024) ]);
+  Caption := Caption + Format('Up : %s', [VarFormatBKMPerSec(qBMain.Fserver_state.Fup_info_speed)]);
   LBTorrents.Clear;
   for var T in qBMAin.Ftorrents do
       LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname + ' / ' + TqBitTorrentType(T.Value).Fstate);

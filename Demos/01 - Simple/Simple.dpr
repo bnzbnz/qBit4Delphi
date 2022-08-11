@@ -24,6 +24,7 @@ uses
   Vcl.Forms,
   uSimple in 'uSimple.pas' {FrmSimple},
   uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
+  uqBitFormat in '..\..\Common\uqBitFormat.pas',
   uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
   uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 

@@ -118,6 +118,7 @@
             <Form>FrmSimpleThreaded</Form>
         </DCCReference>
         <DCCReference Include="..\..\Common\uqBitPatchChecker.pas"/>
+        <DCCReference Include="..\..\Common\uqBitFormat.pas"/>
         <DCCReference Include="..\..\Common\Dialogs\uqBitAddServerDlg.pas">
             <Form>qBitAddServerDlg</Form>
         </DCCReference>
