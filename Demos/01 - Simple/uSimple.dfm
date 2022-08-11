@@ -26,8 +26,6 @@ object FrmSimple: TFrmSimple
     ItemHeight = 13
     ParentDoubleBuffered = False
     TabOrder = 1
-    ExplicitTop = 40
-    ExplicitHeight = 302
   end
   object Warning: TMemo
     Left = 8
@@ -78,7 +76,6 @@ object FrmSimple: TFrmSimple
     Height = 26
     Align = alTop
     TabOrder = 2
-    ExplicitTop = -6
     object LinkLabel1: TLinkLabel
       Left = 208
       Top = 6

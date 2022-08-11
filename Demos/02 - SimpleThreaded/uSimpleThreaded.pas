@@ -105,9 +105,9 @@ begin
   ////////////////  Few Properties...
   Caption := Format('Torrents : %d', [qBMain.Ftorrents.Count]);
   Caption := Caption + ' / ';
-  Caption := Caption + Format('Dl : %s KiB/s', [qBMain.Fserver_state.Fdl_info_speed div 1024 ]);
+  Caption := Caption + Format('Dl : %s MiB/s', [qBMain.Fserver_state.Fdl_info_speed div (1024 * 1024) ]);
   Caption := Caption + ' / ';
-  Caption := Caption + Format('Up : %s KiB/s', [qBMain.Fserver_state.FUp_info_speed div 1024 ]);
+  Caption := Caption + Format('Up : %s MiB/s', [qBMain.Fserver_state.FUp_info_speed div (1024 * 1024) ]);
   LBTorrents.Clear;
   for var T in qBMAin.Ftorrents do
       LBTorrents.Items.Add( TqBitTorrentType(T.Value).Fname + ' / ' + TqBitTorrentType(T.Value).Fstate);
