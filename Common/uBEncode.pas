@@ -1,11 +1,12 @@
 ///
 ///  Authors: ShareNET Networks, Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  Version: 2.2.0
 ///
 ///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://torry.net/pages.php?id=650
 ///  https://stackoverflow.com/questions/34157958/delphi-how-to-use-bencode-to-get-info-hash
+///
+///  License: MPL 1.1 / GPL 2.1
 ///
 
 unit uBEncode;

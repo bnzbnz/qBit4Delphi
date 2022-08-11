@@ -1,10 +1,13 @@
 ///  Author: Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  version: 1.0.0
-//
+///
+///  https://github.com/bnzbnz/qBit4Delphi
 ///  https://humdi.net/vnstat/
 ///  Doc: https://en.wikipedia.org/wiki/VnStat
-///  Converter: https://mtp.tools/converters/data-storage    Converter
+///  Converter: https://mtp.tools/converters/data-storage 
+///
+///  License: MPL 1.1 / GPL 2.1
+///
 
 // usage:
 // use a server running vnstat, a webserver(nginx, lighthttpd, apache...), php

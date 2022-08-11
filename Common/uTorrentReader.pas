@@ -1,13 +1,17 @@
 ///
-///  Author: Laurent Meyer
+///  Author:  Laurent Meyer
 ///  Contact: qBit4Delphi@ea4d.com
-///  Version: 2.0.0
+///
 ///
 ///  https://github.com/bnzbnz/qBit4Delphi
-///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///  https://www.nayuki.io/page/bittorrent-bencode-format-tools
 ///  https://chocobo1.github.io/bencode_online/
 ///
+///
+///  License: MPL 1.1 / GPL 2.1
+///
+
+
 
 unit uTorrentReader;
 

@@ -1,10 +1,20 @@
-// Thanks to : https://github.com/joielechong/iso-country-flags-svg-collection
+unit uCountryFlags;
+
+///
+///  Author:  Laurent Meyer
+///  Contact: qBit4Delphi@ea4d.com
+///
+///  https://github.com/bnzbnz/qBit4Delphi
+///  https://ip-api.com/docs/api:json
+///
+///  Thanks to : https://github.com/joielechong/iso-country-flags-svg-collection
+///
+///  License: MPL 1.1 / GPL 2.1
+///
 
 ///
 ///  !!! PLEASE ADD >>>> CountryFlags.rc <<<< TO YOUR PROJECT !!!
 ///
-
-unit uCountryFlags;
 
 interface
 uses Vcl.Graphics;

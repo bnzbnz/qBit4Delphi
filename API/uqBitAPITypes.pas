@@ -1,12 +1,15 @@
 ﻿unit uqBitAPITypes;
 
-///  Author: Laurent Meyer
-///  Contact: qBit4Delphi@ea4d.com
-///  API v2.8.3.dev.025 + Hidden/Missing Fields
 ///
+///  Author:  Laurent Meyer
+///  Contact: qBit4Delphi@ea4d.com
+///
+///  API v2.8.3 + Hidden/Missing Fields
+///  https://github.com/bnzbnz/qBit4Delphi:
 ///  https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 ///
-///  ToDo : Search (if requested)
+///  License: MPL 1.1 / GPL 2.1
+///
 
 interface
 uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types,

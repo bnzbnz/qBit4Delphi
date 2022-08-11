@@ -1,5 +1,14 @@
 unit uqBitPatchChecker;
 
+///
+///  Author:  Laurent Meyer
+///  Contact: qBit4Delphi@ea4d.com
+///
+///  https://github.com/bnzbnz/qBit4Delphi:
+///
+///  License: MPL 1.1 / GPL 2.1
+///
+
 interface
 
 implementation
