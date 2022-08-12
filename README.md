@@ -4,7 +4,8 @@ qBit4Delphi is an open-source project created by Laurent Meyer to embed qBittore
 This package contains also :
 - TTorrentReader: a torrent file parser (UTF8 BEncode, Format: V1, V2 and Hybrid).
 - TvnStatClient : a vnStat client to get bandwith usage statistics from a remote linux server (metered connection)
-- TExternalIP : a class to get the external IP from ipinfo.io
+- TIP_API : an interface to ip-api.com to get any IP data
+- uCountryFlags: country flags .png images from app. resources (ISO 639)
             
 Official WebUI API Documentation: https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)
 
