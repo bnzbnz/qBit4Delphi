@@ -106,7 +106,7 @@ constructor TBEncoded.Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
         if BufferPtr + (Len + 1) > BufferEndPtr then FormatException;
         Inc(BufferPtr);
         SetLength(AnsiStr, Len);
-        Move(BufferPtr^, AnsiStr[1], Len);
+        if Len > 0 then Move(BufferPtr^, AnsiStr[1], Len);
         Inc(BufferPtr, Len);
         Break;
       end
