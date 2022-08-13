@@ -76,7 +76,6 @@ type
     function GetUseDefault: Boolean;
     function ShowModal: Integer; override;
     procedure UpdateCategories(CurCat: string = '');
-    function GetTorrentName(NewT: TNewTorrentInfo): string;
   public
     { Public declarations }
     NewTorrents: TObjectList<TNewTorrentInfo>;
@@ -109,6 +108,8 @@ end;
 procedure TqBitAddTorrentDlg.BtnOKClick(Sender: TObject);
 begin
   UpLoadTorrents;
+  ModalResult := mrOk;
+  BtnOk.ModalResult := mrOk;
 end;
 
 procedure TqBitAddTorrentDlg.BtnMgeCatClick(Sender: TObject);
@@ -132,14 +133,6 @@ begin
   Result := Self.ChkDefault.Checked;
 end;
 
-function TqBitAddTorrentDlg.GetTorrentName(NewT: TNewTorrentInfo): string;
-begin
-  if NewT.FileData.Data.Info.HasMultipleFiles then
-    Result := NewT.FileData.Data.Info.Name
-  else
-    Result := NewT.FileData.Data.Info.FileList[0].FullPath;
-end;
-
 procedure TqBitAddTorrentDlg.SetUseDefault(DMode: Boolean);
 begin
   Self.ChkDefault.Checked := DMode;
@@ -150,7 +143,7 @@ begin
   var Index := LBFiles.ItemIndex;
   if Index = -1  then  Exit;
   var NewT := TNewTorrentInfo(LBFiles.Items.Objects[Index]);
-  TIEditName.Text :=GetTorrentName(NewT);
+  TIEditName.Text := NewT.FileData.Data.NiceName;
   TIEditSize.Text := VarFormatBKM(NewT.FileData.Data.Info.FilesSize);
   TIEditHashV1.Text := IIF(NewT.FileData.Data.HashV1 <> '', NewT.FileData.Data.HashV1, 'N/A');
   TIEditHashV2.Text := IIF(NewT.FileData.Data.HashV2 <> '', NewT.FileData.Data.HashV2, 'N/A');
@@ -222,7 +215,7 @@ begin
     LBFiles.Clear;
     for var NewT in NewTorrents do
       if NewT.Status = ntsSuccess  then
-        LBFiles.Items.AddObject( NewT.Filename + '  ==>  ' + GetTorrentName(NewT), NewT);
+        LBFiles.Items.AddObject( NewT.Filename + '  ==>  ' + NewT.FileData.Data.NiceName, NewT);
     if LBFiles.Count = 0 then
     begin
       Result := mrOk;

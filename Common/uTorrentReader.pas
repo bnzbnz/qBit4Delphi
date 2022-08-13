@@ -67,8 +67,9 @@ type
     HashV1: string;
     HashV2: string;
     Info: TTorrentDataInfo;
+    NiceName: string; // Helper
     PieceLayers: TStringList; // V2 Only
-    qBitKeyHash: string; // Helper for qBittorent Key/Hash caclculation
+    qBitKeyHash: string; // Helper for qBittorent : Key/Hash caclculation
     WebSeeds: TStringList;
     constructor Create; overload;
     destructor Destroy; override;
@@ -464,6 +465,12 @@ begin
       if Data.Info.MetaVersion > 1 then
         Data.Info.PiecesCount := Data.Info.PiecesCount + fle.PiecesCount;
     end;
+
+    // NiceName : Custom Helper
+    if Data.Info.HasMultipleFiles then
+      FData.NiceName := Data.Info.Name
+    else
+      FData.NiceName := Data.Info.FileList[0].FullPath;
 
   except
     RaiseException('Invalid Torrent File');

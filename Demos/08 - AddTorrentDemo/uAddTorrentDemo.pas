@@ -35,10 +35,7 @@ uses ShellAPI, uqBitPatchChecker, uqBitSelectServerDlg, uqBitAddServerDlg, uqBit
 procedure TFrmAddTorrent.Button1Click(Sender: TObject);
 begin
   if DlgOpenTorrent.Execute then
-  if qBitAddTorrentDlg.ShowAsModal(qB, DlgOpenTorrent.Files) = mrOk then
-    UpdateUI
-  else
-    asm nop; end;
+    if qBitAddTorrentDlg.ShowAsModal(qB, DlgOpenTorrent.Files) = mrOk then UpdateUI;
 end;
 
 procedure TFrmAddTorrent.FormClose(Sender: TObject; var Action: TCloseAction);
