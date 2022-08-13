@@ -65,9 +65,11 @@ type
     function AddAllPeers(Peers: TStringList): boolean; overload; virtual;
 
     function BanPeers(Peers: TStringList): boolean; overload; virtual;
-    function GetBanPeersList: TStringList;
-    function SetBanPeersList(PeersList: TStringList): Boolean; overload;
-    function SetBanPeersList(PeersStr: string): Boolean; overload;
+    function GetBanPeersList: TStringList; overload; virtual;
+    function SetBanPeersList(PeersList: TStringList): Boolean; overload; virtual;
+    function SetBanPeersList(PeersStr: string): Boolean; overload; virtual;
+    function UnbanPeers(Peers: TStringList): boolean; overload; virtual;
+    function UnbanPeers(Peers: string): boolean; overload; virtual;
 
     function IncreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function IncreaseTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
@@ -474,6 +476,26 @@ begin
   Result := BanPeers(Peers);
 end;
 
+function TqBitObject.UnbanPeers(Peers: TStringList): boolean;
+begin
+  Result := False;
+  var BanPeers := GetBanPeersList;
+  if BanPeers = nil then exit;
+  for var Peer in Peers do
+    if BanPeers.IndexOf(Peer) <> -1 then
+      BanPeers.Delete(BanPeers.IndexOf(Peer));
+  Result := SetBanPeersList(BanPeers);
+end;
+
+function TqBitObject.UnbanPeers(Peers: string): boolean;
+begin
+  var BanPeers := TStringList.Create;
+  BanPeers.Delimiter := ',';
+  BanPeers.DelimitedText := Peers;
+  Result := UnbanPeers(BanPeers);
+  BanPeers.Free;
+end;
+
 function TqBitObject.GetBanPeersList: TStringList;
 begin
   Result := nil;
@@ -490,6 +512,7 @@ begin
   var Prefs := TqBitPreferencesType.Create;
   Prefs.Fbanned_IPs := PeersStr;
   Result := SetPreferences(Prefs);
+  Prefs.Free;
 end;
 
 function TqBitObject.SetBanPeersList(PeersList: TStringList): Boolean;
