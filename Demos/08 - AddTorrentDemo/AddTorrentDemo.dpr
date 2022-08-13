@@ -47,7 +47,6 @@ begin
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.CreateForm(TqBitAddTorrentDlg, qBitAddTorrentDlg);
   Application.CreateForm(TqBitCatDlg, qBitCatDlg);
-  Application.CreateForm(TqBitSelectServerDlg, qBitSelectServerDlg);
   Application.Run;
 end.
 
