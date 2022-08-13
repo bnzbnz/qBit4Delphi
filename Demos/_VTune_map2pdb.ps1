@@ -10,5 +10,6 @@ map2pdb "Simple"
 map2pdb "SimpleThreaded"
 map2pdb "VnStatDemo"
 map2pdb "IPAPIDemo"
+map2pdb "AddTorrentDemo"
 
 pause
