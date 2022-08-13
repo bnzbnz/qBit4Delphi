@@ -197,7 +197,7 @@ begin
 
     //Check for Duplicates
     var FilterList := TqBitTorrentListRequestType.Create;
-    for var NewT in NewTorrents do FilterList.Fhashes.Add(NewT.FileData.Data.qBitKeyHash);
+    for var NewT in NewTorrents do FilterList.Fhashes.Add(NewT.FileData.Data.KeyHash);
     DuplicateList := qB.GetTorrentList(FilterList);
     FilterList.Free;
 
@@ -205,7 +205,7 @@ begin
 
     for var NewT in NewTorrents do
       for var Dup in DuplicateList.Ftorrents do
-        if (TqBitTorrentType(Dup).Fhash = NewT.FileData.Data.qBitKeyHash) then // and (NewT.FileData.Data.Info.IsPrivate) then
+        if (TqBitTorrentType(Dup).Fhash = NewT.FileData.Data.KeyHash) then // and (NewT.FileData.Data.Info.IsPrivate) then
         begin
           NewT.Status := ntsDuplicate;
           break;
@@ -233,6 +233,7 @@ begin
     if UseDefault then
     begin
       UploadTorrents;
+      Result := mrOk;
       exit;
     end;
 

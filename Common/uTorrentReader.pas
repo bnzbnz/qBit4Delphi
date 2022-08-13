@@ -69,7 +69,7 @@ type
     Info: TTorrentDataInfo;
     NiceName: string; // Helper
     PieceLayers: TStringList; // V2 Only
-    qBitKeyHash: string; // Helper for qBittorent : Key/Hash caclculation
+    KeyHash: string; // Helper
     WebSeeds: TStringList;
     constructor Create; overload;
     destructor Destroy; override;
@@ -364,12 +364,12 @@ begin
     if ((FData.Info.MetaVersion = 1) or FData.Info.IsHybrid) and (not (trNoHash in Options)) then
     begin
       FData.HashV1 := GetSHA1(Info);
-      FData.qBitKeyHash := FData.HashV1;
+      FData.KeyHash := FData.HashV1;
     end;
     if ((FData.Info.MetaVersion = 2) or FData.Info.IsHybrid) and (not (trNoHash in Options)) then
     begin
       FData.HashV2 := GetSHA2(Info);
-      FData.qBitKeyHash := Copy(FData.HashV2, 1, 40);
+      FData.KeyHash := Copy(FData.HashV2, 1, 40);
     end;
 
     // Name:

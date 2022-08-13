@@ -87,7 +87,7 @@ begin
     FL.Add(FileName);
   end;
   if FL.Count > 0 then
-    qBitAddTorrentDlg.ShowAsModal(qB, FL);
+    if qBitAddTorrentDlg.ShowAsModal(qB, FL)  = mrOk then UpdateUI;
   FL.Free;
   DragFinish(hDrop);
 end;
