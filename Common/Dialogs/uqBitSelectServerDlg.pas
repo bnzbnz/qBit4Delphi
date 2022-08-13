@@ -152,7 +152,9 @@ begin
       LBSrv.Items.AddObject(Srv.FUN + '@' + Srv.FHP, Srv);
     end;
     SrvLst.Free;
-  end else begin
+  end;
+  if LBSrv.Items.Count = 0 then
+  begin
      var Srv := TqBitServer.Create('http://127.0.0.1:8080', '', '');
      LBSrv.Items.AddObject(Srv.FUN + '@' + Srv.FHP, Srv);
   end;
