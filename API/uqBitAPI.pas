@@ -238,9 +238,21 @@ uses REST.Json, NetEncoding, SysUtils, wininet, System.Net.URLClient,
 const
   BoolToStr: array[boolean] of string = ('false','true');
 
-function URLEncode(Url: string): string; inline;  // Inline Helper
+function URLEncode(Url: string): string; inline;
 begin
-  Result := TNetEncoding.URL.Encode(Url);
+  Result := System.Net.URLClient.TURI.URLEncode(Url);
+end;
+
+function URLEncodeList(Str: string; Delimiter: Char): string;
+begin
+  var List := TStringList.Create;
+  List.StrictDelimiter := True;
+  List.Delimiter := Delimiter;
+  List.DelimitedText := Str;
+  for var i := 0 to List.Count - 1 do
+    List[i] := URLEncode(List[i]);
+  Result := List.DelimitedText;
+  List.Free;
 end;
 
 constructor TqBitAPI.Create(HostPath: string);
@@ -419,7 +431,7 @@ function TqBitAPI.GetPeerLog(LastKnownId: int64 = -1): TqBitPeerLogsType;
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body :=  Format('last_known_id=%d', [ LastKnownId ]);
+  var Body :=  Format('last_known_id=%d', [lastKnownId]);
   if  qBPost('/log/peers', Body) = 200 then
     Result := TJson.JsonToObject<TqBitPeerLogsType>('{"logs":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -440,7 +452,7 @@ function TqBitAPI.GetTorrentPeersData(Hash: string;
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body := Format('hash=%s&rid=%d', [ Hash, Rid ]);
+  var Body := Format('hash=%s&rid=%d', [Hash, Rid]);
   if  qBPost('/sync/torrentPeers', Body) = 200 then
     Result := TJson.JsonToObject<TqBitTorrentPeersDataType>(Body, []);
   FDuration := GetTickcount - FDuration;
@@ -511,7 +523,7 @@ end;
 function TqBitAPI.BanPeers(PeerListStr: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('peers=%s', [URLEncode(PeerListStr)]);
+  var Body := Format('peers=%s', [URLEncodeList(PeerListStr, '|')]);
   Result := qBPost('/transfer/banPeers', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -550,7 +562,7 @@ function TqBitAPI.GetTorrentGenericProperties(Hash: string): TqBitTorrentInfoTyp
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body :=  Format('hash=%s', [URLEncode(Hash)]);
+  var Body :=  Format('hash=%s', [Hash]);
   if (qBPost('/torrents/properties', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitTorrentInfoType>(Body, []);
   FDuration := GetTickcount - FDuration;
@@ -560,7 +572,7 @@ function TqBitAPI.GetTorrentTrackers(Hash: string): TqBitTrackersType;
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body := Format('hash=%s', [URLEncode(Hash)]);
+  var Body := Format('hash=%s', [Hash]);
   if (qBPost('/torrents/trackers', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitTrackersType>('{"trackers":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -570,7 +582,7 @@ function TqBitAPI.GetTorrentWebSeeds(Hash: string): TqBitWebSeedsType;
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body := Format('hash=%s', [URLEncode(Hash)]);
+  var Body := Format('hash=%s', [Hash]);
   if (qBPost('/torrents/webseeds', Body) = 200) and (Body <> '')  then
      Result := TJson.JsonToObject<TqBitWebSeedsType>('{"urls":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -582,9 +594,9 @@ begin
   Result := nil;
   var Body := '';
   if Indexes = '' then
-    Body := Format('hash=%s', [URLEncode(Hash)] )
+    Body := Format('hash=%s', [Hash] )
   else
-    Body := Format('hash=%s&indexes=%s', [URLEncode(Hash), URLEncode(Indexes)]);
+    Body := Format('hash=%s&indexes=%s', [Hash, URLEncodeList(Indexes, '|')]);
   if (qBPost('/torrents/files', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitContentsType>('{"contents":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -594,7 +606,7 @@ function TqBitAPI.GetTorrentPiecesStates(Hash: string): TqBitPiecesStatesType;
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body :=  Format('hash=%s', [URLEncode(Hash)]);
+  var Body :=  Format('hash=%s', [Hash]);
   if (qBPost('/torrents/pieceStates', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitPiecesStatesType>('{"states":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -603,7 +615,7 @@ end;
 function TqBitAPI.PauseTorrents(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/pause', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -611,7 +623,7 @@ end;
 function TqBitAPI.ResumeTorrents(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/resume', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -619,7 +631,7 @@ end;
 function TqBitAPI.DeleteTorrents(Hashes: string; DeleteFiles: boolean = False): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&deleteFiles=%s', [URLEncode(Hashes), BoolToStr[DeleteFiles]]);
+  var Body := Format('hashes=%s&deleteFiles=%s', [Hashes, BoolToStr[DeleteFiles]]);
   Result := qBPost('/torrents/delete', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -627,7 +639,7 @@ end;
 function TqBitAPI.RecheckTorrents(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/recheck', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -635,7 +647,7 @@ end;
 function TqBitAPI.ReannounceTorrents(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/reannounce', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -643,7 +655,7 @@ end;
 function TqBitAPI.AddTrackersToTorrent(Hash, Urls: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hash=%s&urls=%s', [URLEncode(Hash), URLEncode(Urls)]);
+  var Body := Format('hash=%s&urls=%s', [Hash, URLEncodeList(Urls, #$A)]);
   Result := qBPost('/torrents/addTrackers', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -659,7 +671,7 @@ end;
 function TqBitAPI.RemoveTrackers(Hash, Urls: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hash=%s&urls=%s', [URLEncode(Hash), URLEncode(Urls)]);
+  var Body := Format('hash=%s&urls=%s', [Hash, URLEncodeList(Urls, '|')]);
   Result := qBPost('/torrents/removeTrackers', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -667,7 +679,7 @@ end;
 function TqBitAPI.AddPeers(Hashes, Peers: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&peers=%s', [URLEncode(Hashes), URLEncode(Peers)]);
+  var Body := Format('hashes=%s&peers=%s', [Hashes, URLEncodeList(Peers, '|')]);
   Result := qBPost('/torrents/addPeers', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -675,7 +687,7 @@ end;
 function TqBitAPI.IncreaseTorrentPriority(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/increasePrio', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -683,7 +695,7 @@ end;
 function TqBitAPI.DecreaseTorrentPriority(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/decreasePrio', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -691,7 +703,7 @@ end;
 function TqBitAPI.MaximalTorrentPriority(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/topPrio', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -699,7 +711,7 @@ end;
 function TqBitAPI.MinimalTorrentPriority(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/bottomPrio', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -707,7 +719,7 @@ end;
 function TqBitAPI.SetFilePriority(Hash, Ids: string; Priority: integer): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hash=%s&id=%s&priority=%d', [URLEncode(Hash), URLEncode(Ids), Priority]);
+  var Body := Format('hash=%s&id=%s&priority=%d', [Hash,  URLEncodeList(Ids, '|'), Priority]);
   Result := qBPost('/torrents/filePrio', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -716,7 +728,7 @@ function TqBitAPI.GetTorrentDownloadLimit(Hashes: string): TqBitTorrentSpeedsLim
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body :=  Format('hashes=%s', [ URLEncode(Hashes) ]);
+  var Body :=  Format('hashes=%s', [Hashes]);
   if (qBPost('/torrents/downloadLimit', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitTorrentSpeedsLimitType>('{"speeds":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -725,7 +737,7 @@ end;
 function TqBitAPI.SetTorrentDownloadLimit(Hashes: string;  Limit: integer): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&limit=%d', [URLEncode(Hashes), Limit]);
+  var Body := Format('hashes=%s&limit=%d', [Hashes, Limit]);
   Result := qBPost('/torrents/setDownloadLimit', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -733,7 +745,7 @@ end;
 function TqBitAPI.SetTorrentShareLimit(Hashes: string; RatioLimit: double; SeedingTimeLimit: integer): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&ratioLimit=%0.2f&seedingTimeLimit=%d', [URLEncode(Hashes), RatioLimit, SeedingTimeLimit]);
+  var Body := Format('hashes=%s&ratioLimit=%0.2f&seedingTimeLimit=%d', [Hashes, RatioLimit, SeedingTimeLimit]);
   Result := qBPost('/torrents/setShareLimits', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -742,7 +754,7 @@ function TqBitAPI.GetTorrentUploadLimit(Hashes: string): TqBitTorrentSpeedsLimit
 begin
   FDuration := GetTickCount;
   Result := nil;
-  var Body :=   Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body :=   Format('hashes=%s', [Hashes]);
   if (qBPost('/torrents/uploadLimit', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitTorrentSpeedsLimitType>('{"speeds":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
@@ -751,7 +763,7 @@ end;
 function TqBitAPI.SetTorrentUploadLimit(Hashes: string;  Limit: integer): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&limit=%d', [URLEncode(Hashes), Limit]);
+  var Body := Format('hashes=%s&limit=%d', [Hashes, Limit]);
   Result := qBPost('/torrents/setUploadLimit', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -759,7 +771,7 @@ end;
 function TqBitAPI.SetTorrentLocation(Hashes, Location: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&location=%s', [URLEncode(Hashes), URLEncode(Location)]);
+  var Body := Format('hashes=%s&location=%s', [Hashes, URLEncode(Location)]);
   Result := qBPost('/torrents/setLocation', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -767,7 +779,7 @@ end;
 function TqBitAPI.SetTorrentName(Hash, Name: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hash=%s&name=%s', [URLEncode(Hash), URLEncode(Name)]);
+  var Body := Format('hash=%s&name=%s', [Hash, URLEncode(Name)]);
   Result := qBPost('/torrents/rename', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -775,7 +787,7 @@ end;
 function TqBitAPI.SetTorrentCategory(Hashes, Category: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&category=%s', [URLEncode(Hashes), URLEncode(Category)]);
+  var Body := Format('hashes=%s&category=%s', [Hashes, URLEncode(Category)]);
   Result := qBPost('/torrents/setCategory', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -809,7 +821,7 @@ end;
 function TqBitAPI.RemoveCategories(Categories: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('categories=%s', [URLEncode(Categories)]);
+  var Body := Format('categories=%s', [URLEncodeList(Categories, #$A)]);
   Result := qBPost('/torrents/removeCategories', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -817,7 +829,7 @@ end;
 function TqBitAPI.AddTorrentTags(Hashes, Tags: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&tags=%s', [URLEncode(Hashes), URLEncode(Tags)]);
+  var Body := Format('hashes=%s&tags=%s', [Hashes, URLEncodeList(Tags, '|')]);
   Result := qBPost('/torrents/addTags', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -825,7 +837,7 @@ end;
 function TqBitAPI.RemoveTorrentTags(Hashes, Tags: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&tags=%s', [URLEncode(Hashes), URLEncode(Tags)]);
+  var Body := Format('hashes=%s&tags=%s', [Hashes, URLEncodeList(Tags, '|')]);
   Result := qBPost('/torrents/removeTags', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -843,7 +855,7 @@ end;
 function TqBitAPI.CreateTags(Tags: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('tags=%s', [URLEncode(Tags)]);
+  var Body := Format('tags=%s', [URLEncodeList(Tags, ',')]);
   Result := qBPost('/torrents/createTags', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -851,7 +863,7 @@ end;
 function TqBitAPI.DeleteTags(Tags: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('tags=%s', [URLEncode(Tags)]);
+  var Body := Format('tags=%s', [URLEncodeList(Tags, ',')]);
   Result := qBPost('/torrents/deleteTags', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -859,7 +871,7 @@ end;
 function TqBitAPI.SetAutomaticTorrentManagement(Hashes: string; Enable: boolean): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&enable=%s', [URLEncode(Hashes), BoolToStr[Enable]]);
+  var Body := Format('hashes=%s&enable=%s', [Hashes, BoolToStr[Enable]]);
   Result := qBPost('/torrents/setAutoManagement', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -867,7 +879,7 @@ end;
 function TqBitAPI.ToggleSequentialDownload(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/toggleSequentialDownload', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -875,7 +887,7 @@ end;
 function TqBitAPI.SetFirstLastPiecePriority(Hashes: string): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s', [URLEncode(Hashes)]);
+  var Body := Format('hashes=%s', [Hashes]);
   Result := qBPost('/torrents/toggleFirstLastPiecePrio', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -883,7 +895,7 @@ end;
 function TqBitAPI.SetForceStart(Hashes: string; value: boolean): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&value=%s', [URLEncode(Hashes), BoolToStr[Value]]);
+  var Body := Format('hashes=%s&value=%s', [Hashes, BoolToStr[Value]]);
   Result := qBPost('/torrents/setForceStart', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
@@ -891,7 +903,7 @@ end;
 function TqBitAPI.SetSuperSeeding(Hashes: string; value: boolean): boolean;
 begin
   FDuration := GetTickCount;
-  var Body := Format('hashes=%s&value=%s', [URLEncode(Hashes), BoolToStr[Value]]);
+  var Body := Format('hashes=%s&value=%s', [Hashes, BoolToStr[Value]]);
   Result := qBPost('/torrents/setSuperSeeding', Body) = 200;
   FDuration := GetTickcount - FDuration;
 end;
