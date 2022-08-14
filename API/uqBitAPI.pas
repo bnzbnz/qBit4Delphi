@@ -238,6 +238,11 @@ uses REST.Json, NetEncoding, SysUtils, wininet, System.Net.URLClient,
 const
   BoolToStr: array[boolean] of string = ('false','true');
 
+function IIF(Condition: Boolean; IsTrue, IsFalse: variant): variant; inline; // Do Not Rely on qBitUtils
+begin
+  if Condition then Result := IsTrue else Result := IsFalse;
+end;
+
 function URLEncode(Url: string): string; inline;
 begin
   // Having issues with TNetEncoding.URL.Encode()   (space being + instead of %20...)
@@ -325,9 +330,8 @@ begin
   try
     ReqSS := TStringStream.Create(Body, TEncoding.UTF8);
     ResSS := TStringStream.Create('', TEncoding.UTF8);
-    Body := '';
     Result := qBPost(MethodPath, ReqSS, ResSS, 'application/x-www-form-urlencoded; charset=UTF-8');
-    if Result = 200 then Body := ResSS.DataString;
+    if Result = 200 then Body := ResSS.DataString else Body := '';
   except
     Result := -1;
   end;
@@ -1043,7 +1047,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(NewTorrentUrls.FdlLimit.ToString);
+    SS.WriteString( IIF(NewTorrentUrls.FdlLimit < 0, 'NaN', NewTorrentUrls.FdlLimit.ToString) );
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1051,7 +1055,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(NewTorrentUrls.FupLimit.ToString);
+    SS.WriteString( IIF(NewTorrentUrls.FupLimit < 0, 'NaN', NewTorrentUrls.FupLimit.ToString) );
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary +'--');
     SS.WriteString(#$D#$A);
@@ -1170,7 +1174,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(NewTorrentFile.FdlLimit.ToString);
+    SS.WriteString( IIF(NewTorrentFile.FdlLimit < 0, 'NaN', NewTorrentFile.FdlLimit.ToString) );
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary);
     SS.WriteString(#$D#$A);
@@ -1178,7 +1182,7 @@ begin
     SS.WriteString(#$D#$A);
     SS.WriteString('');
     SS.WriteString(#$D#$A);
-    SS.WriteString(NewTorrentFile.FupLimit.ToString);
+    SS.WriteString( IIF(NewTorrentFile.FupLimit < 0, 'NaN', NewTorrentFile.FupLimit.ToString) );
     SS.WriteString(#$D#$A);
     SS.WriteString('--' + Boundary+'--');
     SS.WriteString(#$D#$A);
