@@ -18,15 +18,14 @@ uses classes, uqBitAPI, uqBitAPITypes;
 type
 
   TqBitObject = class(TqBitAPI)
-  Private
-  Protected
-  Public
+  private
+  protected
+  public
 
     // Main
 
     class function Connect(HostPath, Username, Password : string): TqBitObject;
     function Clone: TqBitObject;
-    procedure SetHTTPParams(Retries: Integer; Compression: Boolean = True; ConnectionTimeout: Integer = 500; SendTimeout: Integer = 1000; ResponseTimeout: Integer = 2000);
 
     // API Helpers
 
@@ -162,6 +161,7 @@ type
     class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
     class function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
     class function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
+    class function qBitStringList(Delimiter: Char; DelimitedText: string = ''): TStringList;
 
     class function qBitMajorVersion: Integer; virtual;
     class function qBitMinorVersion: Integer; virtual;
@@ -239,15 +239,6 @@ begin
   Result.FPassword := FPassword;
 end;
 
-procedure TqBitObject.SetHTTPParams(Retries: Integer; Compression: Boolean; ConnectionTimeout: Integer; SendTimeout: Integer; ResponseTimeout: Integer);
-begin
-  Self.HTTPRetries := Retries;
-  Self.HTTPConnectionTimeout := ConnectionTimeout;
-  Self.HTTPSendTimeout := SendTimeout;
-  Self.HTTPResponseTimeout := ResponseTimeout;
-  Self.HTTPCompression := Compression;
-end;
-
 class function TqBitObject.TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList;
 begin
   Result := TStringList.Create;
@@ -262,10 +253,24 @@ begin
     Result.Add(TqBitTorrentType(Torrent).Fhash);
 end;
 
+class function TqBitObject.qBitStringList(Delimiter: Char; DelimitedText: string = ''): TStringList;
+begin
+  Result := TStringList.Create;
+  Result.StrictDelimiter := True;
+  Result.Delimiter := Delimiter;
+  Result.DelimitedText := DelimitedText;;
+end;
+
+(*
+  **************************
+  ****  WebAPI Helpers  ****
+  **************************
+*)
+
 // PauseTorrents
 function TqBitObject.PauseTorrents(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := PauseTorrents(Hashes.DelimitedText);
 end;
 function TqBitObject.PauseTorrents(Torrents: TqBitTorrentListType): boolean;
@@ -284,7 +289,7 @@ end;
 // ResumeTorrents
 function TqBitObject.ResumeTorrents(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := ResumeTorrents(Hashes.DelimitedText);
 end;
 function TqBitObject.ResumeTorrents(Torrents: TqBitTorrentListType): boolean;
@@ -303,7 +308,7 @@ end;
 // DeleteTorrents
 function TqBitObject.DeleteTorrents(Hashes: TStringList; DeleteFiles: boolean = False): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := DeleteTorrents(Hashes.DelimitedText, DeleteFiles);
 end;
 function TqBitObject.DeleteTorrents(Torrents: TqBitTorrentListType; DeleteFiles: boolean): boolean;
@@ -322,7 +327,7 @@ end;
 // RecheckTorrents
 function TqBitObject.RecheckTorrents(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := RecheckTorrents(Hashes.DelimitedText);
 end;
 function TqBitObject.RecheckTorrents(Torrents: TqBitTorrentListType): boolean;
@@ -341,7 +346,7 @@ end;
 // ReannounceTorrents
 function TqBitObject.ReannounceTorrents(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := ReannounceTorrents(Hashes.DelimitedText);
 end;
 function TqBitObject.ReannounceTorrents(Torrents: TqBitTorrentListType): boolean;
@@ -360,27 +365,27 @@ end;
 // AddTrackersToTorrent
 function TqBitObject.AddTrackersToTorrent(Hash: string;  Urls: TStringList): boolean;
 begin
-  Urls.Delimiter := Chr($A);
+  Urls.StrictDelimiter := True; Urls.Delimiter := Chr($A);
   Result := AddTrackersToTorrent(Hash, Urls.DelimitedText);
 end;
 
 // RemoveTrackers
 function TqBitObject.RemoveTrackers(Hash: string;  Urls: TStringList): boolean;
 begin
-  Urls.Delimiter := '|';
+  Urls.StrictDelimiter := True; Urls.Delimiter := '|';
   Result := RemoveTrackers(Hash, Urls.DelimitedText);
 end;
 
 // AddPeers
 function TqBitObject.AddPeers(Hashes: string; Peers: TStringList): boolean;
 begin
-  Peers.Delimiter := '|';
+  Peers.StrictDelimiter := True; Peers.Delimiter := '|';
   Result := AddPeers(Hashes, Peers.DelimitedText);
 end;
 function TqBitObject.AddPeers(Hashes, Peers: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
-  Peers.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
+  Peers.StrictDelimiter := True; Peers.Delimiter := '|';
   Result := AddPeers(Hashes.DelimitedText, Peers.DelimitedText);
 end;
 function TqBitObject.AddPeers(Torrents: TqBitMainDataType; Peers: TStringList): boolean;
@@ -396,9 +401,10 @@ begin
   TorrentList.Free;;
 end;
 
+// Ban/Unban Peers
 function TqBitObject.BanPeers(Peers: TStringList): boolean;
 begin
-  Peers.Delimiter := '|';
+  Peers.StrictDelimiter := True; Peers.Delimiter := '|';
   Result := BanPeers(Peers);
 end;
 
@@ -415,9 +421,7 @@ end;
 
 function TqBitObject.UnbanPeers(Peers: string): boolean;
 begin
-  var BanPeers := TStringList.Create;
-  BanPeers.Delimiter := ',';
-  BanPeers.DelimitedText := Peers;
+  var BanPeers := qBitStringList(',', Peers);
   Result := UnbanPeers(BanPeers);
   BanPeers.Free;
 end;
@@ -428,7 +432,7 @@ begin
   var Prefs := Self.GetPreferences;
   if Prefs = nil then Exit;
   Result := TStringList.Create;
-  Result.Delimiter := #$A;
+  Result.StrictDelimiter := True; Result.Delimiter := #$A;
   Result.DelimitedText := Prefs.Fbanned_IPs;
   Prefs.Free;
 end;
@@ -443,14 +447,14 @@ end;
 
 function TqBitObject.SetBanPeersList(PeersList: TStringList): Boolean;
 begin
-   PeersList.Delimiter := #$A;
+   PeersList.StrictDelimiter := True; PeersList.Delimiter := #$A;
    Result := SetBanPeersList(PeersList.DelimitedText);
 end;
 
 // IncreaseTorrentPriority
 function TqBitObject.IncreaseTorrentPriority(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := IncreaseTorrentPriority(Hashes.DelimitedText);
 end;
 function TqBitObject.IncreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean;
@@ -469,7 +473,7 @@ end;
 // DecreaseTorrentPriority
 function TqBitObject.DecreaseTorrentPriority(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := DecreaseTorrentPriority(Hashes.DelimitedText);
 end;
 function TqBitObject.DecreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean;
@@ -488,7 +492,7 @@ end;
 // MinimalTorrentPriority
 function TqBitObject.MinimalTorrentPriority(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := MinimalTorrentPriority(Hashes.DelimitedText);
 end;
 function TqBitObject.MinimalTorrentPriority(Torrents: TqBitTorrentListType): boolean;
@@ -507,7 +511,7 @@ end;
 // MaximalTorrentPriority
 function TqBitObject.MaximalTorrentPriority(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := MaximalTorrentPriority(Hashes.DelimitedText);
 end;
 function TqBitObject.MaximalTorrentPriority(Torrents: TqBitTorrentListType): boolean;
@@ -526,14 +530,14 @@ end;
 // SetFilePriority
 function TqBitObject.SetFilePriority(Hash: string; Ids: TStringList; Priority: integer): boolean;
 begin
-  Ids.Delimiter := '|';
+  Ids.StrictDelimiter := True; Ids.Delimiter := '|';
   Result := SetFilePriority(Hash, Ids.DelimitedText, Priority);
 end;
 
 // GetTorrentDownloadLimit
 function TqBitObject.GetTorrentDownloadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := GetTorrentDownloadLimit(Hashes.DelimitedText);
 end;
 function TqBitObject.GetTorrentDownloadLimit(Torrents: TqBitTorrentListType): TqBitTorrentSpeedsLimitType;
@@ -552,7 +556,7 @@ end;
 // SetTorrentDownloadLimit
 function TqBitObject.SetTorrentDownloadLimit(Hashes: TStringList; Limit: integer): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetTorrentDownloadLimit(Hashes.DelimitedText, Limit);
 end;
 function TqBitObject.SetTorrentDownloadLimit(Torrents: TqBitMainDataType; Limit: integer): boolean;
@@ -571,7 +575,7 @@ end;
 // SetTorrentShareLimit
 function TqBitObject.SetTorrentShareLimit(Hashes: TStringList; RatioLimit: double; SeedingTimeLimit: integer): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetTorrentShareLimit(Hashes.DelimitedText, RatioLimit, SeedingTimeLimit);
 end;
 function TqBitObject.SetTorrentShareLimit(Torrents: TqBitMainDataType; RatioLimit: double; SeedingTimeLimit: integer): boolean;
@@ -590,7 +594,7 @@ end;
 // GetTorrentUploadLimit
 function TqBitObject.GetTorrentUploadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType;
 begin
-  Hashes.Delimiter := '|';
+ Hashes.StrictDelimiter := True;  Hashes.Delimiter := '|';
   Result := GetTorrentUploadLimit(Hashes.DelimitedText);
 end;
 function TqBitObject.GetTorrentUploadLimit(Torrents: TqBitMainDataType): TqBitTorrentSpeedsLimitType;
@@ -609,7 +613,7 @@ end;
 // SetTorrentUploadLimit
 function TqBitObject.SetTorrentUploadLimit(Hashes: TStringList; Limit: integer): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetTorrentUploadLimit(Hashes.DelimitedText, Limit);
 end;
 function TqBitObject.SetTorrentUploadLimit(Torrents: TqBitMainDataType; Limit: integer): boolean;
@@ -629,7 +633,7 @@ end;
 function TqBitObject.SetTorrentLocation(Hashes: TStringList;
   Location: string): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetTorrentLocation(Hashes.DelimitedText, Location);
 end;
 function TqBitObject.SetTorrentLocation(Torrents: TqBitMainDataType; Location: string): boolean;
@@ -648,7 +652,7 @@ end;
 // SetTorrentCategory
 function TqBitObject.SetTorrentCategory(Hashes: TStringList; Category: string): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetTorrentCategory(Hashes.DelimitedText, Category);
 end;
 function TqBitObject.SetTorrentCategory(Torrents: TqBitMainDataType; Category: string): boolean;
@@ -664,29 +668,28 @@ begin
   TorrentList.Free;;
 end;
 
-
 // RemoveCategories
 function TqBitObject.RemoveCategories(Categories: TStringList): boolean;
 begin
-  Categories.Delimiter := Chr($A);
+  Categories.StrictDelimiter := True; Categories.Delimiter := Chr($A);
   Result := RemoveCategories(Categories.DelimitedText);
 end;
 
 // AddTorrentTags
 function TqBitObject.AddTorrentTags(Hashes: string; Tags: TStringList): boolean;
 begin
-  Tags.Delimiter := ',';
+  Tags.StrictDelimiter := True; Tags.Delimiter := ',';
   Result := AddTorrentTags(Hashes, Tags.DelimitedText);
 end;
 function TqBitObject.AddTorrentTags(Hashes: TStringList; Tags: string): boolean;
 begin
-  Hashes.Delimiter := ',';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := ',';
   Result := AddTorrentTags(Hashes.DelimitedText, Tags);
 end;
 function TqBitObject.AddTorrentTags(Hashes, Tags: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
-  Tags.Delimiter := ',';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Tags.Delimiter := ',';
   Result := AddTorrentTags(Hashes.DelimitedText, Tags.DelimitedText);
 end;
 function TqBitObject.AddTorrentTags(Torrents: TqBitMainDataType; Tags: TStringList): boolean;
@@ -714,22 +717,21 @@ begin
   TorrentList.Free;;
 end;
 
-
 // RemoveTorrentTags
 function TqBitObject.RemoveTorrentTags(Hashes: string; Tags: TStringList): boolean;
 begin
-  Tags.Delimiter := ',';
+  Tags.StrictDelimiter := True; Tags.Delimiter := ',';
   Result := RemoveTorrentTags(Hashes, Tags.DelimitedText);
 end;
 function TqBitObject.RemoveTorrentTags(Hashes: TStringList; Tags: string): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := RemoveTorrentTags(Hashes.DelimitedText, Tags);
 end;
 function TqBitObject.RemoveTorrentTags(Hashes, Tags: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
-  Tags.Delimiter := ',';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Tags.Delimiter := ',';
   Result := RemoveTorrentTags(Hashes.DelimitedText, Tags.DelimitedText);
 end;
 function TqBitObject.RemoveTorrentTags(Torrents: TqBitMainDataType; Tags: TStringList): boolean;
@@ -757,16 +759,15 @@ begin
   TorrentList.Free;;
 end;
 
-
 // CreateTags
 function TqBitObject.CreateTags(Tags: TStringList): boolean;
 begin
-  Tags.Delimiter := ',';
+  Tags.StrictDelimiter := True; Tags.Delimiter := ',';
   Result := CreateTags(Tags.DelimitedText);
 end;
 function TqBitObject.DeleteTags(Tags: TStringList): boolean;
 begin
-  Tags.Delimiter := ',';
+  Tags.StrictDelimiter := True; Tags.Delimiter := ',';
   Result := DeleteTags(Tags.DelimitedText);
 end;
 
@@ -783,7 +784,7 @@ end;
 // SetAutomaticTorrentManagement
 function TqBitObject.SetAutomaticTorrentManagement(Hashes: TStringList; Enable: boolean): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetAutomaticTorrentManagement(Hashes.DelimitedText, Enable);
 end;
 function TqBitObject.SetAutomaticTorrentManagement(Torrents: TqBitMainDataType; Enable: boolean): boolean;
@@ -802,7 +803,7 @@ end;
 // ToggleSequentialDownload
 function TqBitObject.ToggleSequentialDownload(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True;  Hashes.Delimiter := '|';
   Result := ToggleSequentialDownload(Hashes.DelimitedText);
 end;
 function TqBitObject.ToggleSequentialDownload(Torrents: TqBitMainDataType): boolean;
@@ -821,7 +822,7 @@ end;
 // SetFirstLastPiecePriority
 function TqBitObject.SetFirstLastPiecePriority(Hashes: TStringList): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetFirstLastPiecePriority(Hashes.DelimitedText);
 end;
 function TqBitObject.SetFirstLastPiecePriority(Torrents: TqBitMainDataType): boolean;
@@ -840,7 +841,7 @@ end;
 // SetForceStart
 function TqBitObject.SetForceStart(Hashes: TStringList; Value: boolean): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetForceStart(Hashes.DelimitedText, Value);
 end;
 function TqBitObject.SetForceStart(Torrents: TqBitMainDataType; Value: boolean): boolean;
@@ -859,7 +860,7 @@ end;
 // SetSuperSeeding
 function TqBitObject.SetSuperSeeding(Hashes: TStringList; Value: boolean): boolean;
 begin
-  Hashes.Delimiter := '|';
+  Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := SetSuperSeeding(Hashes.DelimitedText, value);
 end;
 function TqBitObject.SetSuperSeeding(Torrents: TqBitMainDataType; Value: boolean): boolean;
