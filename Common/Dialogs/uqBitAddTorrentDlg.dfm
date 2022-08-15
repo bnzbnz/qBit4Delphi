@@ -177,9 +177,9 @@ object qBitAddTorrentDlg: TqBitAddTorrentDlg
         Width = 52
         Height = 22
         MaxValue = 1024
-        MinValue = -1
+        MinValue = 0
         TabOrder = 12
-        Value = -1
+        Value = 0
       end
       object SpinEdit1: TSpinEdit
         Left = 335
@@ -187,9 +187,9 @@ object qBitAddTorrentDlg: TqBitAddTorrentDlg
         Width = 52
         Height = 22
         MaxValue = 1024
-        MinValue = -1
+        MinValue = 0
         TabOrder = 10
-        Value = -1
+        Value = 0
       end
       object TTM: TComboBox
         Left = 20

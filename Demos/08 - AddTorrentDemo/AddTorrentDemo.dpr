@@ -29,7 +29,7 @@ uses
   uqBitAddTorrentDlg in '..\..\Common\Dialogs\uqBitAddTorrentDlg.pas' {qBitAddTorrentDlg},
   uTorrentReader in '..\..\Common\uTorrentReader.pas',
   uBEncode in '..\..\Common\uBEncode.pas',
-  uCategoriesDlg in '..\..\Common\Dialogs\uCategoriesDlg.pas' {qBitCatDlg},
+  uqBitCategoriesDlg in '..\..\Common\Dialogs\uqBitCategoriesDlg.pas' {qBitCatDlg},
   uqBitUtils in '..\..\Common\uqBitUtils.pas',
   uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
@@ -43,10 +43,9 @@ begin
   Application.CreateForm(TFrmAddTorrent, FrmAddTorrent);
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.CreateForm(TqBitSelectServerDlg, qBitSelectServerDlg);
-  Application.CreateForm(TqBitCatDlg, qBitCatDlg);
+  Application.CreateForm(TqBitCategoriesDlg, qBitCategoriesDlg);
   Application.CreateForm(TqBitAddServerDlg, qBitAddServerDlg);
   Application.CreateForm(TqBitAddTorrentDlg, qBitAddTorrentDlg);
-  Application.CreateForm(TqBitCatDlg, qBitCatDlg);
   Application.Run;
 end.
 

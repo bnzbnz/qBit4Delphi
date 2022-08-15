@@ -14,7 +14,7 @@ uses  System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Type
       System.Generics.Defaults, Classes;
 
 const
-  BStr: array[boolean] of string = ('false','true');
+  BLStr: array[boolean] of string = ('false','true');
   BCStr: array[boolean] of string = ('False','True');
   BUStr: array[boolean] of string = ('FALSE','TRUE');
 
@@ -23,21 +23,21 @@ type
   TqBitUtils = class
 
     // URL Encoding
-    class function URLEncode(Url: string): string; inline;
-    class function URLEncodeDelimStr(Str: string; Delim: Char): string;
+    class function  URLEncode(Url: string): string; inline;
+    class function  URLEncodeDelimStr(Str: string; Delim: Char): string;
     // IIF
-    class function IIF(Condition: Boolean; IsTrue, IsFalse: variant): variant; overload; inline;
-    class function IIF(Condition: Boolean; IsTrue, IsFalse: TObject): TObject; overload; inline;
+    class function  IIF(Condition: Boolean; IsTrue, IsFalse: variant): variant; overload; inline;
+    class function  IIF(Condition: Boolean; IsTrue, IsFalse: TObject): TObject; overload; inline;
     // Variants
     class procedure MergerVariant(var Src: Variant; Dst, Def: Variant); inline;
     // RTTI
-    class function GetRTTIReadableValues(Instance: Pointer; ObjectClass: TClass): TDictionary<string, Variant>;
+    class function  GetRTTIReadableValues(Instance: Pointer; ObjectClass: TClass): TDictionary<string, Variant>;
     // StringList
-    class function DelimStringList(StringList: TStringList; Delimiter: Char = '|'; DelimitedText: string = ''): TStringList;
+    class function  DelimStringList(StringList: TStringList; Delimiter: Char = '|'; DelimitedText: string = ''): TStringList;
     // DateTime Timestamp conversion
-    class function UTimestampToDateTime(Timestamp: int64): TDatetime;
-    class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
-    class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
+    class function  TimestampToDateTime(Timestamp: int64): TDatetime;
+    class function  TimestampMsToDateTime(TimestampMs: int64): TDatetime;
+    class procedure TimestampToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
 
   end;
 
@@ -111,19 +111,19 @@ begin
   Result.DelimitedText := DelimitedText;;
 end;
 
-class function TqBitUtils.UTimestampToDateTime(Timestamp: int64): TDatetime;
+class function TqBitUtils.TimestampToDateTime(Timestamp: int64): TDatetime;
 begin
   Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp));
 end;
 
-class function TqBitUtils.UTimestampMsToDateTime(Timestamp: int64): TDatetime;
+class function TqBitUtils.TimestampMsToDateTime(TimestampMs: int64): TDatetime;
 begin
-  Result := UTimestampToDateTime(Timestamp div 1000);
+  Result := TimestampToDateTime(TimestampMs div 1000);
 end;
 
-class procedure TqBitUtils.TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
+class procedure TqBitUtils.TimestampToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
 begin
-  var Dte := TqBitUtils.UTimestampToDateTime(Timestamp);
+  var Dte := TqBitUtils.TimestampToDateTime(Timestamp);
   var diff := SecondsBetween(Now, Dte);
   days := diff div SecsPerDay;
   diff := diff mod SecsPerDay;

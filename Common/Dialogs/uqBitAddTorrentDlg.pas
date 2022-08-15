@@ -87,7 +87,7 @@ var
   qBitAddTorrentDlg: TqBitAddTorrentDlg;
 
 implementation
-uses Math, uqBitUtils, uCategoriesDlg;
+uses Math, uqBitUtils, uqBitCategoriesDlg;
 
 {$R *.dfm}
 
@@ -114,8 +114,8 @@ end;
 
 procedure TqBitAddTorrentDlg.BtnMgeCatClick(Sender: TObject);
 begin
-  if qBitCatDlg.ShowAsModal(FqB, True) = mrOk then
-    UpdateCategories(qBitCatDlg.Selected.Fname);
+  if qBitCategoriesDlg.ShowAsModal(FqB, True) = mrOk then
+    UpdateCategories(qBitCategoriesDlg.Selected.Fname);
 end;
 
 procedure TqBitAddTorrentDlg.FormCreate(Sender: TObject);

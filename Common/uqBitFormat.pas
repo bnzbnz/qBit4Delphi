@@ -44,7 +44,7 @@ function VarFormatDate(v: variant): string;
 begin
   Result := '';
   if v <= 0 then Exit;
-  Result := DateTimeToStr(TqBitUtils.UTimestampToDateTime(v));
+  Result := DateTimeToStr(TqBitUtils.TimestampToDateTime(v));
 end;
 
 function VarFormatBKM(v: variant): string;

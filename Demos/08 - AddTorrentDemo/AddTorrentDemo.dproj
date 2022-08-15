@@ -128,9 +128,8 @@
         </DCCReference>
         <DCCReference Include="..\..\Common\uTorrentReader.pas"/>
         <DCCReference Include="..\..\Common\uBEncode.pas"/>
-        <DCCReference Include="..\..\Common\Dialogs\uCategoriesDlg.pas">
+        <DCCReference Include="..\..\Common\Dialogs\uqBitCategoriesDlg.pas">
             <Form>qBitCatDlg</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <DCCReference Include="..\..\Common\Dialogs\uqBitSelectServerDlg.pas">
