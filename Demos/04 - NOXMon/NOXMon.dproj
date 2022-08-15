@@ -107,6 +107,7 @@
         <DCCReference Include="..\..\API\JSON\22\REST.JsonReflect.pas"/>
         <DCCReference Include="..\..\API\JSON\22\System.JSON.pas"/>
         <DCCReference Include="..\..\API\JSON\22\REST.Json.pas"/>
+        <DCCReference Include="..\..\API\uqBitUtils.pas"/>
         <DCCReference Include="..\..\API\uqBitAPITypes.pas"/>
         <DCCReference Include="..\..\API\uqBitAPI.pas"/>
         <DCCReference Include="..\..\API\uqBitObject.pas"/>

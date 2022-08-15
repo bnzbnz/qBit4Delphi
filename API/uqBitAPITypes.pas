@@ -803,17 +803,9 @@ type
   {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
-uses SysUtils, REST.Json, NetEncoding, Variants, RTTI;
+uses SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitUtils;
 
 {$REGION 'Helpers Impl.'}
-
-const
-  BoolStr: array[boolean] of string = ('false','true');
-
-procedure VarMrg(var src: variant; dst, def: variant); inline;
-begin
-  if not VarIsEmpty(dst) then src := dst else if not VarIsNull(def) then src := def;
-end;
 
 procedure TqBitUserRec.SetObject(aObject: TObject; aOwnObject: Boolean);
 begin
@@ -1715,7 +1707,7 @@ begin
   if From = Nil then Exit;
   inherited Merge(From);
   M := TqBitMainDataType(From);
-  VarMrg(Self.Ffull_update, M.Ffull_update, False);
+  VariantMerge(Self.Ffull_update, M.Ffull_update, False);
   if M.Fserver_state <> nil then
   begin
     if Self.Fserver_state = nil then Fserver_state := TqBitserver_stateType.Create;
@@ -2124,7 +2116,7 @@ begin
   if From = Nil then Exit;
   inherited Merge(From);
   P := TqBitTorrentPeersDataType(From);
-  VarMrg(Self.Ffull_update, P.Ffull_update, False);
+  VariantMerge(Self.Ffull_update, P.Ffull_update, False);
   //// Fpeers
   FreeAndNil(Self._Fpeers_added);
   FreeAndNil(Self._Fpeers_modified);

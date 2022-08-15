@@ -17,6 +17,7 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
+  uqBitUtils in '..\..\API\uqBitUtils.pas',
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
@@ -24,8 +25,7 @@ uses
   FMX.Forms,
   System.StartUpCopy,
   uFMXReport in 'uFMXReport.pas' {FrmFMXReport},
-  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
-  uqBitUtils in '..\..\Common\uqBitUtils.pas';
+  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas';
 
 {$R *.res}
 begin
@@ -53,9 +53,10 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
+  uqBitUtils in '..\..\API\uqBitUtils.pas',
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
 
-  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
 

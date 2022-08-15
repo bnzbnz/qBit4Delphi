@@ -11,7 +11,7 @@ uses
   Vcl.Forms,
   uIPAPIDemo in 'uIPAPIDemo.pas' {Form2},
   uIP_API in '..\..\Common\uIP_API.pas',
-  uqBitUtils in '..\..\Common\uqBitUtils.pas',
+  uqBitUtils in '..\..\API\uqBitUtils.pas',
   uCountryFlags in '..\..\Common\uCountryFlags\uCountryFlags.pas';
 
 {$R *.res}
