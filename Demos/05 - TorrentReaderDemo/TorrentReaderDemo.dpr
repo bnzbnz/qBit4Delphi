@@ -9,7 +9,9 @@ uses
   uTorrentReaderDemo in 'uTorrentReaderDemo.pas' {Form2},
   uTorrentReader in '..\..\Common\uTorrentReader.pas',
   uBEncode in '..\..\Common\uBEncode.pas';
+
 {$R *.res}
+
 begin
   {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
   Application.Initialize;

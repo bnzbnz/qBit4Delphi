@@ -110,6 +110,7 @@
         <DCCReference Include="..\..\API\JSON\22\REST.JsonReflect.pas"/>
         <DCCReference Include="..\..\API\JSON\22\System.JSON.pas"/>
         <DCCReference Include="..\..\API\JSON\22\REST.Json.pas"/>
+        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <DCCReference Include="..\..\API\uqBitAPITypes.pas"/>
         <DCCReference Include="..\..\API\uqBitAPI.pas"/>
         <DCCReference Include="..\..\API\uqBitObject.pas"/>
@@ -120,21 +121,17 @@
         <DCCReference Include="..\..\Common\uqBitFormat.pas"/>
         <DCCReference Include="..\..\Common\Dialogs\uqBitAddServerDlg.pas">
             <Form>qBitAddServerDlg</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Common\Dialogs\uqBitAddTorrentDlg.pas">
             <Form>qBitAddTorrentDlg</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\..\Common\uTorrentReader.pas"/>
         <DCCReference Include="..\..\Common\uBEncode.pas"/>
         <DCCReference Include="..\..\Common\Dialogs\uqBitCategoriesDlg.pas">
             <Form>qBitCatDlg</Form>
         </DCCReference>
-        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <DCCReference Include="..\..\Common\Dialogs\uqBitSelectServerDlg.pas">
             <Form>qBitSelectServerDlg</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>

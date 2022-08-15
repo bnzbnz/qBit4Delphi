@@ -17,6 +17,7 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
+  uqBitUtils in '..\..\Common\uqBitUtils.pas',
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
@@ -30,7 +31,6 @@ uses
   uTorrentReader in '..\..\Common\uTorrentReader.pas',
   uBEncode in '..\..\Common\uBEncode.pas',
   uqBitCategoriesDlg in '..\..\Common\Dialogs\uqBitCategoriesDlg.pas' {qBitCatDlg},
-  uqBitUtils in '..\..\Common\uqBitUtils.pas',
   uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
@@ -67,6 +67,7 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
+  uqBitUtils in '..\..\Common\uqBitUtils.pas',
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',

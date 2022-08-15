@@ -578,7 +578,7 @@ begin
   Result := nil;
   var Body := '';
   if Indexes = '' then
-    Body := Format('hash=%s', [Hash] )
+    Body := Format('hash=%s', [Hash])
   else
     Body := Format('hash=%s&indexes=%s', [Hash, TqBitUtils.URLEncodeDelimStr(Indexes, '|')]);
   if (qBPost('/torrents/files', Body) = 200) and (Body <> '')  then
