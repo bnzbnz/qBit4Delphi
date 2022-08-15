@@ -430,7 +430,7 @@ type
     Fglobal_ratio: variant;
     Fqueued_io_jobs: variant;
     Fqueueing: variant;
-    Fread_cache_hits: variant;
+    Fread_cache_hits: variant;  // Libtorrent 1x Only
     Fread_cache_overload: variant;
     Frefresh_interval: variant;
     Ftotal_buffers_size: variant;
@@ -1707,7 +1707,7 @@ begin
   if From = Nil then Exit;
   inherited Merge(From);
   M := TqBitMainDataType(From);
-  VariantMerge(Self.Ffull_update, M.Ffull_update, False);
+  TqBitUTils.MergerVariant(Self.Ffull_update, M.Ffull_update, False);
   if M.Fserver_state <> nil then
   begin
     if Self.Fserver_state = nil then Fserver_state := TqBitserver_stateType.Create;
@@ -2116,7 +2116,7 @@ begin
   if From = Nil then Exit;
   inherited Merge(From);
   P := TqBitTorrentPeersDataType(From);
-  VariantMerge(Self.Ffull_update, P.Ffull_update, False);
+  TqBitUTils.MergerVariant(Self.Ffull_update, P.Ffull_update, False);
   //// Fpeers
   FreeAndNil(Self._Fpeers_added);
   FreeAndNil(Self._Fpeers_modified);

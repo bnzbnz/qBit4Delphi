@@ -59,14 +59,14 @@ begin
     Memo1.Lines.Add(Format('  Boost : %s', [B.Fboost]));
     B.Free;
 
-    var Props := GetRTTIReadableValues(M.Fserver_state, TqBitserver_stateType);
+    var Props := TqBitUtils.GetRTTIReadableValues(M.Fserver_state, TqBitserver_stateType);
     for var Prop in Props do
       Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
     Props.Free;
 
     Memo1.Lines.Add('******************* Preferences *******************');
     var Q := qB.GetPreferences;
-    Props := GetRTTIReadableValues(Q, TqBitPreferencesType);
+    Props := TqBitUtils.GetRTTIReadableValues(Q, TqBitPreferencesType);
     for var Prop in Props do
       Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
     Props.Free;
@@ -76,7 +76,7 @@ begin
     for var T in M.Ftorrents do
     begin
       Memo1.Lines.Add(Format('  ************* Torrent : %s *******************',[TqBitTorrentType(T.Value).Fname]));
-      Props := GetRTTIReadableValues(T.Value, TqBitTorrentType);
+      Props := TqBitUtils.GetRTTIReadableValues(T.Value, TqBitTorrentType);
       for var Prop in Props do
       Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
       Props.Free;
@@ -86,7 +86,7 @@ begin
     for var C in M.Fcategories do
     begin
       Memo1.Lines.Add(Format('  ************* Categorie : %s *******************',[TqBitCategoryType(C.Value).Fname]));
-      Props := GetRTTIReadableValues(C.Value, TqBitCategoryType);
+      Props := TqBitUtils.GetRTTIReadableValues(C.Value, TqBitCategoryType);
       for var Prop in Props do
       Memo1.Lines.Add('  ' + Prop.key + ' : ' +  VarToStr(Prop.Value));
       Props.Free;

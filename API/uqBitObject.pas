@@ -156,12 +156,8 @@ type
 
     // Helpers
 
-    class function UTimestampToDateTime(Timestamp: int64): TDatetime;
-    class function UTimestampMsToDateTime(Timestamp: int64): TDatetime;
-    class procedure TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
     class function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
     class function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
-    class function qBitStringList(Delimiter: Char; DelimitedText: string = ''): TStringList;
 
     class function qBitMajorVersion: Integer; virtual;
     class function qBitMinorVersion: Integer; virtual;
@@ -192,7 +188,7 @@ type
   TqNOX = class(TqBitObject);
 
 implementation
-uses SysUtils, DateUtils;
+uses SysUtils, DateUtils, uqBitUtils;
 
 class function TqBitObject.Connect(HostPath, Username, Password : string): TqBitObject;
 begin
@@ -202,29 +198,6 @@ begin
 end;
 
 // Helpers
-
-class function TqBitObject.UTimestampToDateTime(Timestamp: int64): TDatetime;
-begin
-  Result := TTimeZone.Local.ToLocalTime(UnixToDateTime(Timestamp));
-end;
-
-class function TqBitObject.UTimestampMsToDateTime(Timestamp: int64): TDatetime;
-begin
-  Result := UTimestampToDateTime(Timestamp div 1000);
-end;
-
-class procedure TqBitObject.TSDurationToNow(Timestamp: int64; var Days, Hours, Mins, Secs: word);
-begin
-  var Dte := UTimestampToDateTime(Timestamp);
-  var diff := SecondsBetween(Now, Dte);
-  days := diff div SecsPerDay;
-  diff := diff mod SecsPerDay;
-  hours := diff div SecsPerHour;
-  diff := diff mod SecsPerHour;
-  mins := diff div SecsPerMin;
-  diff := diff mod SecsPerMin;
-  secs := diff;
-end;
 
 function TqBitObject.Clone: TqBitObject;
 begin
@@ -251,14 +224,6 @@ begin
   Result := TStringList.Create;
   for var Torrent in Torrents.Ftorrents do
     Result.Add(TqBitTorrentType(Torrent).Fhash);
-end;
-
-class function TqBitObject.qBitStringList(Delimiter: Char; DelimitedText: string = ''): TStringList;
-begin
-  Result := TStringList.Create;
-  Result.StrictDelimiter := True;
-  Result.Delimiter := Delimiter;
-  Result.DelimitedText := DelimitedText;;
 end;
 
 (*
@@ -417,11 +382,12 @@ begin
     if BanPeers.IndexOf(Peer) <> -1 then
       BanPeers.Delete(BanPeers.IndexOf(Peer));
   Result := SetBanPeersList(BanPeers);
+  BanPeers.Free;
 end;
 
 function TqBitObject.UnbanPeers(Peers: string): boolean;
 begin
-  var BanPeers := qBitStringList(',', Peers);
+  var BanPeers := TqBitUtils.DelimStringList(nil, '|', Peers);
   Result := UnbanPeers(BanPeers);
   BanPeers.Free;
 end;

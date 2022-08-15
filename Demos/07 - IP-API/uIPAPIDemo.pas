@@ -38,7 +38,7 @@ begin
   if IP = nil then Exit;
 
   Memo1.Clear;
-  var Props := GetRTTIReadableValues(IP, TIP_API);
+  var Props := TqBitUtils.GetRTTIReadableValues(IP, TIP_API);
   for var Prop in Props do
     Memo1.Lines.Add('  ' + Prop.Key + ' : ' +  varToStr(Prop.Value));
   Props.Free;

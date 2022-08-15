@@ -34,11 +34,11 @@ type
     { Private declarations }
     FCatList: TqBitCategoriesType;
     procedure Refresh(SelCat: string);
-    function ShowModal: Integer; override;
   public
     { Public declarations }
     qBit: TqBitObject;
     Selected: TqBitCategoryType;
+    function ShowModal: Integer; override;
     function ShowAsModal(qB: TqBitObject; SelectMode: Boolean = True): TModalResult;
   end;
 

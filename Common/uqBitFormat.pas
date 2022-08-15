@@ -10,7 +10,7 @@
 ///
 
 interface
-uses uqBitAPITypes, uqBitObject;
+uses uqBitUtils;
 
 type
   TVarDataFormater = function(v: variant): string;
@@ -44,7 +44,7 @@ function VarFormatDate(v: variant): string;
 begin
   Result := '';
   if v <= 0 then Exit;
-  Result := DateTimeToStr(TqBitObject.UTimestampToDateTime(v));
+  Result := DateTimeToStr(TqBitUtils.UTimestampToDateTime(v));
 end;
 
 function VarFormatBKM(v: variant): string;
