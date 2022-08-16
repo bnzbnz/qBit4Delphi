@@ -16,20 +16,16 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
-  uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
-  uqBitAPI in '..\..\API\uqBitAPI.pas',
-  uqBitObject in '..\..\API\uqBitObject.pas',
+
+  // use project search path : ..\..\API;..\..\Common;..\..\Common\Dialogs;..\..\Common\uCountryFlags
 
   FMX.Forms,
   System.StartUpCopy,
-  uFMXReport in 'uFMXReport.pas' {FrmFMXReport},
-  uqBitUtils  in '..\..\Common\uqBitUtils.pas',
-  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas';
+  uFMXReport in 'uFMXReport.pas' {FrmFMXReport};
 
 {$R *.res}
 begin
-  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
   Application.Initialize;
   Application.CreateForm(TFrmFMXReport, FrmFMXReport);
   Application.Run;
@@ -53,10 +49,6 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
-  uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
-  uqBitAPI in '..\..\API\uqBitAPI.pas',
-  uqBitObject in '..\..\API\uqBitObject.pas',
 
   {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
 

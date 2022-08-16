@@ -17,24 +17,17 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
-  uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
-  uqBitAPI in '..\..\API\uqBitAPI.pas',
-  uqBitObject in '..\..\API\uqBitObject.pas',
 
+  // use project search path : ..\..\API;..\..\Common;..\..\Common\Dialogs;..\..\Common\uCountryFlags
   Vcl.Forms,
   uSimpleThreaded in 'uSimpleThreaded.pas' {FrmSimpleThreaded},
 
-  uqBitUtils  in '..\..\Common\uqBitUtils.pas',
-  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
-  uqBitFormat in '..\..\Common\uqBitFormat.pas',
-  uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
-  uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
+  uqBitAddServerDlg, uqBitSelectServerDlg;
 
 {$R *.res}
 
 begin
-  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF}{$ENDIF}
+  {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TFrmSimpleThreaded, FrmSimpleThreaded);
@@ -61,10 +54,6 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-  uqBitUtils in '..\..\API\uqBitUtils.pas',
-  uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
-  uqBitAPI in '..\..\API\uqBitAPI.pas',
-  uqBitObject in '..\..\API\uqBitObject.pas',
 
   {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
 

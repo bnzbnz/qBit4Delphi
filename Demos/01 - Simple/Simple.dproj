@@ -66,9 +66,9 @@
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <VerInfo_Locale>1033</VerInfo_Locale>
+        <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <DCC_UnitSearchPath>..\..\API;..\..\Common;..\..\Common\Dialogs;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;bindcompvclsmp;tethering;bindcompvclwinx;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;TeeDB;FireDAC;vcltouch;vcldb;bindcompfmx;FireDACSqliteDriver;FireDACPgDriver;inetdb;FMXTee;soaprtl;DbxCommonDriver;FmxTeeUI;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;vcledge;fmxobj;vclwinx;Tee;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;TeeUI;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -99,7 +99,6 @@
         <AppDPIAwarenessMode>PerMonitorV2</AppDPIAwarenessMode>
         <DCC_ExeOutput>..\</DCC_ExeOutput>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -110,23 +109,8 @@
         <DCCReference Include="..\..\API\JSON\22\REST.JsonReflect.pas"/>
         <DCCReference Include="..\..\API\JSON\22\System.JSON.pas"/>
         <DCCReference Include="..\..\API\JSON\22\REST.Json.pas"/>
-        <DCCReference Include="..\..\API\uqBitAPIUtils .pas">
-            <ModuleName>uqBitAPIUtils</ModuleName>
-        </DCCReference>
-        <DCCReference Include="..\..\API\uqBitAPITypes.pas"/>
-        <DCCReference Include="..\..\API\uqBitAPI.pas"/>
-        <DCCReference Include="..\..\API\uqBitObject.pas"/>
         <DCCReference Include="uSimple.pas">
             <Form>FrmSimple</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
-        <DCCReference Include="..\..\Common\uqBitPatchChecker.pas"/>
-        <DCCReference Include="..\..\Common\uqBitFormat.pas"/>
-        <DCCReference Include="..\..\Common\Dialogs\uqBitAddServerDlg.pas">
-            <Form>qBitAddServerDlg</Form>
-        </DCCReference>
-        <DCCReference Include="..\..\Common\Dialogs\uqBitSelectServerDlg.pas">
-            <Form>qBitSelectServerDlg</Form>
         </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
