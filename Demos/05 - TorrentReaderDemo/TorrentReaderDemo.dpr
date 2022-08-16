@@ -5,10 +5,11 @@ uses
     FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
   {$ENDIF}
 
-  // use project search path : ..\..\API;..\..\Common;..\..\Common\Dialogs;..\..\Common\uCountryFlags
-
   Vcl.Forms,
-  uTorrentReaderDemo;
+  uTorrentReaderDemo in 'uTorrentReaderDemo.pas' {Form2},
+
+  uTorrentReader in '..\..\Common\uTorrentReader.pas',
+  uBEncode in '..\..\Common\uBEncode.pas';
 
 {$R *.res}
 

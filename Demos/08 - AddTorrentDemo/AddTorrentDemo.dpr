@@ -18,17 +18,26 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-
-  // use project search path : ..\..\API;..\..\Common;..\..\Common\Dialogs;..\..\Common\uCountryFlags
+  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
+  uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
+  uqBitAPI in '..\..\API\uqBitAPI.pas',
+  uqBitObject in '..\..\API\uqBitObject.pas',
 
   Vcl.Forms,
-  uAddTorrentDemo,
-  uqBitAddServerDlg,
-  uqBitAddTorrentDlg,
-  uqBitCategoriesDlg,
-  uqBitSelectServerDlg;
+  uAddTorrentDemo in 'uAddTorrentDemo.pas' {FrmAddTorrent},
+  uqBitUtils  in '..\..\Common\uqBitUtils.pas',
+  uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
+  uqBitFormat in '..\..\Common\uqBitFormat.pas',
+  uTorrentReader in '..\..\Common\uTorrentReader.pas',
+  uBEncode in '..\..\Common\uBEncode.pas',
+
+  uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
+  uqBitAddTorrentDlg in '..\..\Common\Dialogs\uqBitAddTorrentDlg.pas' {qBitAddTorrentDlg},
+  uqBitCategoriesDlg in '..\..\Common\Dialogs\uqBitCategoriesDlg.pas' {qBitCatDlg},
+  uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
+
 
 begin
   {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
@@ -62,6 +71,10 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
+  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
+  uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
+  uqBitAPI in '..\..\API\uqBitAPI.pas',
+  uqBitObject in '..\..\API\uqBitObject.pas',
 
 
   {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}

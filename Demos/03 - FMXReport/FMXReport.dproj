@@ -71,7 +71,6 @@
         <SanitizedProjectName>FMXReport</SanitizedProjectName>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <DCC_UnitSearchPath>..\..\API;..\..\Common;..\..\Common\Dialogs;..\..\Common\uCountryFlags;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>DBXSqliteDriver;IndyIPCommon;RESTComponents;bindcompdbx;DBXInterBaseDriver;vcl;IndyIPServer;vclactnband;vclFireDAC;IndySystem;bindcompvclsmp;tethering;svnui;bindcompvclwinx;dsnapcon;FireDACADSDriver;FireDACMSAccDriver;fmxFireDAC;vclimg;TeeDB;FireDAC;vcltouch;vcldb;bindcompfmx;svn;FireDACSqliteDriver;FireDACPgDriver;inetdb;FMXTee;soaprtl;DbxCommonDriver;FmxTeeUI;fmx;FireDACIBDriver;fmxdae;xmlrtl;soapmidas;vcledge;fmxobj;vclwinx;Tee;rtl;DbxClientDriver;CustomIPTransport;vcldsnap;dbexpress;IndyCore;vclx;bindcomp;appanalytics;dsnap;FireDACCommon;IndyIPClient;bindcompvcl;RESTBackendComponents;TeeUI;VCLRESTComponents;soapserver;dbxcds;VclSmp;adortl;vclie;bindengine;DBXMySQLDriver;CloudService;dsnapxml;FireDACMySQLDriver;dbrtl;IndyProtocols;inetdbxpress;FireDACCommonODBC;FireDACCommonDriver;inet;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
@@ -142,9 +141,17 @@
         <DCCReference Include="..\..\API\JSON\22\REST.JsonReflect.pas"/>
         <DCCReference Include="..\..\API\JSON\22\System.JSON.pas"/>
         <DCCReference Include="..\..\API\JSON\22\REST.Json.pas"/>
+        <DCCReference Include="..\..\API\uqBitAPIUtils .pas">
+            <ModuleName>uqBitAPIUtils</ModuleName>
+        </DCCReference>
+        <DCCReference Include="..\..\API\uqBitAPITypes.pas"/>
+        <DCCReference Include="..\..\API\uqBitAPI.pas"/>
+        <DCCReference Include="..\..\API\uqBitObject.pas"/>
         <DCCReference Include="uFMXReport.pas">
             <Form>FrmFMXReport</Form>
         </DCCReference>
+        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
+        <DCCReference Include="..\..\Common\uqBitPatchChecker.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

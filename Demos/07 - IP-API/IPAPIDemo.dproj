@@ -90,7 +90,6 @@
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_MapFile>3</DCC_MapFile>
-        <DCC_UnitSearchPath>...\..\API;..\..\Common;..\..\Common\Dialogs;..\..\Common\uCountryFlags;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -113,6 +112,9 @@
             <Form>Form2</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\..\Common\uIP_API.pas"/>
+        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
+        <DCCReference Include="..\..\Common\uCountryFlags\uCountryFlags.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
