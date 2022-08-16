@@ -803,7 +803,7 @@ type
   {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
-uses SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitUtils;
+uses SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils;
 
 {$REGION 'Helpers Impl.'}
 
@@ -1707,7 +1707,7 @@ begin
   if From = Nil then Exit;
   inherited Merge(From);
   M := TqBitMainDataType(From);
-  TqBitUTils.MergerVariant(Self.Ffull_update, M.Ffull_update, False);
+  TqBitAPIUtils.MergerVariants(Self.Ffull_update, M.Ffull_update, False);
   if M.Fserver_state <> nil then
   begin
     if Self.Fserver_state = nil then Fserver_state := TqBitserver_stateType.Create;
@@ -2116,7 +2116,7 @@ begin
   if From = Nil then Exit;
   inherited Merge(From);
   P := TqBitTorrentPeersDataType(From);
-  TqBitUTils.MergerVariant(Self.Ffull_update, P.Ffull_update, False);
+  TqBitAPIUtils.MergerVariants(Self.Ffull_update, P.Ffull_update, False);
   //// Fpeers
   FreeAndNil(Self._Fpeers_added);
   FreeAndNil(Self._Fpeers_modified);

@@ -111,13 +111,16 @@
         <DCCReference Include="..\..\API\JSON\22\REST.JsonReflect.pas"/>
         <DCCReference Include="..\..\API\JSON\22\System.JSON.pas"/>
         <DCCReference Include="..\..\API\JSON\22\REST.Json.pas"/>
-        <DCCReference Include="..\..\API\uqBitUtils.pas"/>
+        <DCCReference Include="..\..\API\uqBitAPIUtils .pas">
+            <ModuleName>uqBitAPIUtils</ModuleName>
+        </DCCReference>
         <DCCReference Include="..\..\API\uqBitAPITypes.pas"/>
         <DCCReference Include="..\..\API\uqBitAPI.pas"/>
         <DCCReference Include="..\..\API\uqBitObject.pas"/>
         <DCCReference Include="uSimpleThreaded.pas">
             <Form>FrmSimpleThreaded</Form>
         </DCCReference>
+        <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <DCCReference Include="..\..\Common\uqBitPatchChecker.pas"/>
         <DCCReference Include="..\..\Common\uqBitFormat.pas"/>
         <DCCReference Include="..\..\Common\Dialogs\uqBitAddServerDlg.pas">

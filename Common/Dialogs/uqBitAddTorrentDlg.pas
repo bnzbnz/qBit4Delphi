@@ -87,7 +87,7 @@ var
   qBitAddTorrentDlg: TqBitAddTorrentDlg;
 
 implementation
-uses Math, uqBitUtils, uqBitCategoriesDlg;
+uses Math, uqBitAPIUtils, uqBitCategoriesDlg;
 
 {$R *.dfm}
 
@@ -145,8 +145,8 @@ begin
   var NewT := TNewTorrentInfo(LBFiles.Items.Objects[Index]);
   TIEditName.Text := NewT.FileData.Data.NiceName;
   TIEditSize.Text := VarFormatBKM(NewT.FileData.Data.Info.FilesSize);
-  TIEditHashV1.Text := TqBitUtils.IIF(NewT.FileData.Data.HashV1 <> '', NewT.FileData.Data.HashV1, 'N/A');
-  TIEditHashV2.Text := TqBitUtils.IIF(NewT.FileData.Data.HashV2 <> '', NewT.FileData.Data.HashV2, 'N/A');
+  TIEditHashV1.Text := TqBitAPIUtils.IIF(NewT.FileData.Data.HashV1 <> '', NewT.FileData.Data.HashV1, 'N/A');
+  TIEditHashV2.Text := TqBitAPIUtils.IIF(NewT.FileData.Data.HashV2 <> '', NewT.FileData.Data.HashV2, 'N/A');
   TIEditComment.Text := NewT.FileData.Data.Comment.Text;
 end;
 
@@ -274,7 +274,7 @@ begin
     NewTorrent.FfirstLastPiecePrio := CBFLP.Checked;
     NewTorrent.FdlLimit := 1024 * SpinEdit1.Value * Max(ComboBox1.ItemIndex * 1024, 1);
     NewTorrent.FupLimit := 1024 * SpinEdit2.Value * Max(ComboBox2.ItemIndex * 1024, 1);
-    TInfo.Status := TqBitUtils.IIF(FqB.AddNewTorrentFile(NewTorrent), ntsSuccess, ntsError);
+    TInfo.Status := TqBitAPIUtils.IIF(FqB.AddNewTorrentFile(NewTorrent), ntsSuccess, ntsError);
     NewTorrent.Free;
   end;
 

@@ -189,7 +189,7 @@ type
   TqNOX = class(TqBitObject);
 
 implementation
-uses SysUtils, DateUtils, uqBitUtils;
+uses SysUtils, uqBitAPIUtils;
 
 class function TqBitObject.Connect(HostPath, Username, Password : string): TqBitObject;
 begin
@@ -388,7 +388,7 @@ end;
 
 function TqBitObject.UnbanPeers(Peers: string): boolean;
 begin
-  var BanPeers := TqBitUtils.DelimStringList(nil, '|', Peers);
+  var BanPeers := TqBitAPIUtils.DelimStringList(nil, '|', Peers);
   Result := UnbanPeers(BanPeers.DelimitedText);
   BanPeers.Free;
 end;

@@ -1,6 +1,5 @@
 program FMXReport;
 uses
-
   {$IFDEF FASTMM4}
     FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
   {$ENDIF}
@@ -17,7 +16,7 @@ uses
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-  uqBitUtils in '..\..\API\uqBitUtils.pas',
+  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
@@ -25,6 +24,7 @@ uses
   FMX.Forms,
   System.StartUpCopy,
   uFMXReport in 'uFMXReport.pas' {FrmFMXReport},
+  uqBitUtils  in '..\..\Common\uqBitUtils.pas',
   uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas';
 
 {$R *.res}
@@ -53,7 +53,7 @@ end.
     System.JSON in '..\..\API\JSON\22\System.JSON.pas',
     REST.Json in '..\..\API\JSON\22\REST.Json.pas',
   {$ENDIF}
-  uqBitUtils in '..\..\API\uqBitUtils.pas',
+  uqBitAPIUtils  in '..\..\API\uqBitAPIUtils .pas',
   uqBitAPITypes in '..\..\API\uqBitAPITypes.pas',
   uqBitAPI in '..\..\API\uqBitAPI.pas',
   uqBitObject in '..\..\API\uqBitObject.pas',
