@@ -3,7 +3,9 @@ uses
 
   {$INCLUDE ..\..\Defines.inc}
   {$IFDEF FASTMM4}
-    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+    {$IFDEF DEBUG}
+      FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+    {$ENDIF}
   {$ENDIF}
 
   Vcl.Forms,
@@ -26,7 +28,9 @@ end.
 
   {$INCLUDE ..\..\Defines.inc}
   {$IFDEF FASTMM4}
-    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+    {$IFDEF DEBUG}
+      FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+    {$ENDIF}
   {$ENDIF}
 
   {$IFNDEF FASTMM4} {$IFDEF DEBUG} ReportMemoryLeaksOnShutdown := True; {$ENDIF} {$ENDIF}
