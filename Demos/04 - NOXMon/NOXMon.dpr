@@ -1,8 +1,10 @@
 program NOXMon;
 uses
+
+  {$INCLUDE ..\..\Defines.inc}
   {$IFDEF FASTMM4}
-  FastMM4,
-  {$ENDIF }
+    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
+  {$ENDIF}
 
   {$IFDEF VER340}
     REST.Json.Types in '..\..\API\JSON\21\REST.Json.Types.pas',
@@ -44,8 +46,9 @@ end.
 
   // Place Holder :
 
+  {$INCLUDE ..\..\Defines.inc}
   {$IFDEF FASTMM4}
-    FastMM4,  //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)
+    FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
   {$ENDIF}
 
   {$IFDEF VER340}
