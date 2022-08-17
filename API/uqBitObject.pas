@@ -194,8 +194,12 @@ uses SysUtils, uqBitAPIUtils;
 class function TqBitObject.Connect(HostPath, Username, Password : string): TqBitObject;
 begin
   Result := TqBitObject.Create(HostPath);
+  var CurRetries := Result.HTTPRetries;
+  Result.FHTTPRetries := 1;
   if not Result.Login(Username, Password) then
     FreeAndNil(Result)
+  else
+    Result.HTTPRetries := CurRetries;
 end;
 
 // Helpers

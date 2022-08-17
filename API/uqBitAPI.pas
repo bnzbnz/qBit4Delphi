@@ -241,10 +241,10 @@ begin
   inherited Create;
   FSID := '';
   FHostPath := HostPath;
-  FHTTPConnectionTimeout := 500;
-  FHTTPSendTimeout := 1000;
+  FHTTPConnectionTimeout := 250;
+  FHTTPSendTimeout := 500;
   FHTTPResponseTimeout := 2000;
-  FHTTPRetries := 2;
+  FHTTPRetries := 3;
   FHTTPResponse := '';
   FHTTPStatus := 0;
   FDuration := 0;
@@ -272,7 +272,7 @@ begin
     Http.CookieManager.AddServerCookie(Format('SID=%s', [FSID]), FHostPath);
     Http.ConnectionTimeout := FHTTPConnectionTimeout;
     Http.SendTimeout := FHTTPSendTimeout;
-    Http.ResponseTimeout := FHTTPConnectionTimeout;
+    Http.ResponseTimeout := FHTTPResponseTimeout;
     var Retries := FHTTPRetries;
     repeat
       Dec(Retries);
