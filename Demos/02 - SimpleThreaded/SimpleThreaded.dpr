@@ -1,7 +1,7 @@
 program SimpleThreaded;
 uses
 
-  {$INCLUDE ..\..\Defines.inc}
+  {$INCLUDE ..\Defines.inc}
   {$IFDEF FASTMM4}
     {$IFDEF DEBUG}
       FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
@@ -48,7 +48,7 @@ end.
 
   // Place Holder :
 
-  {$INCLUDE ..\..\Defines.inc}
+  {$INCLUDE ..\Defines.inc}
   {$IFDEF FASTMM4}
     {$IFDEF DEBUG}
       FastMM4,    //  MPL 1.1, LGPL 2.1 (https://github.com/pleriche/FastMM4)  << Can be removed if not used
