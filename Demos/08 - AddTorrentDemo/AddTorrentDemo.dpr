@@ -34,10 +34,10 @@ uses
   uTorrentReader in '..\..\Common\uTorrentReader.pas',
   uBEncode in '..\..\Common\uBEncode.pas',
 
-  uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
-  uqBitAddTorrentDlg in '..\..\Common\Dialogs\uqBitAddTorrentDlg.pas' {qBitAddTorrentDlg},
-  uqBitCategoriesDlg in '..\..\Common\Dialogs\uqBitCategoriesDlg.pas' {qBitCatDlg},
-  uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
+  uqBitAddServerDlg in '..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
+  uqBitAddTorrentDlg in '..\Common\Dialogs\uqBitAddTorrentDlg.pas' {qBitAddTorrentDlg},
+  uqBitCategoriesDlg in '..\Common\Dialogs\uqBitCategoriesDlg.pas' {qBitCatDlg},
+  uqBitSelectServerDlg in '..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
 

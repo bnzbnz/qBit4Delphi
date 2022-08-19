@@ -112,9 +112,9 @@
             <Form>Form2</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\..\Common\uIP_API.pas"/>
         <DCCReference Include="..\..\Common\uqBitUtils.pas"/>
         <DCCReference Include="..\..\Common\uCountryFlags\uCountryFlags.pas"/>
+        <DCCReference Include="..\..\Common\uIpAPI.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

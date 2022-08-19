@@ -31,8 +31,8 @@ uses
   uqBitUtils  in '..\..\Common\uqBitUtils.pas',
   uqBitFormat in '..\..\Common\uqBitFormat.pas',
   uqBitPatchChecker in '..\..\Common\uqBitPatchChecker.pas',
-  uqBitAddServerDlg in '..\..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
-  uqBitSelectServerDlg in '..\..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
+  uqBitAddServerDlg in '..\Common\Dialogs\uqBitAddServerDlg.pas' {qBitAddServerDlg},
+  uqBitSelectServerDlg in '..\Common\Dialogs\uqBitSelectServerDlg.pas' {qBitSelectServerDlg};
 
 {$R *.res}
 

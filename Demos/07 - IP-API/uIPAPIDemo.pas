@@ -28,17 +28,17 @@ var
   Form2: TForm2;
 
 implementation
-uses uIP_API, uqBitUtils, uCountryFlags, ShellAPI;
+uses uIpAPI, uqBitUtils, uCountryFlags, ShellAPI;
 {$R *.dfm}
 
 procedure TForm2.Button1Click(Sender: TObject);
 begin
 
-  var IP := TIP_API.FromURL(Self.LabeledEdit1.Text);
+  var IP := TIpAPI.FromURL(Self.LabeledEdit1.Text);
   if IP = nil then Exit;
 
   Memo1.Clear;
-  var Props := TqBitUtils.GetRTTIReadableValues(IP, TIP_API);
+  var Props := TqBitUtils.GetRTTIReadableValues(IP, TIpAPI);
   for var Prop in Props do
     Memo1.Lines.Add('  ' + Prop.Key + ' : ' +  varToStr(Prop.Value));
   Props.Free;
