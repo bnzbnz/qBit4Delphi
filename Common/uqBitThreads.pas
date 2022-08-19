@@ -17,6 +17,7 @@ type
     FOnEvent: TqBitThreadEvent;
     FMain: TqBitMainDataType;
     FMainUpdate: TqBitMainDataType;
+    FRefresh: Boolean;
     FPause: Boolean;
     FMustExit: Boolean;
     FIntervalMS: Cardinal;
@@ -29,7 +30,8 @@ type
     property Main: TqBitMainDataType read FMain;
     property MainUpdate: TqBitMainDataType read FMainUpdate;
     property IntervalMS: Cardinal read FIntervalMS write FIntervalMS;
-    property Pause: boolean read FPause write FPause;
+    property Refresh: Boolean read FRefresh write FRefresh;
+    property Pause: Boolean read FPause write FPause;
     property MustExit: Boolean read FMustExit write FMustExit;
   end;
 
@@ -41,6 +43,7 @@ type
     FPeerUpdate: TqBitTorrentPeersDataType;
     FIntervalMS: Cardinal;
     FKeyHash: string;
+    FPause: Boolean;
     FMustExit: Boolean;
   public
     constructor Create( qBClone: TqBitObject; OnEvent: TqBitThreadEvent); overload;
@@ -52,6 +55,7 @@ type
     property IntervalMS: Cardinal read FIntervalMS write FIntervalMS;
     property KeyHash: string read FKeyHash write FKeyHash;
     property MustExit: Boolean read FMustExit write FMustExit;
+    property Pause: Boolean read FPause write FPause;
   end;
 
   TqBitTrackersThread = class(TThread)
@@ -61,6 +65,7 @@ type
     FTrackers: TqBitTrackersType;
     FIntervalMS: Cardinal;
     FKeyHash: string;
+    FPause: Boolean;
     FMustExit: Boolean;
   public
     constructor Create( qBClone: TqBitObject; OnEvent: TqBitThreadEvent); overload;
@@ -71,6 +76,7 @@ type
     property IntervalMS: Cardinal read FIntervalMS write FIntervalMS;
     property KeyHash: string read FKeyHash write FKeyHash;
     property MustExit: Boolean read FMustExit write FMustExit;
+    property Pause: Boolean read FPause write FPause;
   end;
 
 
@@ -86,6 +92,7 @@ begin
   FMain := Nil;
   FMainUpdate := Nil;
   FMustExit := False;
+  FRefresh := False;
   FPause := False;
   FIntervalMS := QBIT_DEFAULT_THREAD_WAIT_MS;
   inherited Create(False);
@@ -119,10 +126,12 @@ begin
     while not Terminated do
     begin
 
-      var StartTime := GetTickCount;
-      if not FPause  then
+      if not FPause then
       begin
+
+        var StartTime := GetTickCount;
         try
+          FRefresh := False;
           FMainUpdate := FqB.GetMainData(Main.Frid);
           if FMainUpdate = Nil then
           begin
@@ -136,14 +145,17 @@ begin
         finally
           FreeAndNil(FMainUpdate);
         end;
-      end;
-      while
-        (GetTickCount - StartTime < IntervalMS)
-        and (not Terminated) do
-      begin
-        Sleep(100);
-        Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
-      end;
+
+        while
+          (GetTickCount - StartTime < IntervalMS)
+          and (not Terminated) and (not FRefresh) do
+        begin
+          Sleep(100);
+          Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
+        end;
+
+      end else
+       Sleep(100);
 
     end;
 
@@ -166,6 +178,7 @@ begin
   FPeers := Nil;
   FPeerUpdate := Nil;
   FMustExit := False;;
+  FPause := False;
   inherited Create(False);
 end;
 
@@ -187,61 +200,65 @@ begin
   Synchronize( procedure begin FOnEvent(Self, qtetInit); end );
   while not Terminated do
   begin
-    var StartTime := GetTickCount;
-    if KeyHash <> '' then
+    if not FPause then
     begin
-      if KeyHash <> CurKeyHash then
+      var StartTime := GetTickCount;
+      if KeyHash <> '' then
       begin
-
-        CurKeyHash := KeyHash;
-        FreeAndNil(FPeers);
-        FPeers := FqB.GetTorrentPeersData(KeyHash, 0);
-        if FPeers = Nil then
+        if KeyHash <> CurKeyHash then
         begin
-          CurKeyHash := '';
-          if FqB.HTTPStatus = 404 then
-            Synchronize( procedure begin FOnEvent(Self, qtetNotFound); end )
-          else
-            Synchronize( procedure begin FOnEvent(Self, qtetError); end );
-          if FMustExit then Exit;
-        end else
-          FOnEvent(Self, qtetLoaded);
 
-      end else begin
+          CurKeyHash := KeyHash;
+          FreeAndNil(FPeers);
+          FPeers := FqB.GetTorrentPeersData(KeyHash, 0);
+          if FPeers = Nil then
+          begin
+            CurKeyHash := '';
+            if FqB.HTTPStatus = 404 then
+              Synchronize( procedure begin FOnEvent(Self, qtetNotFound); end )
+            else
+              Synchronize( procedure begin FOnEvent(Self, qtetError); end );
+            if FMustExit then Exit;
+          end else
+            FOnEvent(Self, qtetLoaded);
 
-        FPeerUpdate := FqB.GetTorrentPeersData(KeyHash, Peers.Frid);
-        if FPeerUpdate = Nil then
-        begin
-          CurKeyHash := '';
-          if FqB.HTTPStatus = 404 then
-            Synchronize( procedure begin FOnEvent(Self, qtetNotFound); end )
-          else
-            Synchronize( procedure begin FOnEvent(Self, qtetError); end );
-          if FqB.HTTPStatus = -1 then Exit;
         end else begin
-          Synchronize( procedure begin FOnEvent(Self, qtetBeforeMerging); end );
-          Peers.Merge(FPeerUpdate);
-          Synchronize( procedure begin FOnEvent(Self, qtetAfterMerging); end );
-          FreeAndNil(FPeerUpdate);
+
+          FPeerUpdate := FqB.GetTorrentPeersData(KeyHash, Peers.Frid);
+          if FPeerUpdate = Nil then
+          begin
+            CurKeyHash := '';
+            if FqB.HTTPStatus = 404 then
+              Synchronize( procedure begin FOnEvent(Self, qtetNotFound); end )
+            else
+              Synchronize( procedure begin FOnEvent(Self, qtetError); end );
+            if FqB.HTTPStatus = -1 then Exit;
+          end else begin
+            Synchronize( procedure begin FOnEvent(Self, qtetBeforeMerging); end );
+            Peers.Merge(FPeerUpdate);
+            Synchronize( procedure begin FOnEvent(Self, qtetAfterMerging); end );
+            FreeAndNil(FPeerUpdate);
+          end;
+
         end;
-
+      end else begin
+        CurKeyHash := '';
+        FreeAndNil(FPeers);
       end;
-    end else begin
-      CurKeyHash := '';
-      FreeAndNil(FPeers);
-    end;
 
-    var Refresh := False;
-    while
-      ((GetTickCount - StartTime) < IntervalMS)
-      and (not Terminated) and (not Refresh)
-    do
-    begin
-      Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
-      Refresh := KeyHash <> CurKeyHash;
-      if not Refresh then Sleep(100);
-    end;
+      var Refresh := False;
+      while
+        ((GetTickCount - StartTime) < IntervalMS)
+        and (not Terminated) and (not Refresh)
+      do
+      begin
+        Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
+        Refresh := KeyHash <> CurKeyHash;
+        if not Refresh then Sleep(100);
+      end;
 
+    end else
+      Sleep(100);
   end;
   finally
     Synchronize( procedure begin FOnEvent(Self, qtetExit); end );
@@ -260,7 +277,8 @@ begin
   FIntervalMS := QBIT_DEFAULT_THREAD_WAIT_MS;
   FKeyHash := '';
   FTrackers := Nil;
-  FMustExit := False;;
+  FMustExit := False;
+  FPause := False;
   inherited Create(False);
 end;
 
@@ -281,30 +299,35 @@ begin
     while not Terminated do
     begin
 
-      var StartTime := GetTickCount;
-      if FKeyHash <> '' then
+      if not FPause then
       begin
-        FreeAndNil(FTrackers);
-        FTrackers := FqB.GetTorrentTrackers(KeyHash);
-        if FTrackers = Nil then
+
+        var StartTime := GetTickCount;
+        if FKeyHash <> '' then
         begin
-          if FqB.HTTPStatus = 404 then
-            Synchronize( procedure begin FOnEvent(Self, qtetNotFound); end )
-          else
-            Synchronize( procedure begin FOnEvent(Self, qtetError); end );
-          if FMustExit then Exit;
-        end else
-          FOnEvent(Self, qtetLoaded);
-      end;
+          FreeAndNil(FTrackers);
+          FTrackers := FqB.GetTorrentTrackers(KeyHash);
+          if FTrackers = Nil then
+          begin
+            if FqB.HTTPStatus = 404 then
+              Synchronize( procedure begin FOnEvent(Self, qtetNotFound); end )
+            else
+              Synchronize( procedure begin FOnEvent(Self, qtetError); end );
+            if FMustExit then Exit;
+          end else
+            FOnEvent(Self, qtetLoaded);
+        end;
 
-      while
-        ((GetTickCount - StartTime) < IntervalMS) and (not Terminated)
-      do
-      begin
-        Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
-        sleep(100);
-      end;
+        while
+          ((GetTickCount - StartTime) < IntervalMS) and (not Terminated)
+        do
+        begin
+          Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
+          sleep(100);
+        end;
 
+      end else
+        Sleep(100);
     end;
   finally
     Synchronize( procedure begin FOnEvent(Self, qtetExit); end );

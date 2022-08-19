@@ -333,6 +333,7 @@ type
     Ftype: variant;
     // inherited Merge/Clone
   end;
+
   TqBitLogsType = class(TqBitTorrentBaseType)
     [JsonReflect(ctstring, rtString, TqBitObjectListInterceptor)]
     Flogs: TqBitObjectList<TqBitLogType>;
