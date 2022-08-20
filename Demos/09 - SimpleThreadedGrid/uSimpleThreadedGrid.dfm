@@ -21,8 +21,9 @@ object FrmSTG: TFrmSTG
     Width = 961
     Height = 26
     Align = alTop
+    Color = clGradientActiveCaption
+    ParentBackground = False
     TabOrder = 0
-    ExplicitWidth = 635
   end
   inline MainFrame: TqBitFrame
     Left = 0
@@ -32,13 +33,13 @@ object FrmSTG: TFrmSTG
     Align = alClient
     TabOrder = 1
     ExplicitTop = 26
-    ExplicitWidth = 635
-    ExplicitHeight = 316
+    ExplicitWidth = 961
+    ExplicitHeight = 405
     inherited SG: TStringGrid
       Width = 961
       Height = 405
-      ExplicitWidth = 635
-      ExplicitHeight = 316
+      ExplicitWidth = 961
+      ExplicitHeight = 405
     end
   end
   object MainPopup: TPopupMenu

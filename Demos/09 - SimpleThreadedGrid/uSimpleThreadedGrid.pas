@@ -51,30 +51,33 @@ begin
     MainFrame.OnUpdateUIEvent := MainFramUpdateEvent;
     MainFrame.OnPopupEvent := self.MainFramePopupEvent;
 
-    var Row := 0;
-    Inc(Row); MainFrame.AddCol(Row, 'Name', 'Fname', VarFormatString, 320, True, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Size', 'Fsize', VarFormatBKM, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Total Size', 'Ftotal_size', VarFormatBKM, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Progress', 'Fprogress', VarFormatPercent, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Status', 'Fstate', VarFormatString, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Seeds', 'Fnum_seeds', VarFormatString, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Peers', 'Fnum_leechs', VarFormatString, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Ratio', 'Fratio', VarFormatFloat2d, 36, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Down Speed', 'Fdlspeed', VarFormatBKMPerSec, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Upload Speed', 'Fupspeed', VarFormatBKMPerSec, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'ETA', 'Feta', VarFormatDeltaSec, 128, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Category', 'Fcategory', VarFormatString, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Tags', 'Ftags', VarFormatString, 84, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Added On', 'Fadded_on', VarFormatDate, 128, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Completed On', 'Fcompletion_on', VarFormatDate, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Tracker', 'Ftracker', VarFormatString, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Down Limit', 'Fdl_limit', VarFormatLimit, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Up Limit', 'Fdl_limit', VarFormatLimit, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Downloaded', 'Fdownloaded', VarFormatBKM, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Uploaded  ', 'Fuploaded', VarFormatBKM, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Session Downloaded', 'Fdownloaded_session', VarFormatBKM, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Session Uploaded  ', 'Fuploaded_session', VarFormatBKM, -1, True);
-    Inc(Row); MainFrame.AddCol(Row, 'Availability', 'Favailability', VarFormatMulti, -1, True);
+    MainFrame.AddCol('Name', 'Fname', VarFormatString, 320, True);
+
+    MainFrame.AddCol('Size', 'Fsize', VarFormatBKM, 84, True);
+    MainFrame.AddCol('Total Size', 'Ftotal_size', VarFormatBKM, -1, True);
+    MainFrame.AddCol('Progress', 'Fprogress', VarFormatPercent, 84, True);
+    MainFrame.AddCol('Status', 'Fstate', VarFormatString, 84, True);
+    MainFrame.AddCol('Seeds', 'Fnum_seeds', VarFormatString, 84, True);
+    MainFrame.AddCol('Peers', 'Fnum_leechs', VarFormatString, 84, True);
+    MainFrame.AddCol('Ratio', 'Fratio', VarFormatFloat2d, 36, True);
+    MainFrame.AddCol('Down Speed', 'Fdlspeed', VarFormatBKMPerSec, 84, True);
+    MainFrame.AddCol('Upload Speed', 'Fupspeed', VarFormatBKMPerSec, 84, True);
+    MainFrame.AddCol('ETA', 'Feta', VarFormatDeltaSec, 128, True);
+    MainFrame.AddCol('Category', 'Fcategory', VarFormatString, 84, True);
+    MainFrame.AddCol('Tags', 'Ftags', VarFormatString, 84, True);
+    MainFrame.AddCol('Added On', 'Fadded_on', VarFormatDate, 128, True);
+    MainFrame.AddCol('Completed On', 'Fcompletion_on', VarFormatDate, -1, True);
+    MainFrame.AddCol('Tracker', 'Ftracker', VarFormatString, -1, True);
+    MainFrame.AddCol('Down Limit', 'Fdl_limit', VarFormatLimit, -1, True);
+    MainFrame.AddCol('Up Limit', 'Fdl_limit', VarFormatLimit, -1, True);
+    MainFrame.AddCol('Downloaded', 'Fdownloaded', VarFormatBKM, -1, True);
+    MainFrame.AddCol('Uploaded  ', 'Fuploaded', VarFormatBKM, -1, True);
+    MainFrame.AddCol('Session Downloaded', 'Fdownloaded_session', VarFormatBKM, -1, True);
+    MainFrame.AddCol('Session Uploaded  ', 'Fuploaded_session', VarFormatBKM, -1, True);
+    MainFrame.AddCol('Availability', 'Favailability', VarFormatMulti, -1, True);
+
+    MainFrame.SortField := 'Fname';
+    MainFrame.SortReverse := False;
 
     var rttictx := TRttiContext.Create();
     var rttitype := rttictx.GetType(TqBitTorrentType);
@@ -82,7 +85,7 @@ begin
     begin
       var Title := 'Raw: ' + field.Name;
       if pos('_', field.Name) = 1 then continue;
-      Inc(Row); MainFrame.AddCol(Row, Title, field.Name, VarFormatString, -2, False);
+      MainFrame.AddCol(Title, field.Name, VarFormatString, -2, False);
     end;
     rttictx.Free;
 
