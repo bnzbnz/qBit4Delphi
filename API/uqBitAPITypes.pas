@@ -13,7 +13,7 @@
 
 interface
 uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types,
-     System.Generics.Defaults, Classes;
+     System.Generics.Defaults, Classes, SyncObjs;
 
 const
 
@@ -21,6 +21,15 @@ const
   qBitAPI_Developer = 'Laurent Meyer (qBit4Delphi@ea4d.com)';
 
 type
+
+  TJsonRawPatcher = class(TObject)
+    FRaw: TDictionary<string, string>;
+    FLock: TCriticalSection;
+    constructor Create; overload;
+    destructor Destroy; override;
+    function Encode(value: string): string;
+    function Decode(value: string): string;
+  end;
 
   TqBitUserRec = record
     Val: variant;
@@ -30,10 +39,6 @@ type
   end;
 
   TqBitTorrentBaseType = class
-  private
-    _RawJsonData: TDictionary<string, string>;
-    function RawJsonDecode(RawJson: string): string;
-    function RawJsonEncode(Header, Value, Footer: string): string;
   protected
     procedure ClonePropertiesTo(T : TqBitTorrentBaseType); virtual;
     procedure MergePropertiesFrom(T: TqBitTorrentBaseType);
@@ -808,10 +813,59 @@ uses SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils;
 
 {$REGION 'Helpers Impl.'}
 
+var
+  JsonRawPatcher: TJsonRawPatcher;
+
 procedure TqBitUserRec.SetObject(aObject: TObject; aOwnObject: Boolean);
 begin
   Self.OwnObj := aOwnObject;
   Self.Obj := aObject;
+end;
+
+
+{ TJsonRawPatcher }
+
+constructor TJsonRawPatcher.Create;
+begin
+  inherited;
+  FLock := TCriticalSection.Create;
+  FRaw := TDictionary<string, string>.Create;
+end;
+
+destructor TJsonRawPatcher.Destroy;
+begin
+  FRaw.Free;
+  FLock.Free;
+  inherited;
+end;
+
+function TJsonRawPatcher.decode(value: string): string;
+begin
+  FLock.Acquire;
+  Result := value;
+  for var R in FRaw do
+    if pos(R.Key, Result)>0 then
+    begin
+      Result := StringReplace(Result,R.Key,R.Value,[]);
+      FRaw.Remove(R.Key);
+    end;
+  FLock.Release;
+end;
+
+function TJsonRawPatcher.Encode(Value: string): string;
+var
+  MyGuid0: TGUID;
+begin
+  FLock.Acquire;
+  CreateGUID(MyGuid0);
+  Result := Format(
+    '%0.8X%0.4X%0.4X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X',
+    [MyGuid0.D1, MyGuid0.D2, MyGuid0.D3,
+    MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
+    MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]
+  );
+  FRaw.Add('"'+Result+'"', Value);
+  FLock.Release;
 end;
 
 {$ENDREGION} // 'Helpers Impl.'
@@ -923,7 +977,8 @@ begin
         SB.Append(TJson.ObjectToJsonString( TqBitLogsType(Data).Flogs[i] ));
       end;
   SB.Append(']');
-  Result := TqBitTorrentBaseType(Data).RawJsonEncode('"logs":"',SB.ToString, '"');
+  Result := JsonRawPatcher.Encode(SB.ToString);
+  //Result := TqBitTorrentBaseType(Data).RawJsonEncode('"',SB.ToString, '"');
   SB.Free;
 end;
 
@@ -1041,7 +1096,7 @@ begin
         SB.Append(string(value));
     end;
     SB.Append(']');
-    Result := TqBitTorrentBaseType(Data).RawJsonEncode('"',SB.ToString, '"');
+    Result := JsonRawPatcher.Encode(SB.ToString);
     SB.Free;
   end else
   raise
@@ -1212,7 +1267,7 @@ begin
         p.Free;
       end;
       Result :=('{' + string.Join(',', Arr) + '}');
-      Result := TqBitPreferencesType(Data).RawJsonEncode('"', Result, '"');
+      Result := JsonRawPatcher.Encode(Result);
     end;
   end else
   raise
@@ -1455,8 +1510,6 @@ end;
 
 constructor TqBitTorrentBaseType.Create;
 begin
-  _RawJsonData := TDictionary<string, string>.Create;
-  _RawJsonData.Clear;
   _UserRec.OwnObj := False;
   _UserRec.Obj := nil;
 end;
@@ -1464,7 +1517,6 @@ end;
 destructor TqBitTorrentBaseType.Destroy;
 begin
   if _UserRec.OwnObj then _UserRec.Obj.Free;
-  _RawJsonData.Free;
   inherited;
 end;
 
@@ -1511,33 +1563,10 @@ begin
   Result._UserRec.Obj := Self._UserRec.Obj;
 end;
 
-function TqBitTorrentBaseType.RawJsonEncode(Header, Value, Footer: string): string;
-var
-  MyGuid0: TGUID;
-begin
-  CreateGUID(MyGuid0);
-  Result := Format(
-    '%0.8X%0.4X%0.4X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X',
-    [MyGuid0.D1, MyGuid0.D2, MyGuid0.D3,
-    MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
-    MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]
-  );
-  _RawJsonData.Add(Header + Result + Footer, Value);
-end;
-
-function TqBitTorrentBaseType.RawJsonDecode(RawJson: string): string;
-begin
-  Result := RawJson;
-  for var Tag in _RawJsonData do
-    if Tag.Key <> '' then
-      Result := StringReplace(Result, Tag.Key, Tag.Value, []);
-end;
-
 function TqBitTorrentBaseType.toJSON: string;
 begin
-  _RawJsonData.Clear;
   Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
-  Result := RawJsonDecode(Result);
+  Result := JsonRawPatcher.Decode(Result);
 end;
 
 procedure TqBitTorrentBaseType.Clear;
@@ -2365,4 +2394,8 @@ end;
 
 {$ENDREGION} // 'JSON Types Intf.'
 
+initialization
+  JsonRawPatcher := TJsonRawPatcher.Create;
+finalization
+  JsonRawPatcher.Free;
 end.
