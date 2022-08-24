@@ -18,7 +18,7 @@ const
 
 type
 
-  TqBtiGridData = class
+  TqBitGridData = class
     Key: string;
     Selected: boolean;
     Name: string;
@@ -76,12 +76,12 @@ type
     SortField: string;
     SortReverse: boolean;
 
-    function  AddCol(Name, Field: string; Fmt: TVarDataFormater; Width: Integer; Visible: Boolean): TqBtiGridData;
+    function  AddCol(Name, Field: string; Fmt: TVarDataFormater; Width: Integer; Visible: Boolean): TqBitGridData;
     procedure AddRow(K: string; V: TObject);
     procedure DoCreate;
     procedure DoDestroy;
-    function GetColData(Index: Integer): TqBtiGridData;
-    function GetRowData(Index: Integer): TqBtiGridData;
+    function GetColData(Index: Integer): TqBitGridData;
+    function GetRowData(Index: Integer): TqBitGridData;
     procedure RowUpdateStart;
     procedure RowUpdateEnd;
     procedure SelectAll;
@@ -103,7 +103,7 @@ begin
   var Sel := GetGridSel;
   Result := TStringList.Create;
   for var v in Sel do
-    Result.Add(TqBtiGridData(v).Key);
+    Result.Add(TqBitGridData(v).Key);
   Sel.Free;
 end;
 
@@ -147,7 +147,7 @@ begin
     begin
       if (i = 0) or (j = 0 ) then
       begin
-        var Data :=  TqBtiGridData.Create;
+        var Data :=  TqBitGridData.Create;
         SG.ColWidths[i] := -1;
         SG.RowHeights[j] := -1;
         SG.Objects[i, j] := Data;
@@ -168,7 +168,7 @@ begin
   FSelList.Free;
   for var i := 0 to SG.ColCount - 1 do
       for var j := 0 to SG.RowCount - 1 do
-        if (i = 0) or (j = 0) then TqBtiGridData(SG.Objects[i, j]).Free;
+        if (i = 0) or (j = 0) then TqBitGridData(SG.Objects[i, j]).Free;
 end;
 
 procedure TqBitFrame.ITMDebugClick(Sender: TObject);
@@ -227,22 +227,22 @@ begin
     end;
 end;
 
-function TqBitFrame.GetColData(Index: Integer): TqBtiGridData;
+function TqBitFrame.GetColData(Index: Integer): TqBitGridData;
 begin
-  Result := TqBtiGridData(SG.Objects[Index, 0]);
+  Result := TqBitGridData(SG.Objects[Index, 0]);
 end;
 
 function TqBitFrame.GetGridSel: tqBitGridSelection;
 begin
   Result := TObjectList<TObject>.Create(False);
   for var i := 0 to SG.RowCount - 1 do
-    if TqBtiGridData(GetRowData(i)).Selected then
-      Result.Add(TqBtiGridData(GetRowData(i)));
+    if TqBitGridData(GetRowData(i)).Selected then
+      Result.Add(TqBitGridData(GetRowData(i)));
 end;
 
-function TqBitFrame.GetRowData(Index: Integer): TqBtiGridData;
+function TqBitFrame.GetRowData(Index: Integer): TqBitGridData;
 begin
-  Result := TqBtiGridData(SG.Objects[0, Index]);
+  Result := TqBitGridData(SG.Objects[0, Index]);
 end;
 
 procedure TqBitFrame.RowUpdateStart;
@@ -277,9 +277,9 @@ begin
   SG.EndUpdate;
 end;
 
-function TqBitFrame.AddCol(Name, Field: string; Fmt: TVarDataFormater; Width: Integer; Visible: Boolean): TqBtiGridData;
+function TqBitFrame.AddCol(Name, Field: string; Fmt: TVarDataFormater; Width: Integer; Visible: Boolean): TqBitGridData;
 begin
-  Result:= TqBtiGridData(SG.Objects[FAddColIndex, 0]);
+  Result:= TqBitGridData(SG.Objects[FAddColIndex, 0]);
   SG.ColWidths[FAddColIndex] := Width;
   SG.RowHeights[0] := ROWHEIGHT;
   SG.Cells[FAddColIndex, 0] := Name;
@@ -331,7 +331,7 @@ begin
   if (ARow < sG.FixedRows) or (ACol < SG.FixedCols) then
       SG.Canvas.Brush.Color := clMenu;
 
-  var GD := TqBtiGridData(SG.Objects[0, ARow]);
+  var GD := TqBitGridData(SG.Objects[0, ARow]);
   if GD.Selected  then
   begin
     SG.Canvas.Brush.Color := clNavy;
@@ -414,16 +414,16 @@ begin
 
   if GetKeyState(VK_CONTROL) < 0 then
   begin
-    TqBtiGridData(GetRowData(ARow)).Selected := not TqBtiGridData(GetRowData(ARow)).Selected;
+    TqBitGridData(GetRowData(ARow)).Selected := not TqBitGridData(GetRowData(ARow)).Selected;
     FLastSelectedRowIndex := ARow;
   end else
   if GetKeyState(VK_SHIFT) < 0 then
   begin
     for var Row := Min(FLastSelectedRowIndex, ARow) to Max(FLastSelectedRowIndex, ARow) do
-       TqBtiGridData(GetRowData(Row)).Selected := True;
+       TqBitGridData(GetRowData(Row)).Selected := True;
   end else begin
     for var i := 0 to SG.RowCount - 1 do GetRowData(i).Selected := False;
-    TqBtiGridData(GetRowData(ARow)).Selected := True;
+    TqBitGridData(GetRowData(ARow)).Selected := True;
     FLastSelectedRowIndex := ARow;
   end;
   if Assigned(FOnRowsSelectedEvent) then FOnRowsSelectedEvent(Self);

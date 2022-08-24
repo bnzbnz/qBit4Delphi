@@ -103,14 +103,12 @@ end;
 
 procedure TFrmSTG.MainFramePopupEvent(Sender: TObject; X, Y, aCol, aRow: integer);
 begin
-  MainThread.Pause := True;  //Thread Safe;
   var Sel := MainFrame.GetGridSel;
   try
     if Sel.Count = 0 then Exit;
     MainPopup.Popup(X,Y);
   finally
     Sel.Free;
-    MainThread.Pause := False;  //Thread Safe;
   end;
 end;
 
@@ -138,18 +136,20 @@ end;
 
 procedure TFrmSTG.ShowSelection1Click(Sender: TObject);
 begin
+  Self.MainThread.Pause := True;
   var Sel := MainFrame.GetGridSel;
   try
     if Sel.Count = 0 then Exit;
     for var GridData in Sel do
     begin
-      var Data := TqBtiGridData(GridData);
+      var Data := TqBitGridData(GridData);
       var Key :=  Data.Key;
       var Torrent := TqBitTorrentType(Data.Obj);
       ShowMessage( Torrent.Fhash + ' : ' + Torrent.Fname );
     end;
   finally
     Sel.Free;
+    Self.MainThread.Pause := False;
   end;
 end;
 
@@ -165,6 +165,7 @@ begin
   case EventType of
     qtetLoaded, qtetAfterMerging:
     begin
+
       var SortList := TObjectList<TqBitTorrentType>.Create(False);
 
       if Assigned(M.Main.Ftorrents) then
@@ -194,7 +195,7 @@ begin
       ));
       rttictx.Free;
 
-      // Displaying Grid
+      // Display Grid
       MainFrame.RowUpdateStart;
       for var T in SortList do
         MainFrame.AddRow(TqBitTorrentType(T).Fhash, T);

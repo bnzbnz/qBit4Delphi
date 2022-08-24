@@ -78,6 +78,7 @@ begin
   Result := TStringList( IIF(StringList = nil, TObject(TStringList.Create), TObject(StringList)) );
   Result.StrictDelimiter := True;
   Result.Delimiter := Delimiter;
+  Result.QuoteChar := #0;
   Result.DelimitedText := DelimitedText;;
 end;
 

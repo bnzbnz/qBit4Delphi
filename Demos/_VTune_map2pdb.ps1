@@ -11,5 +11,6 @@ map2pdb "SimpleThreaded"
 map2pdb "VnStatDemo"
 map2pdb "IPAPIDemo"
 map2pdb "AddTorrentDemo"
+map2pdb "SimpleThreadedGrid"
 
 pause
