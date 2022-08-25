@@ -899,8 +899,8 @@ var
 begin
 
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
-  RTTIField.SetValue(Data, TqBitStringListDictionary<variant, TStringList>.Create([doOwnsValues]));
-  var SLDic := TqBitStringListDictionary<variant, TStringList>( RTTIField.GetValue(Data).AsObject );
+  var SLDic := TqBitStringListDictionary<variant, TStringList>.Create([doOwnsValues]);
+  RTTIField.SetValue(Data, SLDic);
 
   var JSONObj:= TJSONObject.ParseJSONValue(Arg) as TJSONObject;
   for var JSONPair in JSONObj do
@@ -918,9 +918,10 @@ var
   ctx: TRttiContext;
 begin
 
-  var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
   var SLDic := TqBitStringListDictionary<variant, TStringList>( RTTIField.GetValue(Data).AsObject );
+
+  var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
   for var kv in SLDic do
   begin
     var v := TqBitAPIUtils.DelimStringList(nil, ',', '');
@@ -936,14 +937,6 @@ end;
 { TqBitObjectListInterceptor }
 
 procedure TqBitObjectListInterceptor.StringReverter(Data: TObject; Field, Arg: string);
-var
-  ctx: TRttiContext;
-  function GetGeneric(Value: TValue): TObject;
-  begin
-     var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
-      RTTIField.SetValue(Data, Value);
-      Result := ( RTTIField.GetValue(Data).AsObject );
-  end;
 begin
 
   if (Data is TqBitNetworkInterfacesType) and (Field = 'Fifaces') then
@@ -1042,28 +1035,26 @@ end;
 
 function TqBitObjectListInterceptor.StringConverter(Data: TObject; Field: string): string;
 begin
-  var Header := '{"' + Copy(Field, 2, MAXINT) + '":"'; var Footer := '"}';
+  var Header := '{"' + Copy(Field, 2, MAXINT) + '":"';
+  var Footer := '"}';
   var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
 
   if (Data is TqBitTorrentsListType) and (Field = 'Ftorrents') then
   begin
-    if TqBitTorrentsListType(Data).Ftorrents <> nil then
-      for var i := 0 to TqBitTorrentsListType(Data).Ftorrents.Count - 1 do
-        SL.Add(TJson.ObjectToJsonString(TqBitTorrentsListType(Data).Ftorrents[i]));
+    var v := TqBitTorrentsListType(Data).Ftorrents;
+    if v <> nil then for var i := 0 to v.Count - 1 do SL.Add(TJson.ObjectToJsonString(v[i]));
   end else
 
   if (Data is TqBitNetworkInterfacesType) and (Field = 'Fifaces') then
   begin
-    if TqBitNetworkInterfacesType(Data).Fifaces <> nil then
-      for var i := 0 to TqBitNetworkInterfacesType(Data).Fifaces.Count - 1 do
-        SL.Add(TJson.ObjectToJsonString(TqBitNetworkInterfacesType(Data).Fifaces[i]));
+    var v := TqBitNetworkInterfacesType(Data).Fifaces;
+    if v <> nil then for var i := 0 to v.Count - 1 do SL.Add(TJson.ObjectToJsonString(v[i]));
   end else
 
   if (Data is TqBitLogsType) and (Field = 'Flogs') then
   begin
-    if TqBitLogsType(Data).Flogs <> nil then
-      for var i := 0 to TqBitLogsType(Data).Flogs.Count - 1 do
-        SL.Add(TJson.ObjectToJsonString(TqBitLogsType(Data).Flogs[i]));
+    var v := TqBitLogsType(Data).Flogs;
+    if v <> nil then for var i := 0 to v.Count - 1 do SL.Add(TJson.ObjectToJsonString(v[i]));
   end else
 
   raise
@@ -1082,7 +1073,6 @@ procedure TqBitVariantListInterceptor.StringReverter(Data: TObject; Field, Arg: 
 var
   ctx: TRttiContext;
 begin
-
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
   RTTIField.SetValue(Data, TqBitList<variant>.Create);
   var VList := TqBitList<variant>( RTTIField.GetValue(Data).AsObject );
@@ -1091,7 +1081,6 @@ begin
   for var i:= 0 to JSONArray.Count -1 do
     VList.Add(  JSONArray.Items[i].Value );
   JSONArray.Free;
-
 end;
 
 function TqBitVariantListInterceptor.StringConverter(Data: TObject; Field: string): string;
@@ -1236,8 +1225,6 @@ procedure TqBitVariantDictionaryInterceptor.StringReverter(Data: TObject; Field:
 var
   ctx: TRttiContext;
 begin
-  // TqBitPreferencesType : Fscan_dirs
-  // TqBitTorrentSpeedsLimitType : Fspeeds
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
   RTTIField.SetValue(Data, TqBitVariantDictionary<variant, variant>.Create);
   var VD := TqBitVariantDictionary<variant, variant>( RTTIField.GetValue(Data).AsObject );
@@ -1253,8 +1240,6 @@ var
   ctx: TRttiContext;
   Arr: array of string;
 begin
-  // TqBitPreferencesType : Fscan_dirs
-  // TqBitTorrentSpeedsLimitType : Fspeeds
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
   var VD := TqBitVariantDictionary<variant, variant>( RTTIField.GetValue(Data).AsObject );
   if VD = nil then Exit;

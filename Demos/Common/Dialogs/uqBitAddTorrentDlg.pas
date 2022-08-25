@@ -168,7 +168,7 @@ end;
 
 function TqBitAddTorrentDlg.ShowAsModal(qB: TqBitObject; FileList: TStrings): TModalResult;
 var
-  DuplicateList: TqBitTorrentListType;
+  DuplicateList: TqBitTorrentsListType;
 begin
   Result := mrNone;
   DuplicateList := Nil;
