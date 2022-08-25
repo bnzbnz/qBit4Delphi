@@ -585,7 +585,7 @@ type
      // inherited Merge/Clone
   end;
 
-  TqBitTorrentListType  = class(TqBitTorrentBaseType)
+  TqBitTorrentsListType  = class(TqBitTorrentBaseType)
     [JsonReflect(ctstring, rtString, TqBitObjectListInterceptor)]
     Ftorrents: TqBitObjectList<TqBitTorrentType>;
     function Clone: TqBitTorrentBaseType; override;
@@ -990,12 +990,12 @@ begin
     JSONArr.Free;
   end else
 
-  if (Data is TqBitTorrentListType) and (Field = 'Ftorrents') then
+  if (Data is TqBitTorrentsListType) and (Field = 'Ftorrents') then
   begin
-    TqBitPeerLogsType(Data).Flogs := TqBitObjectList<TqBitPeerLogType>.Create(True);
+    TqBitTorrentsListType(Data).Ftorrents := TqBitObjectList<TqBitTorrentType>.Create(True);
     var JSONArr := TJSONObject.ParseJSONValue(Arg) as TJSONArray;
     for var i:= 0 to JSONArr.Count -1 do
-      TqBitTorrentListType(Data).Ftorrents.Add(
+      TqBitTorrentsListType(Data).Ftorrents.Add(
         TJSON.JsonToObject<TqBitTorrentType>( JSONArr.Items[i] as TJSONObject )
       );
     JSONArr.Free;
@@ -1042,12 +1042,18 @@ end;
 
 function TqBitObjectListInterceptor.StringConverter(Data: TObject; Field: string): string;
 begin
-  var Header := ''; var Footer := '"}';
+  var Header := '{"' + Copy(Field, 2, MAXINT) + '":"'; var Footer := '"}';
   var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
+
+  if (Data is TqBitTorrentsListType) and (Field = 'Ftorrents') then
+  begin
+    if TqBitTorrentsListType(Data).Ftorrents <> nil then
+      for var i := 0 to TqBitTorrentsListType(Data).Ftorrents.Count - 1 do
+        SL.Add(TJson.ObjectToJsonString(TqBitTorrentsListType(Data).Ftorrents[i]));
+  end else
 
   if (Data is TqBitNetworkInterfacesType) and (Field = 'Fifaces') then
   begin
-    Header := '{"ifaces":"';
     if TqBitNetworkInterfacesType(Data).Fifaces <> nil then
       for var i := 0 to TqBitNetworkInterfacesType(Data).Fifaces.Count - 1 do
         SL.Add(TJson.ObjectToJsonString(TqBitNetworkInterfacesType(Data).Fifaces[i]));
@@ -1055,7 +1061,6 @@ begin
 
   if (Data is TqBitLogsType) and (Field = 'Flogs') then
   begin
-    Header := '{"logs":"';
     if TqBitLogsType(Data).Flogs <> nil then
       for var i := 0 to TqBitLogsType(Data).Flogs.Count - 1 do
         SL.Add(TJson.ObjectToJsonString(TqBitLogsType(Data).Flogs[i]));
@@ -1871,23 +1876,23 @@ begin
   sl.Free;
 end;
 
-function TqBitTorrentListType.Clone: TqBitTorrentBaseType;
+function TqBitTorrentsListType.Clone: TqBitTorrentBaseType;
 begin
-  var T := TqBitTorrentListType.Create;
+  var T := TqBitTorrentsListType.Create;
   Self.ClonePropertiesTo(T);
   if Self.Ftorrents <> nil then T.Ftorrents := Self.Ftorrents.Clone;
   Result := T;
 end;
 
-destructor TqBitTorrentListType.Destroy;
+destructor TqBitTorrentsListType.Destroy;
 begin
   Self.Ftorrents.Free;
   inherited Destroy;
 end;
 
-procedure TqBitTorrentListType.Merge(From: TqBitTorrentBaseType);
+procedure TqBitTorrentsListType.Merge(From: TqBitTorrentBaseType);
 begin
-  var T := TqBitTorrentListType(From);
+  var T := TqBitTorrentsListType(From);
   if T.Ftorrents <> nil then
   begin
     if Self.Ftorrents = nil then Self.Ftorrents := TqBitObjectList<TqBitTorrentType>.Create(True);

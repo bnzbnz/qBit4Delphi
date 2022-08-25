@@ -31,23 +31,23 @@ type
 
     function PauseTorrents(Hashes: TStringList): boolean; overload; virtual;
     function PauseTorrents(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function PauseTorrents(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function PauseTorrents(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function ResumeTorrents(Hashes: TStringList): boolean; overload; virtual;
     function ResumeTorrents(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function ResumeTorrents(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function ResumeTorrents(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function DeleteTorrents(Hashes: TStringList; DeleteFiles: boolean = False): boolean; overload; virtual;
     function DeleteTorrents(Torrents: TqBitMainDataType; DeleteFiles: boolean = False): boolean; overload; virtual;
-    function DeleteTorrents(Torrents: TqBitTorrentListType; DeleteFiles: boolean = False): boolean; overload; virtual;
+    function DeleteTorrents(Torrents: TqBitTorrentsListType; DeleteFiles: boolean = False): boolean; overload; virtual;
 
     function RecheckTorrents(Hashes: TStringList): boolean; overload; virtual;
     function RecheckTorrents(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function RecheckTorrents(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function RecheckTorrents(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function ReannounceTorrents(Hashes: TStringList): boolean; overload;
     function ReannounceTorrents(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function ReannounceTorrents(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function ReannounceTorrents(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function AddTrackersToTorrent(Hash: string; Urls: TStringList): boolean; overload; virtual;
     function RemoveTrackers(Hash: string;  Urls: TStringList): boolean; overload; virtual;
@@ -55,7 +55,7 @@ type
     function AddPeers(Hashes: string; Peers: TStringList): boolean; overload; virtual;
     function AddPeers(Hashes, Peers: TStringList): boolean; overload; virtual;
     function AddPeers(Torrents: TqBitMainDataType; Peers: TStringList): boolean; overload; virtual;
-    function AddPeers(Torrents: TqBitTorrentListType; Peers: TStringList): boolean; overload; virtual;
+    function AddPeers(Torrents: TqBitTorrentsListType; Peers: TStringList): boolean; overload; virtual;
 
     function BanPeers(Peers: TStringList): boolean; overload; virtual;
     function GetBanPeersList: TStringList; overload; virtual;
@@ -67,49 +67,49 @@ type
 
     function IncreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function IncreaseTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function IncreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function IncreaseTorrentPriority(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function DecreaseTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function DecreaseTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function DecreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function DecreaseTorrentPriority(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function MaximalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function MaximalTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function MaximalTorrentPriority(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function MaximalTorrentPriority(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function MinimalTorrentPriority(Hashes: TStringList): boolean; overload; virtual;
     function MinimalTorrentPriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function MinimalTorrentPriority(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function MinimalTorrentPriority(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function SetFilePriority(Hash: string; Ids: TStringList; Priority: integer): boolean; overload; virtual;
 
     function GetTorrentDownloadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType; overload; virtual;
     function GetTorrentDownloadLimit(Torrents: TqBitMainDataType): TqBitTorrentSpeedsLimitType; overload; virtual;
-    function GetTorrentDownloadLimit(Torrents: TqBitTorrentListType): TqBitTorrentSpeedsLimitType; overload; virtual;
+    function GetTorrentDownloadLimit(Torrents: TqBitTorrentsListType): TqBitTorrentSpeedsLimitType; overload; virtual;
 
     function SetTorrentDownloadLimit(Hashes: TStringList; Limit: integer): boolean; overload; virtual;
     function SetTorrentDownloadLimit(Torrents: TqBitMainDataType; Limit: integer): boolean; overload; virtual;
-    function SetTorrentDownloadLimit(Torrents: TqBitTorrentListType; Limit: integer): boolean; overload; virtual;
+    function SetTorrentDownloadLimit(Torrents: TqBitTorrentsListType; Limit: integer): boolean; overload; virtual;
 
     function SetTorrentShareLimit(Hashes: TStringList; RatioLimit: double; SeedingTimeLimit: integer): boolean; overload; virtual;
     function SetTorrentShareLimit(Torrents: TqBitMainDataType; RatioLimit: double; SeedingTimeLimit: integer): boolean; overload; virtual;
-    function SetTorrentShareLimit(Torrents: TqBitTorrentListType; RatioLimit: double; SeedingTimeLimit: integer): boolean; overload; virtual;
+    function SetTorrentShareLimit(Torrents: TqBitTorrentsListType; RatioLimit: double; SeedingTimeLimit: integer): boolean; overload; virtual;
 
     function GetTorrentUploadLimit(Hashes: TStringList): TqBitTorrentSpeedsLimitType; overload; virtual;
     function GetTorrentUploadLimit(Torrents: TqBitMainDataType): TqBitTorrentSpeedsLimitType; overload; virtual;
-    function GetTorrentUploadLimit(Torrents: TqBitTorrentListType): TqBitTorrentSpeedsLimitType; overload; virtual;
+    function GetTorrentUploadLimit(Torrents: TqBitTorrentsListType): TqBitTorrentSpeedsLimitType; overload; virtual;
 
     function SetTorrentUploadLimit(Hashes: TStringList; Limit: integer): boolean; overload; virtual;
     function SetTorrentUploadLimit(Torrents: TqBitMainDataType; Limit: integer): boolean; overload; virtual;
-    function SetTorrentUploadLimit(Torrents: TqBitTorrentListType; Limit: integer): boolean; overload; virtual;
+    function SetTorrentUploadLimit(Torrents: TqBitTorrentsListType; Limit: integer): boolean; overload; virtual;
 
     function SetTorrentLocation(Hashes: TStringList; Location: string): boolean; overload; virtual;
     function SetTorrentLocation(Torrents: TqBitMainDataType; Location: string): boolean; overload; virtual;
-    function SetTorrentLocation(Torrents: TqBitTorrentListType; Location: string): boolean; overload; virtual;
+    function SetTorrentLocation(Torrents: TqBitTorrentsListType; Location: string): boolean; overload; virtual;
 
     function SetTorrentCategory(Hashes: TStringList; Category: string): boolean; overload; virtual;
     function SetTorrentCategory(Torrents: TqBitMainDataType; Category: string): boolean; overload; virtual;
-    function SetTorrentCategory(Torrents: TqBitTorrentListType; Category: string): boolean; overload; virtual;
+    function SetTorrentCategory(Torrents: TqBitTorrentsListType; Category: string): boolean; overload; virtual;
 
     function RemoveCategories(Categories: TStringList): boolean; overload; virtual;
 
@@ -117,17 +117,17 @@ type
     function AddTorrentTags(Hashes: TStringList; Tags: string): boolean; overload; virtual;
     function AddTorrentTags(Hashes, Tags: TStringList): boolean; overload; virtual;
     function AddTorrentTags(Torrents: TqBitMainDataType; Tags: TStringList): boolean; overload; virtual;
-    function AddTorrentTags(Torrents: TqBitTorrentListType; Tags: TStringList): boolean; overload; virtual;
+    function AddTorrentTags(Torrents: TqBitTorrentsListType; Tags: TStringList): boolean; overload; virtual;
     function AddTorrentTags(Torrents: TqBitMainDataType; Tags: string): boolean; overload; virtual;
-    function AddTorrentTags(Torrents: TqBitTorrentListType; Tags: string): boolean; overload; virtual;
+    function AddTorrentTags(Torrents: TqBitTorrentsListType; Tags: string): boolean; overload; virtual;
 
     function RemoveTorrentTags(Hashes: string; Tags: TStringList): boolean; overload; virtual;
     function RemoveTorrentTags(Hashes: TStringList; Tags: string): boolean; overload; virtual;
     function RemoveTorrentTags(Hashes, Tags: TStringList): boolean; overload; virtual;
     function RemoveTorrentTags(Torrents: TqBitMainDataType; Tags: TStringList): boolean; overload; virtual;
-    function RemoveTorrentTags(Torrents: TqBitTorrentListType; Tags: TStringList): boolean; overload; virtual;
+    function RemoveTorrentTags(Torrents: TqBitTorrentsListType; Tags: TStringList): boolean; overload; virtual;
     function RemoveTorrentTags(Torrents: TqBitMainDataType; Tags: string): boolean; overload; virtual;
-    function RemoveTorrentTags(Torrents: TqBitTorrentListType; Tags: string): boolean; overload; virtual;
+    function RemoveTorrentTags(Torrents: TqBitTorrentsListType; Tags: string): boolean; overload; virtual;
 
     function CreateTags(Tags: TStringList): boolean; overload; virtual;
     function DeleteTags(Tags: TStringList): boolean; overload; virtual;
@@ -135,30 +135,30 @@ type
 
     function SetAutomaticTorrentManagement(Hashes: TStringList; Enable: boolean): boolean; overload; virtual;
     function SetAutomaticTorrentManagement(Torrents: TqBitMainDataType; Enable: boolean): boolean; overload; virtual;
-    function SetAutomaticTorrentManagement(Torrents: TqBitTorrentListType; Enable: boolean): boolean; overload; virtual;
+    function SetAutomaticTorrentManagement(Torrents: TqBitTorrentsListType; Enable: boolean): boolean; overload; virtual;
 
     function ToggleSequentialDownload(Hashes: TStringList): boolean; overload; virtual;
     function ToggleSequentialDownload(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function ToggleSequentialDownload(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function ToggleSequentialDownload(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function SetFirstLastPiecePriority(Hashes: TStringList): boolean; overload; virtual;
     function SetFirstLastPiecePriority(Torrents: TqBitMainDataType): boolean; overload; virtual;
-    function SetFirstLastPiecePriority(Torrents: TqBitTorrentListType): boolean; overload; virtual;
+    function SetFirstLastPiecePriority(Torrents: TqBitTorrentsListType): boolean; overload; virtual;
 
     function SetForceStart(Hashes: TStringList; Value: boolean): boolean; overload; virtual;
     function SetForceStart(Torrents: TqBitMainDataType; Value: boolean): boolean; overload; virtual;
-    function SetForceStart(Torrents: TqBitTorrentListType; Value: boolean): boolean; overload; virtual;
+    function SetForceStart(Torrents: TqBitTorrentsListType; Value: boolean): boolean; overload; virtual;
 
     function SetSuperSeeding(Hashes: TStringList; Value: boolean): boolean; overload; virtual;
     function SetSuperSeeding(Torrents: TqBitMainDataType; Value: boolean): boolean; overload; virtual;
-    function SetSuperSeeding(Torrents: TqBitTorrentListType; Value: boolean): boolean; overload; virtual;
+    function SetSuperSeeding(Torrents: TqBitTorrentsListType; Value: boolean): boolean; overload; virtual;
 
-    function GetAllTorrentList: TqBitTorrentListType; virtual;
+    function GetAllTorrentList: TqBitTorrentsListType; virtual;
 
     // Helpers
 
     class function TorrentsToHashesList(Torrents: TqBitMainDataType): TStringList; overload; virtual;
-    class function TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList; overload; virtual;
+    class function TorrentsToHashesList(Torrents: TqBitTorrentsListType): TStringList; overload; virtual;
 
     class function qBitMajorVersion: Integer; virtual;
     class function qBitMinorVersion: Integer; virtual;
@@ -224,7 +224,7 @@ begin
     Result.Add(Torrent.Key)
 end;
 
-class function TqBitObject.TorrentsToHashesList(Torrents: TqBitTorrentListType): TStringList;
+class function TqBitObject.TorrentsToHashesList(Torrents: TqBitTorrentsListType): TStringList;
 begin
   Result := TStringList.Create;
   for var Torrent in Torrents.Ftorrents do
@@ -243,7 +243,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := PauseTorrents(Hashes.DelimitedText);
 end;
-function TqBitObject.PauseTorrents(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.PauseTorrents(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := PauseTorrents(TorrentList);
@@ -262,7 +262,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := ResumeTorrents(Hashes.DelimitedText);
 end;
-function TqBitObject.ResumeTorrents(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.ResumeTorrents(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := ResumeTorrents(TorrentList);
@@ -281,7 +281,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := DeleteTorrents(Hashes.DelimitedText, DeleteFiles);
 end;
-function TqBitObject.DeleteTorrents(Torrents: TqBitTorrentListType; DeleteFiles: boolean): boolean;
+function TqBitObject.DeleteTorrents(Torrents: TqBitTorrentsListType; DeleteFiles: boolean): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := DeleteTorrents(TorrentList);
@@ -300,7 +300,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := RecheckTorrents(Hashes.DelimitedText);
 end;
-function TqBitObject.RecheckTorrents(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.RecheckTorrents(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := RecheckTorrents(TorrentList);
@@ -319,7 +319,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := ReannounceTorrents(Hashes.DelimitedText);
 end;
-function TqBitObject.ReannounceTorrents(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.ReannounceTorrents(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := ReannounceTorrents(TorrentList);
@@ -364,7 +364,7 @@ begin
   Result := AddPeers(TorrentList, Peers);
   TorrentList.Free;;
 end;
-function TqBitObject.AddPeers(Torrents: TqBitTorrentListType; Peers: TStringList): boolean;
+function TqBitObject.AddPeers(Torrents: TqBitTorrentsListType; Peers: TStringList): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := AddPeers(TorrentList, Peers);
@@ -434,7 +434,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := IncreaseTorrentPriority(Hashes.DelimitedText);
 end;
-function TqBitObject.IncreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.IncreaseTorrentPriority(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := IncreaseTorrentPriority(TorrentList);
@@ -453,7 +453,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := DecreaseTorrentPriority(Hashes.DelimitedText);
 end;
-function TqBitObject.DecreaseTorrentPriority(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.DecreaseTorrentPriority(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := DecreaseTorrentPriority(TorrentList);
@@ -472,7 +472,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := MinimalTorrentPriority(Hashes.DelimitedText);
 end;
-function TqBitObject.MinimalTorrentPriority(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.MinimalTorrentPriority(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := MinimalTorrentPriority(TorrentList);
@@ -491,7 +491,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := MaximalTorrentPriority(Hashes.DelimitedText);
 end;
-function TqBitObject.MaximalTorrentPriority(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.MaximalTorrentPriority(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := MaximalTorrentPriority(TorrentList);
@@ -517,7 +517,7 @@ begin
   Hashes.StrictDelimiter := True; Hashes.Delimiter := '|';
   Result := GetTorrentDownloadLimit(Hashes.DelimitedText);
 end;
-function TqBitObject.GetTorrentDownloadLimit(Torrents: TqBitTorrentListType): TqBitTorrentSpeedsLimitType;
+function TqBitObject.GetTorrentDownloadLimit(Torrents: TqBitTorrentsListType): TqBitTorrentSpeedsLimitType;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := GetTorrentDownloadLimit(TorrentList);
@@ -542,7 +542,7 @@ begin
   Result := SetTorrentDownloadLimit(TorrentList, Limit);
   TorrentList.Free;;
 end;
-function TqBitObject.SetTorrentDownloadLimit(Torrents: TqBitTorrentListType; Limit: integer): boolean;
+function TqBitObject.SetTorrentDownloadLimit(Torrents: TqBitTorrentsListType; Limit: integer): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetTorrentDownloadLimit(TorrentList, Limit);
@@ -561,7 +561,7 @@ begin
   Result := SetTorrentShareLimit(TorrentList, RatioLimit, SeedingTimeLimit);
   TorrentList.Free;;
 end;
-function TqBitObject.SetTorrentShareLimit(Torrents: TqBitTorrentListType; RatioLimit: double; SeedingTimeLimit: integer): boolean;
+function TqBitObject.SetTorrentShareLimit(Torrents: TqBitTorrentsListType; RatioLimit: double; SeedingTimeLimit: integer): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetTorrentShareLimit(TorrentList, RatioLimit, SeedingTimeLimit);
@@ -580,7 +580,7 @@ begin
   Result := GetTorrentUploadLimit(TorrentList);
   TorrentList.Free;;
 end;
-function TqBitObject.GetTorrentUploadLimit(Torrents: TqBitTorrentListType): TqBitTorrentSpeedsLimitType;
+function TqBitObject.GetTorrentUploadLimit(Torrents: TqBitTorrentsListType): TqBitTorrentSpeedsLimitType;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := GetTorrentUploadLimit(TorrentList);
@@ -599,7 +599,7 @@ begin
   Result := SetTorrentUploadLimit(TorrentList, Limit);
   TorrentList.Free;;
 end;
-function TqBitObject.SetTorrentUploadLimit(Torrents: TqBitTorrentListType; Limit: integer): boolean;
+function TqBitObject.SetTorrentUploadLimit(Torrents: TqBitTorrentsListType; Limit: integer): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetTorrentUploadLimit(TorrentList, Limit);
@@ -619,7 +619,7 @@ begin
   Result := SetTorrentLocation(TorrentList, Location);
   TorrentList.Free;;
 end;
-function TqBitObject.SetTorrentLocation(Torrents: TqBitTorrentListType; Location: string): boolean;
+function TqBitObject.SetTorrentLocation(Torrents: TqBitTorrentsListType; Location: string): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetTorrentLocation(TorrentList, Location);
@@ -638,7 +638,7 @@ begin
   Result := SetTorrentCategory(TorrentList, Category);
   TorrentList.Free;;
 end;
-function TqBitObject.SetTorrentCategory(Torrents: TqBitTorrentListType; Category: string): boolean;
+function TqBitObject.SetTorrentCategory(Torrents: TqBitTorrentsListType; Category: string): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetTorrentLocation(TorrentList, Category);
@@ -675,7 +675,7 @@ begin
   Result := AddTorrentTags(TorrentList, Tags);
   TorrentList.Free;;
 end;
-function TqBitObject.AddTorrentTags(Torrents: TqBitTorrentListType; Tags: TStringList): boolean;
+function TqBitObject.AddTorrentTags(Torrents: TqBitTorrentsListType; Tags: TStringList): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := AddTorrentTags(TorrentList, Tags);
@@ -687,7 +687,7 @@ begin
   Result := AddTorrentTags(TorrentList, Tags);
   TorrentList.Free;;
 end;
-function TqBitObject.AddTorrentTags(Torrents: TqBitTorrentListType; Tags: string): boolean;
+function TqBitObject.AddTorrentTags(Torrents: TqBitTorrentsListType; Tags: string): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := AddTorrentTags(TorrentList, Tags);
@@ -717,7 +717,7 @@ begin
   Result := RemoveTorrentTags(TorrentList, Tags);
   TorrentList.Free;;
 end;
-function TqBitObject.RemoveTorrentTags(Torrents: TqBitTorrentListType; Tags: TStringList): boolean;
+function TqBitObject.RemoveTorrentTags(Torrents: TqBitTorrentsListType; Tags: TStringList): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := RemoveTorrentTags(TorrentList, Tags);
@@ -729,7 +729,7 @@ begin
   Result := RemoveTorrentTags(TorrentList, Tags);
   TorrentList.Free;;
 end;
-function TqBitObject.RemoveTorrentTags(Torrents: TqBitTorrentListType; Tags: string): boolean;
+function TqBitObject.RemoveTorrentTags(Torrents: TqBitTorrentsListType; Tags: string): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := RemoveTorrentTags(TorrentList, Tags);
@@ -770,7 +770,7 @@ begin
   Result := SetAutomaticTorrentManagement(TorrentList, Enable);
   TorrentList.Free;;
 end;
-function TqBitObject.SetAutomaticTorrentManagement(Torrents: TqBitTorrentListType; Enable: boolean): boolean;
+function TqBitObject.SetAutomaticTorrentManagement(Torrents: TqBitTorrentsListType; Enable: boolean): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetAutomaticTorrentManagement(TorrentList, Enable);
@@ -789,7 +789,7 @@ begin
   Result := ToggleSequentialDownload(TorrentList);
   TorrentList.Free;;
 end;
-function TqBitObject.ToggleSequentialDownload(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.ToggleSequentialDownload(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := ToggleSequentialDownload(TorrentList);
@@ -808,7 +808,7 @@ begin
   Result := SetFirstLastPiecePriority(TorrentList);
   TorrentList.Free;;
 end;
-function TqBitObject.SetFirstLastPiecePriority(Torrents: TqBitTorrentListType): boolean;
+function TqBitObject.SetFirstLastPiecePriority(Torrents: TqBitTorrentsListType): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetFirstLastPiecePriority(TorrentList);
@@ -827,7 +827,7 @@ begin
   Result := SetForceStart(TorrentList, Value);
   TorrentList.Free;;
 end;
-function TqBitObject.SetForceStart(Torrents: TqBitTorrentListType; Value: boolean): boolean;
+function TqBitObject.SetForceStart(Torrents: TqBitTorrentsListType; Value: boolean): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetForceStart(TorrentList, Value);
@@ -846,14 +846,14 @@ begin
   Result := SetSuperSeeding(TorrentList, Value);
   TorrentList.Free;;
 end;
-function TqBitObject.SetSuperSeeding(Torrents: TqBitTorrentListType; Value: boolean): boolean;
+function TqBitObject.SetSuperSeeding(Torrents: TqBitTorrentsListType; Value: boolean): boolean;
 begin
   var TorrentList := Self.TorrentsToHashesList(Torrents);
   Result := SetSuperSeeding(TorrentList, Value);
   TorrentList.Free;
 end;
 
-function TqBitObject.GetAllTorrentList: TqBitTorrentListType;
+function TqBitObject.GetAllTorrentList: TqBitTorrentsListType;
 var
   Req: TqBitTorrentListRequestType;
 begin

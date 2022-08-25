@@ -109,7 +109,7 @@ type
 
   // Torrent management :
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-list
-    function GetTorrentList(TorrentListRequest : TqBitTorrentListRequestType): TqBitTorrentListType; overload; virtual;
+    function GetTorrentList(TorrentListRequest : TqBitTorrentListRequestType): TqBitTorrentsListType; overload; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-generic-properties
     function GetTorrentGenericProperties(Hash: string): TqBitTorrentInfoType; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-torrent-trackers
@@ -532,13 +532,13 @@ begin
   FDuration := GetTickcount - FDuration
 end;
 
-function TqBitAPI.GetTorrentList(TorrentListRequest: TqBitTorrentListRequestType): TqBitTorrentListType;
+function TqBitAPI.GetTorrentList(TorrentListRequest: TqBitTorrentListRequestType): TqBitTorrentsListType;
 begin
   FDuration := GetTickCount;
   Result := nil;
   var Body := TorrentListRequest.ToParams;
   if (qBPost('/torrents/info', Body) = 200) and (Body <> '')  then
-    Result := TJson.JsonToObject<TqBitTorrentListType>('{"torrents":' + Body + '}', []);
+    Result := TJson.JsonToObject<TqBitTorrentsListType>('{"torrents":' + Body + '}', []);
   FDuration := GetTickcount - FDuration;
 end;
 
