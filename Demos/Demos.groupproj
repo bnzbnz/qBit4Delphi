@@ -30,6 +30,9 @@
         <Projects Include="09 - SimpleThreadedGrid\SimpleThreadedGrid.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="10 - MultiThreadedGrids\MultiThreadedGrids.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -119,14 +122,23 @@
     <Target Name="SimpleThreadedGrid:Make">
         <MSBuild Projects="09 - SimpleThreadedGrid\SimpleThreadedGrid.dproj" Targets="Make"/>
     </Target>
+    <Target Name="MultiThreadedGrids">
+        <MSBuild Projects="10 - MultiThreadedGrids\MultiThreadedGrids.dproj"/>
+    </Target>
+    <Target Name="MultiThreadedGrids:Clean">
+        <MSBuild Projects="10 - MultiThreadedGrids\MultiThreadedGrids.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="MultiThreadedGrids:Make">
+        <MSBuild Projects="10 - MultiThreadedGrids\MultiThreadedGrids.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon;TorrentReaderDemo;IPAPIDemo;vnStatDemo;AddTorrentDemo;SimpleThreadedGrid"/>
+        <CallTarget Targets="Simple;SimpleThreaded;FMXReport;NOXMon;TorrentReaderDemo;IPAPIDemo;vnStatDemo;AddTorrentDemo;SimpleThreadedGrid;MultiThreadedGrids"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean;TorrentReaderDemo:Clean;IPAPIDemo:Clean;vnStatDemo:Clean;AddTorrentDemo:Clean;SimpleThreadedGrid:Clean"/>
+        <CallTarget Targets="Simple:Clean;SimpleThreaded:Clean;FMXReport:Clean;NOXMon:Clean;TorrentReaderDemo:Clean;IPAPIDemo:Clean;vnStatDemo:Clean;AddTorrentDemo:Clean;SimpleThreadedGrid:Clean;MultiThreadedGrids:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make;TorrentReaderDemo:Make;IPAPIDemo:Make;vnStatDemo:Make;AddTorrentDemo:Make;SimpleThreadedGrid:Make"/>
+        <CallTarget Targets="Simple:Make;SimpleThreaded:Make;FMXReport:Make;NOXMon:Make;TorrentReaderDemo:Make;IPAPIDemo:Make;vnStatDemo:Make;AddTorrentDemo:Make;SimpleThreadedGrid:Make;MultiThreadedGrids:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
