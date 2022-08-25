@@ -44,6 +44,7 @@ type
     FIntervalMS: Cardinal;
     FKeyHash: string;
     FPause: Boolean;
+    FRefresh: Boolean;
     FMustExit: Boolean;
   public
     constructor Create( qBClone: TqBitObject; OnEvent: TqBitThreadEvent); overload;
@@ -54,6 +55,7 @@ type
     property PeerUpdate: TqBitTorrentPeersDataType read FPeerUpdate;
     property IntervalMS: Cardinal read FIntervalMS write FIntervalMS;
     property KeyHash: string read FKeyHash write FKeyHash;
+    property Refresh: Boolean read FRefresh write FRefresh;
     property MustExit: Boolean read FMustExit write FMustExit;
     property Pause: Boolean read FPause write FPause;
   end;
@@ -66,6 +68,7 @@ type
     FIntervalMS: Cardinal;
     FKeyHash: string;
     FPause: Boolean;
+    FRefresh: Boolean;
     FMustExit: Boolean;
   public
     constructor Create( qBClone: TqBitObject; OnEvent: TqBitThreadEvent); overload;
@@ -77,6 +80,7 @@ type
     property KeyHash: string read FKeyHash write FKeyHash;
     property MustExit: Boolean read FMustExit write FMustExit;
     property Pause: Boolean read FPause write FPause;
+    property Refresh: Boolean read FRefresh write FRefresh;
   end;
 
 
@@ -179,6 +183,7 @@ begin
   FPeerUpdate := Nil;
   FMustExit := False;;
   FPause := False;
+  FRefresh := False;
   inherited Create(False);
 end;
 
@@ -244,16 +249,18 @@ begin
       end else begin
         CurKeyHash := '';
         FreeAndNil(FPeers);
+        Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
       end;
 
-      var Refresh := False;
+      var Refresh := Self.FRefresh;
+      Self.FRefresh := False;
       while
         ((GetTickCount - StartTime) < IntervalMS)
         and (not Terminated) and (not Refresh)
       do
       begin
         Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
-        Refresh := KeyHash <> CurKeyHash;
+        Refresh := (KeyHash <> CurKeyHash) or FRefresh;
         if not Refresh then Sleep(100);
       end;
 
@@ -279,6 +286,7 @@ begin
   FTrackers := Nil;
   FMustExit := False;
   FPause := False;
+  FRefresh := False;
   inherited Create(False);
 end;
 
@@ -319,13 +327,13 @@ begin
         end;
 
         while
-          ((GetTickCount - StartTime) < IntervalMS) and (not Terminated)
+          ((GetTickCount - StartTime) < IntervalMS) and (not Terminated) and (not Refresh)
         do
         begin
           Synchronize( procedure begin FOnEvent(Self, qtetIdle); end );
           sleep(100);
         end;
-
+        FRefresh := False;
       end else
         Sleep(100);
     end;
