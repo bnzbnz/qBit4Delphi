@@ -32,15 +32,13 @@ object FrmSTG: TFrmSTG
     Height = 325
     Align = alClient
     TabOrder = 0
-    ExplicitTop = 26
-    ExplicitWidth = 953
-    ExplicitHeight = 231
+    ExplicitWidth = 1050
+    ExplicitHeight = 325
     inherited SG: TStringGrid
       Width = 1050
       Height = 325
-      ExplicitTop = -6
       ExplicitWidth = 1050
-      ExplicitHeight = 295
+      ExplicitHeight = 325
     end
   end
   object PageControl1: TPageControl
@@ -52,8 +50,6 @@ object FrmSTG: TFrmSTG
     Align = alBottom
     TabOrder = 1
     OnChange = PageControl1Change
-    ExplicitLeft = 24
-    ExplicitTop = 334
     object PeersTabSheet: TTabSheet
       Caption = 'Peers'
       inline PeersFrame: TqBitFrame
@@ -63,11 +59,13 @@ object FrmSTG: TFrmSTG
         Height = 169
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 264
-        ExplicitTop = -157
+        ExplicitWidth = 1042
+        ExplicitHeight = 169
         inherited SG: TStringGrid
           Width = 1042
           Height = 169
+          ExplicitWidth = 1042
+          ExplicitHeight = 169
         end
       end
       object StatusBar1: TStatusBar
@@ -76,9 +74,6 @@ object FrmSTG: TFrmSTG
         Width = 1042
         Height = 19
         Panels = <>
-        ExplicitLeft = 640
-        ExplicitTop = 176
-        ExplicitWidth = 0
       end
     end
     object TrakersTabSheet: TTabSheet
@@ -91,11 +86,13 @@ object FrmSTG: TFrmSTG
         Height = 188
         Align = alClient
         TabOrder = 0
-        ExplicitLeft = 224
-        ExplicitTop = -94
+        ExplicitWidth = 1042
+        ExplicitHeight = 188
         inherited SG: TStringGrid
           Width = 1042
           Height = 188
+          ExplicitWidth = 1042
+          ExplicitHeight = 188
         end
       end
     end

@@ -543,6 +543,10 @@ begin
   var Body := TorrentListRequest.ToParams;
   if (qBPost('/torrents/info', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitTorrentsListType>('{"torrents":' + Body + '}', []);
+  // Helper
+  if (Result <> nil) and (Result.Ftorrents <> nil) then
+    for var T in Result.Ftorrents do
+       TqBitTorrentType(T)._Key :=  TqBitTorrentType(T).Fhash;
   FDuration := GetTickcount - FDuration;
 end;
 
@@ -563,6 +567,10 @@ begin
   var Body := Format('hash=%s', [Hash]);
   if (qBPost('/torrents/trackers', Body) = 200) and (Body <> '')  then
     Result := TJson.JsonToObject<TqBitTrackersType>('{"trackers":' + Body + '}', []);
+  // Helper
+  if (Result <> nil) and (Result.Ftrackers <> nil) then
+    for var T in Result.Ftrackers do
+       TqBitTrackerType(T)._Key :=  string(TqBitTrackerType(T).Ftier) + '|' + TqBitTrackerType(T).Furl;
   FDuration := GetTickcount - FDuration;
 end;
 
