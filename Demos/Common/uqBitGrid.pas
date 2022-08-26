@@ -107,36 +107,6 @@ begin
   Sel.Free;
 end;
 
-procedure TqBitFrame.AddRow(K: string; V: TObject);
-begin
-  var rttictx := TRttiContext.Create();
-  var rttitype := rttictx.GetType(V.ClassType);
-  Self.GetRowData(FRowIndex).Key := K;
-  for var Col := 0 to SG.ColCount -1 do
-  begin
-    var ColData := Self.GetColData(Col);
-    for var Field in RttiType.GetFields do
-      if ColData.Field = Field.Name then
-      begin
-        SG.Cells[Col, FRowIndex] := varToStr(Field.GetValue(V).asVariant); //  ColData.Format(Field.GetValue(V).asVariant);//Field.GetValue(V).asVariant;
-        SG.RowHeights[FRowIndex] := ROWHEIGHT;
-        if ColData.Field = SortField then
-        begin
-          if not SortReverse then
-            SG.Cells[Col, 0] := '🡻 ' + ColData.Name
-          else
-            SG.Cells[Col, 0] := '🡹 ' + ColData.Name ;
-        end else
-          SG.Cells[Col, 0] := ColData.Name ;
-        break;
-      end;
-  end;
-  Self.GetRowData(FRowIndex).Selected := FSelList.IndexOf(K) <> -1;
-  Self.GetRowData(FRowIndex).Obj := V;
-  Inc(FRowIndex);
-  rttictx.Free;
-end;
-
 procedure TqBitFrame.DoCreate;
 begin
   SG.RowCount := MAXROW;
@@ -262,6 +232,36 @@ begin
   end;
 end;
 
+procedure TqBitFrame.AddRow(K: string; V: TObject);
+begin
+  var rttictx := TRttiContext.Create();
+  var rttitype := rttictx.GetType(V.ClassType);
+  Self.GetRowData(FRowIndex).Key := K;
+  for var Col := 0 to SG.ColCount -1 do
+  begin
+    var ColData := Self.GetColData(Col);
+    for var Field in RttiType.GetFields do
+      if ColData.Field = Field.Name then
+      begin
+        SG.Cells[Col, FRowIndex] := varToStr(Field.GetValue(V).asVariant); //  ColData.Format(Field.GetValue(V).asVariant);//Field.GetValue(V).asVariant;
+        SG.RowHeights[FRowIndex] := ROWHEIGHT;
+        if ColData.Field = SortField then
+        begin
+          if not SortReverse then
+            SG.Cells[Col, 0] := '🡻 ' + ColData.Name
+          else
+            SG.Cells[Col, 0] := '🡹 ' + ColData.Name ;
+        end else
+          SG.Cells[Col, 0] := ColData.Name ;
+        break;
+      end;
+  end;
+  Self.GetRowData(FRowIndex).Selected := FSelList.IndexOf(K) <> -1;
+  Self.GetRowData(FRowIndex).Obj := V;
+  Inc(FRowIndex);
+  rttictx.Free;
+end;
+
 procedure TqBitFrame.RowUpdateEnd;
 begin
   if FSelList.Count > 0 then
@@ -359,7 +359,7 @@ begin
 
      var L := Round((Rect.Right - Rect.Left) * Value);
      SG.Canvas.Brush.Color := clGradientActiveCaption;
-     SG.Canvas.FillRect( TRect.Create(Rect.Left+2 , Rect.Top+2, Rect.Left + L-2 , Rect.Bottom-2 ) );
+     SG.Canvas.FillRect( TRect.Create(Rect.Left+2 , Rect.Top+2, Max(Rect.Left + 2, Rect.Left + L -2) , Rect.Bottom-2 ) );
 
      SG.Canvas.Brush.Style := bsClear;
      L := (Rect.Width - SG.Canvas.TextWidth(Text)) div 2;

@@ -428,6 +428,10 @@ begin
   var Body := Format('rid=%d', [ Rid ]);
   if  qBPost('/sync/maindata', Body) = 200 then
     Result := TJson.JsonToObject<TqBitMainDataType>(Body, []);
+  // Helper: this call does not fill the Fhash field up
+  if (Result <> nil) and (Result.Ftorrents <> nil) then
+    for var T in Result.Ftorrents do
+      TqBitTorrentType(T.Value).Fhash := T.Key;
   FDuration := GetTickcount - FDuration;
 end;
 

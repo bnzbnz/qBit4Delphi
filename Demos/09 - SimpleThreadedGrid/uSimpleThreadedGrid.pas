@@ -96,8 +96,8 @@ end;
 
 procedure TFrmSTG.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
-  MainFrame.DoDestroy;
   MainThread.Free;
+  MainFrame.DoDestroy;
   qB.Free;
 end;
 
@@ -197,7 +197,7 @@ begin
       // Displaying Grid
       MainFrame.RowUpdateStart;
       for var T in SortList do
-        MainFrame.AddRow(TqBitTorrentType(T).Fhash, T);
+        MainFrame.AddRow(TqBitTorrentType(T)._Key, T);
       MainFrame.RowUpdateEnd;
 
       FreeAndNil(SortList);
