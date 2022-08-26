@@ -160,7 +160,6 @@ begin
     TrackersFrame.SortReverse := False;
     TrackersFrame.OnUpdateUIEvent := TrackersFrameUpdateEvent;
 
-
     MainThread := TqBitMainThread.Create(qB.Clone, MainThreadEvent);
     PeersThread := TqBitPeersThread.Create(qB.Clone, PeersThreadEvent);
     TrackersThread := TqBitTrackersThread.Create(qB.Clone, TrackersThreadEvent);
@@ -278,7 +277,6 @@ begin
   PeersThread.Pause := True;
   var Sel := PeersFrame.GetSelectedKeys;
   try
-    if Sel.Count = 0 then Exit;
     PeersPopup.Popup(X,Y);
   finally
     Sel.Free;

@@ -740,7 +740,7 @@ type
     Fid: variant;
     Flink: variant;
     Ftitle: variant;
-    ftorrentURL: variant;
+    FtorrentURL: variant;
     // inherited Merge/Clone
   end;
 
@@ -1021,6 +1021,7 @@ begin
   if not ProcessConverter<TqBitTorrentType>(TqBitTorrentsListType, Data, 'Ftorrents', Field, Result) then
   if not ProcessConverter<TqBitNetworkInterfaceType>(TqBitNetworkInterfacesType, Data, 'Fifaces', Field, Result) then
   if not ProcessConverter<TqBitLogType>(TqBitLogsType, Data, 'Flogs', Field, Result) then
+  if not ProcessConverter<TqBitTrackerType>(TqBitTrackersType, Data, 'Ftrackers', Field, Result) then
   raise
   Exception.Create(Format(
       'Class: %s, %s - %s not implemented.',
@@ -1040,7 +1041,6 @@ begin
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
   RTTIField.SetValue(Data, TqBitList<variant>.Create);
   var VList := TqBitList<variant>( RTTIField.GetValue(Data).AsObject );
-
   var JSONArray := TJSONObject.ParseJSONValue(arg) as TJSONArray;
   for var i:= 0 to JSONArray.Count -1 do
     VList.Add(  JSONArray.Items[i].Value );
@@ -1091,7 +1091,6 @@ end;
 
 procedure TqBitObjectDictionaryInterceptor.StringReverter(Data: TObject; Field, Arg: string);
 begin
-
   if not ProcessReverter<TqBitRSSRuleType>(TqBitAutoDownloadingRulesType, Data, 'Frules', Field, Arg) then
   if not ProcessReverter<TqBitCategoryType>(TqBitMainDataType, Data, 'Fcategories', Field, Arg) then
   if not ProcessReverter<TqBitTorrentType>(TqBitMainDataType, Data, 'Ftorrents', Field, Arg) then
@@ -1102,9 +1101,7 @@ begin
       'Class: %s, %s not implemented.',
       [Data.ClassName, 'TqBitObjectDictionaryInterceptor.StringReverter']
     ));
-
 end;
-
 
 function TqBitObjectDictionaryInterceptor.ProcessConverter<T>(DataClass: TClass; Data: TObject; FieldName: string; Field: string; var JSONStr: string): boolean;
 var
@@ -1113,13 +1110,10 @@ begin
   Result := False;
   if (not (Data is DataClass)) or (FieldName <> Field) then Exit;
   var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
-
- var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
- var ODic := TqBitObjectDictionary<variant, TObject>(RTTIField.GetValue(Data).AsObject);
-
- for var kv in ODic do
+  var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
+  var ODic := TqBitObjectDictionary<variant, TObject>(RTTIField.GetValue(Data).AsObject);
+  for var kv in ODic do
       SL.Add( TJsonVarHelper.VarToJsonStr(kv.Key) + ':' + TJson.ObjectToJsonString(kv.Value) );
-
   SL.Free;
   Result := True;
 end;
@@ -1149,34 +1143,32 @@ var
 begin
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
   RTTIField.SetValue(Data, TqBitVariantDictionary<variant, variant>.Create);
-  var VD := TqBitVariantDictionary<variant, variant>( RTTIField.GetValue(Data).AsObject );
-  if VD = nil then Exit;
+  var VDic := TqBitVariantDictionary<variant, variant>( RTTIField.GetValue(Data).AsObject );
+  if VDic = nil then Exit;
   var JSONObj := TJSONObject.ParseJSONValue(Arg) as TJSONObject;
   for var JSONPair in JSONObj do
-    VD.Add(JSONPair.JsonString.Value, TJsonVarHelper.StrToVar(JSONPair.JsonValue.Value));
+    VDic.Add(JSONPair.JsonString.Value, TJsonVarHelper.StrToVar(JSONPair.JsonValue.Value));
   JSONObj.Free;
 end;
 
 function TqBitVariantDictionaryInterceptor.StringConverter(Data: TObject; Field: string): string;
 var
   ctx: TRttiContext;
-  Arr: array of string;
 begin
   var RTTIField := ctx.GetType(Data.ClassInfo).GetField(Field);
-  var VD := TqBitVariantDictionary<variant, variant>( RTTIField.GetValue(Data).AsObject );
-  if VD = nil then Exit;
-  for var v in VD do
-  begin
-    SetLength(Arr, Length(Arr) + 1);
-    Arr[ Length(Arr) - 1 ] := TJsonVarHelper.VarToJsonStr(v.Key) + ':' + TJsonVarHelper.VarToJsonStr(v.Value);
-  end;
-  Result := JsonRawPatcher.Encode( '{' + string.Join(',', Arr) + '}' );
+  var VDic := TqBitVariantDictionary<variant, variant>( RTTIField.GetValue(Data).AsObject );
+  if VDic = nil then Exit;
+  var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
+  for var v in VDic do
+    SL.Add( TJsonVarHelper.VarToJsonStr(v.Key) + ':' + TJsonVarHelper.VarToJsonStr(v.Value) );
+  Result := JsonRawPatcher.Encode( '{' + SL.DelimitedText + '}' );
+  SL.Free;
 end;
 
 { TqBitRSSObjectDictionaryInterceptor }
 
-procedure TqBitRSSObjectDictionaryInterceptor.StringReverter(Data: TObject;
-  Field, Arg: string);
+procedure TqBitRSSObjectDictionaryInterceptor.StringReverter(Data: TObject; Field, Arg: string);
+
   procedure RSSRecurse(Dic: TqBitObjectDictionary<variant, TqBitRSSItemType>; JsonStr: string; var Path: string);//; var Item: TqBitRSSItemType );
   begin
     var JSONObj := TJSONObject.ParseJSONValue(JsonStr) as TJSONObject;
@@ -1195,6 +1187,7 @@ procedure TqBitRSSObjectDictionaryInterceptor.StringReverter(Data: TObject;
     end;
     JSONObj.Free;
   end;
+
 begin
   if (Data is TqBitRSSAllItemsType) and (Field = 'Fitems') then
   begin

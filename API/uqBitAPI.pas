@@ -221,7 +221,7 @@ type
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#rename-auto-downloading-rule
     function RSSRenameAutoDownloadingRules(RuleName, NewRuleName: string): boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#remove-auto-downloading-rule
-     function RSSRemoveAutoDownloadingRules(RuleName: string): boolean; virtual;
+    function RSSRemoveAutoDownloadingRules(RuleName: string): boolean; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-auto-downloading-rules
     function RSSGetAllAutoDownloadingRules: TqBitAutoDownloadingRulesType; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-articles-matching-a-rule
