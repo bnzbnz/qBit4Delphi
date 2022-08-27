@@ -29,6 +29,7 @@ type
 
   TJsonRawPatcher = class(TObject)
     FRaw: TDictionary<string, string>;
+    FKeys: TStringList;
     FLock: TCriticalSection;
     constructor Create; overload;
     destructor Destroy; override;
@@ -128,12 +129,6 @@ type
   end;
 
   TqBitVariantDictionaryInterceptor = class(TJSONInterceptor)
-  public
-    procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
-    function StringConverter(Data: TObject; Field: string): string; override;
-  end;
-
-  TqBitRSSObjectDictionaryInterceptor = class(TJSONInterceptor)
   public
     procedure StringReverter(Data: TObject; Field: string; Arg: string); override;
     function StringConverter(Data: TObject; Field: string): string; override;
@@ -758,7 +753,7 @@ type
   end;
 
   TqBitRSSAllItemsType = class(TqBitTorrentBaseType)
-    [JsonReflect(ctstring, rtString, TqBitRSSObjectDictionaryInterceptor)]
+    [JsonReflect(ctstring, rtString, TqBitObjectDictionaryInterceptor)]
     Fitems: TqBitObjectDictionary<variant, TqBitRSSItemType>;
     function Clone: TqBitTorrentBaseType; override;
     destructor Destroy; override;
@@ -809,7 +804,6 @@ type
     procedure Merge(From: TqBitTorrentBaseType); override;
   end;
 
-
   TqBitNetworkInterfaceType = class(TqBitTorrentBaseType)
     Fname: variant;
     Fvalue: variant;
@@ -859,34 +853,37 @@ begin
   Result := TJson.JsonEncode(Result)
 end;
 
-
-
 { TJsonRawPatcher }
 
 constructor TJsonRawPatcher.Create;
 begin
   inherited;
   FLock := TCriticalSection.Create;
+  FKeys := TStringList.Create;
   FRaw := TDictionary<string, string>.Create;
 end;
 
 destructor TJsonRawPatcher.Destroy;
 begin
+  FKeys.Free;
   FRaw.Free;
   FLock.Free;
   inherited;
 end;
 
 function TJsonRawPatcher.decode(value: string): string;
+var
+  v: string;
 begin
   FLock.Acquire;
   Result := value;
-  for var R in FRaw do
-    if pos(R.Key, Result)>0 then
-    begin
-      Result := StringReplace(Result, R.Key, R.Value,[]);
-      FRaw.Remove(R.Key);
-    end;
+  for var k := FKeys.count - 1  downto 0 do
+  begin
+    if FRaw.TryGetValue(FKeys[k], v) then
+      Result := StringReplace(Result, FKeys[k], v, []);
+  end;
+  FRaw.Clear;
+  FKeys.Clear;
   FLock.Release;
 end;
 
@@ -903,6 +900,7 @@ begin
     MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]
   );
   FRaw.Add(Header + Result + Footer, Value);
+  FKeys.add(Header + Result + Footer);
   FLock.Release;
 end;
 
@@ -983,8 +981,7 @@ begin
   if not ProcessReverter<TqBitTrackerType>(TqBitTrackersType, Data, 'Ftrackers', Field, Arg) then
   if not ProcessReverter<TqBitWebSeedType>(TqBitWebSeedsType, Data, 'Furls', Field, Arg) then
   if not ProcessReverter<TqBitContentType>(TqBitContentsType, Data, 'Fcontents', Field, Arg) then
-  raise
-  Exception.Create(Format(
+  TqBitAPIUtils.RaiseException(Format(
       'Class: %s, %s - %s not implemented.',
       [Data.ClassName, Field, 'TqBitObjectListInterceptor.StringReverter']
     ));
@@ -1022,13 +1019,13 @@ begin
   if not ProcessConverter<TqBitNetworkInterfaceType>(TqBitNetworkInterfacesType, Data, 'Fifaces', Field, Result) then
   if not ProcessConverter<TqBitLogType>(TqBitLogsType, Data, 'Flogs', Field, Result) then
   if not ProcessConverter<TqBitTrackerType>(TqBitTrackersType, Data, 'Ftrackers', Field, Result) then
-  raise
-  Exception.Create(Format(
+  if not ProcessConverter<TqBitRSSArticleType>(TqBitRSSItemType, Data, 'Farticles', Field, Result) then
+  TqBitAPIUtils.RaiseException(Format(
       'Class: %s, %s - %s not implemented.',
       [Data.ClassName, Field, 'TqBitObjectListInterceptor.StringConverter']
     ));
-
-  Result := JsonRawPatcher.Encode('[' + Result + ']', Header, Footer);
+  //Result := JsonRawPatcher.Encode('[' + Result + ']', Header, Footer );
+  Result := JsonRawPatcher.Encode('[' + Result + ']' );
   SL.Free;
 end;
 
@@ -1096,10 +1093,10 @@ begin
   if not ProcessReverter<TqBitTorrentType>(TqBitMainDataType, Data, 'Ftorrents', Field, Arg) then
   if not ProcessReverter<TqBitTorrentPeerDataType>(TqBitTorrentPeersDataType, Data, 'Fpeers', Field, Arg) then
   if not ProcessReverter<TqBitCategoryType>(TqBitCategoriesType, Data, 'Fcategories', Field, Arg) then
-  raise
-  Exception.Create(Format(
-      'Class: %s, %s not implemented.',
-      [Data.ClassName, 'TqBitObjectDictionaryInterceptor.StringReverter']
+  if not ProcessReverter<TqBitRSSItemType>(TqBitRSSAllItemsType, Data, 'Fitems', Field, Arg) then
+  TqBitAPIUtils.RaiseException(Format(
+      'Class: %s, %s - %S not implemented.',
+      [Data.ClassName, Field, 'TqBitObjectDictionaryInterceptor.StringReverter']
     ));
 end;
 
@@ -1114,6 +1111,7 @@ begin
   var ODic := TqBitObjectDictionary<variant, TObject>(RTTIField.GetValue(Data).AsObject);
   for var kv in ODic do
       SL.Add( TJsonVarHelper.VarToJsonStr(kv.Key) + ':' + TJson.ObjectToJsonString(kv.Value) );
+  JSONStr := SL.DelimitedText;
   SL.Free;
   Result := True;
 end;
@@ -1125,11 +1123,11 @@ begin
   if not ProcessConverter<TqBitCategoryType>(TqBitCategoriesType, Data, 'Fcategories', Field, Result) then
   if not ProcessConverter<TqBitCategoryType>(TqBitMainDataType, Data, 'Fcategories', Field, Result) then
   if not ProcessConverter<TqBitTorrentType>(TqBitMainDataType, Data, 'Ftorrents', Field, Result) then
-  raise
-    Exception.Create(Format(
-        'Class: %s, %s - %s not implemented.',
-        [Data.ClassName, Field, 'TqBitObjectDictionaryInterceptor.StringConverter']
-      ));
+  if not ProcessConverter<TqBitRSSItemType>(TqBitRSSAllItemsType, Data, 'Fitems', Field, Result) then
+  TqBitAPIUtils.RaiseException(Format(
+      'Class: %s, %s - %s not implemented.',
+      [Data.ClassName, Field, 'TqBitObjectDictionaryInterceptor.StringConverter']
+    ));
 
   Result:= JsonRawPatcher.Encode('{' + Result + '}');
   SL.Free;
@@ -1163,58 +1161,6 @@ begin
     SL.Add( TJsonVarHelper.VarToJsonStr(v.Key) + ':' + TJsonVarHelper.VarToJsonStr(v.Value) );
   Result := JsonRawPatcher.Encode( '{' + SL.DelimitedText + '}' );
   SL.Free;
-end;
-
-{ TqBitRSSObjectDictionaryInterceptor }
-
-procedure TqBitRSSObjectDictionaryInterceptor.StringReverter(Data: TObject; Field, Arg: string);
-
-  procedure RSSRecurse(Dic: TqBitObjectDictionary<variant, TqBitRSSItemType>; JsonStr: string; var Path: string);//; var Item: TqBitRSSItemType );
-  begin
-    var JSONObj := TJSONObject.ParseJSONValue(JsonStr) as TJSONObject;
-    if JSONObj.GetValue('url') <> nil then
-    begin
-       Dic.Add(
-        ExcludeTrailingPathDelimiter( Path ),
-        TJson.JsonToObject<TqBitRSSItemType>(JsonStr)
-       );
-    end else begin
-      for var JSONPair in JSONObj do
-      begin
-        var LPath := Path + JSONPair.JSonString.Value + '\';
-        RSSRecurse(Dic, JSONPair.JsonValue.toString, LPath);
-      end;
-    end;
-    JSONObj.Free;
-  end;
-
-begin
-  if (Data is TqBitRSSAllItemsType) and (Field = 'Fitems') then
-  begin
-    TqBitRSSAllItemsType(Data).Fitems := TqBitObjectDictionary<variant, TqBitRSSItemType>.Create([doOwnsValues]);
-    var JSONObj := TJSONObject.ParseJSONValue(Arg) as TJSONObject;
-    for var JSONPair in JSONObj do
-    begin
-      var Path := JSONPair.JSonString.Value + '\';
-      RSSRecurse(TqBitRSSAllItemsType(Data).Fitems, JSONPair.JsonValue.toString, Path);
-    end;
-    JSONObj.Free;
-  end else
-  raise
-    Exception.Create(Format(
-        'Class: %s, %s not implemented.',
-        [Data.ClassName, 'TqBitRSSObjectDictionaryInterceptor.StringReverter']
-      ));
-end;
-
-function TqBitRSSObjectDictionaryInterceptor.StringConverter(Data: TObject;
-  Field: string): string;
-begin
-  raise
-    Exception.Create(Format(
-        'Class: %s, %s not implemented.',
-        [Data.ClassName, 'TqBitRSSObjectDictionaryInterceptor.StringConverter']
-      ));
 end;
 
 {$ENDREGION} // 'JSON Interceptor Impl.'
