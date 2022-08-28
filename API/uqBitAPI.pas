@@ -408,6 +408,10 @@ begin
               );
   if  qBPost('/log/main', Body) = 200 then
     Result := TJson.JsonToObject<TqBitLogsType>('{"logs":' + Body + '}', []);
+  // Helper
+  if (Result <> nil) and (Result.Flogs <> nil) then
+    for var T in Result.Flogs do
+       TqBitLogType(T)._Key :=  TqBitLogType(T).Fid;
   FDuration := GetTickcount - FDuration;
 end;
 
@@ -418,6 +422,10 @@ begin
   var Body :=  Format('last_known_id=%d', [lastKnownId]);
   if  qBPost('/log/peers', Body) = 200 then
     Result := TJson.JsonToObject<TqBitPeerLogsType>('{"logs":' + Body + '}', []);
+  // Helper
+  if (Result <> nil) and (Result.Flogs <> nil) then
+    for var T in Result.Flogs do
+       TqBitPeerLogType(T)._Key :=  TqBitPeerLogType(T).Fid;
   FDuration := GetTickcount - FDuration;
 end;
 
