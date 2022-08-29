@@ -27,16 +27,6 @@ type
     class function VarToJsonStr( V: Variant ): string;
   end;
 
-  TJsonRawPatcher = class(TObject)
-    FRaw: TDictionary<string, string>;
-    FKeys: TStringList;
-    FLock: TCriticalSection;
-    constructor Create; overload;
-    destructor Destroy; override;
-    function Encode(Value: string; Header: string = '"'; Footer: string = '"'): string;
-    function Decode(value: string): string;
-  end;
-
   TJsonUserRec = record
     Val: variant;
     OwnObj: Boolean;
@@ -824,7 +814,20 @@ uses SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils;
 
 {$REGION 'Helpers Impl.'}
 
+type
+
+  TJsonRawPatcher = class(TObject)
+    FRaw: TDictionary<string, string>;
+    FKeys: TStringList;
+    FLock: TCriticalSection;
+    constructor Create; overload;
+    destructor Destroy; override;
+    function Encode(Value: string; Header: string = '"'; Footer: string = '"'): string;
+    procedure Decode(var value: string);
+  end;
+
 var
+
   JsonRawPatcher: TJsonRawPatcher;
 
 procedure TJsonUserRec.SetObject(aObject: TObject; aOwnObject: Boolean);
@@ -867,15 +870,39 @@ begin
   inherited;
 end;
 
-function TJsonRawPatcher.decode(value: string): string;
+procedure TJsonRawPatcher.decode(var value: string);
+
+  // http://alexandrecmachado.blogspot.com/2015/03/fastest-stringreplace-for-delphi.html
+  procedure ReplaceMulti(var InString: string; WhatToReplace,WhatToReplaceWith: string);
+  begin
+    var ReplacePosition := Pos(WhatToReplace,InString);
+    if ReplacePosition <> 0 then
+    begin
+      repeat
+        Delete(InString, ReplacePosition, length(WhatToReplace));
+        Insert(WhatToReplaceWith, InString, ReplacePosition);
+        ReplacePosition := PosEx(WhatToReplace, InString, ReplacePosition);
+      until ReplacePosition = 0;
+    end;
+  end;
+  procedure ReplaceOnce(var InString: string; WhatToReplace, WhatToReplaceWith: string); inline;
+  begin
+    var ReplacePosition := Pos(WhatToReplace, InString);
+    if ReplacePosition <> 0 then
+    begin
+      Delete(InString, ReplacePosition, length(WhatToReplace));
+      Insert(WhatToReplaceWith, InString, ReplacePosition);
+    end
+  end;
+
 begin
   FLock.Acquire;
-  Result := value; var v := '';
+ var v := '';
   for var k := FKeys.count - 1  downto 0 do
   begin
     if FRaw.TryGetValue(FKeys[k], v) then
     begin;
-      Result := StringReplace(Result, FKeys[k], v, []);
+      ReplaceOnce(value, FKeys[k], v);
       FRaw.Remove(FKeys[k]);
       FKeys.Delete(k);
     end;
@@ -1114,7 +1141,6 @@ end;
 function TqBitObjectDictionaryInterceptor.StringConverter(Data: TObject; Field: string): string;
 begin
   var SL := TqBitAPIUtils.DelimStringList(nil, ',', '');
-
   if not ProcessConverter<TqBitCategoryType>(TqBitCategoriesType, Data, 'Fcategories', Field, Result) then
   if not ProcessConverter<TqBitCategoryType>(TqBitMainDataType, Data, 'Fcategories', Field, Result) then
   if not ProcessConverter<TqBitTorrentType>(TqBitMainDataType, Data, 'Ftorrents', Field, Result) then
@@ -1123,7 +1149,6 @@ begin
       'Class: %s, %s - %s not implemented.',
       [Data.ClassName, Field, 'TqBitObjectDictionaryInterceptor.StringConverter']
     ));
-
   Result:= JsonRawPatcher.Encode('{' + Result + '}');
   SL.Free;
 end;
@@ -1396,7 +1421,7 @@ end;
 function TJsonBaseType.toJSON: string;
 begin
   Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
-  Result := JsonRawPatcher.Decode(Result);
+  JsonRawPatcher.Decode(Result);
 end;
 
 procedure TJsonBaseType.Clear;
