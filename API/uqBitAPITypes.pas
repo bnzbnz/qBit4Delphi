@@ -818,7 +818,7 @@ type
 
   TJsonRawPatcher = class(TObject)
     FRaw: TDictionary<string, string>;
-    FKeys: TStringList;
+    FKeys: TList<string>;
     FLock: TCriticalSection;
     constructor Create; overload;
     destructor Destroy; override;
@@ -858,7 +858,7 @@ constructor TJsonRawPatcher.Create;
 begin
   inherited;
   FLock := TCriticalSection.Create;
-  FKeys := TStringList.Create;
+  FKeys := TList<string>.Create;
   FRaw := TDictionary<string, string>.Create;
 end;
 
@@ -885,26 +885,30 @@ procedure TJsonRawPatcher.decode(var value: string);
       until ReplacePosition = 0;
     end;
   end;
-  procedure ReplaceOnce(var InString: string; WhatToReplace, WhatToReplaceWith: string); inline;
+  function ReplaceOnce(var InString: string; WhatToReplace, WhatToReplaceWith: string): Boolean; inline;
   begin
     var ReplacePosition := Pos(WhatToReplace, InString);
     if ReplacePosition <> 0 then
     begin
       Delete(InString, ReplacePosition, length(WhatToReplace));
       Insert(WhatToReplaceWith, InString, ReplacePosition);
-    end
+      Result := True;
+    end else
+      Result := False;
   end;
 
 begin
   FLock.Acquire;
- var v := '';
+  var v := '';
   for var k := FKeys.count - 1  downto 0 do
   begin
     if FRaw.TryGetValue(FKeys[k], v) then
     begin;
-      ReplaceOnce(value, FKeys[k], v);
-      FRaw.Remove(FKeys[k]);
-      FKeys.Delete(k);
+      if ReplaceOnce(value, FKeys[k], v) then
+      begin
+        FRaw.Remove(FKeys[k]);
+        FKeys.Delete(k);
+      end;
     end;
   end;
   FLock.Release;
