@@ -897,21 +897,29 @@ procedure TJsonRawPatcher.decode(var value: string);
       Result := False;
   end;
 
+var
+  v: string;
 begin
   FLock.Acquire;
-  var v := '';
-  for var k := FKeys.count - 1  downto 0 do
+  var Del := TList<string>.Create;
+  var Key := TList<string>.Create(FKeys);
+  var Raw := TDictionary<string, string>.Create(FRaw);
+  FLock.Release;
+
+  for var k := Key.count - 1  downto 0 do
+    if Raw.TryGetValue(Key[k], v) then
+      if ReplaceOnce(value, Key[k], v) then Del.Add(FKeys[k]);
+
+  FLock.Acquire;
+  for var d in Del do
   begin
-    if FRaw.TryGetValue(FKeys[k], v) then
-    begin;
-      if ReplaceOnce(value, FKeys[k], v) then
-      begin
-        FRaw.Remove(FKeys[k]);
-        FKeys.Delete(k);
-      end;
-    end;
+    FKeys.Remove(d);
+    FRaw.Remove(d);
   end;
   FLock.Release;
+  Raw.Free;
+  Key.Free;
+  Del.Free;
 end;
 
 function TJsonRawPatcher.Encode(Value: string; Header: string = '"'; Footer: string = '"'): string;
