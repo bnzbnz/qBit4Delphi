@@ -782,7 +782,7 @@ type
     procedure Merge(From: TJsonBaseType); override;
   end;
 
-  TqBitRSSArticles = class(TJsonBaseType)
+  TqBitRSSArticlesType = class(TJsonBaseType)
     [JsonReflect(ctString, rtString, TqBitStringListDictionaryInterceptor)]
     Farticles: TqBitStringListDictionary<variant, TStringList>;
     function Clone: TJsonBaseType; override;
@@ -810,7 +810,8 @@ type
   {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
-uses SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils;
+uses  SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils,
+      Math;
 
 {$REGION 'Helpers Impl.'}
 
@@ -872,33 +873,17 @@ end;
 
 procedure TJsonRawPatcher.decode(var value: string);
 
-  // http://alexandrecmachado.blogspot.com/2015/03/fastest-stringreplace-for-delphi.html
-  procedure ReplaceMulti(var InString: string; WhatToReplace,WhatToReplaceWith: string);
-  begin
-    var ReplacePosition := Pos(WhatToReplace,InString);
-    if ReplacePosition <> 0 then
-    begin
-      repeat
-        Delete(InString, ReplacePosition, length(WhatToReplace));
-        Insert(WhatToReplaceWith, InString, ReplacePosition);
-        ReplacePosition := PosEx(WhatToReplace, InString, ReplacePosition);
-      until ReplacePosition = 0;
-    end;
-  end;
-  function ReplaceOnce(var InString: string; WhatToReplace, WhatToReplaceWith: string): Boolean; inline;
+  function ReplacePattern(var InString: string; WhatToReplace, WhatToReplaceWith: string): Boolean; inline;
   begin
     var ReplacePosition := Pos(WhatToReplace, InString);
     if ReplacePosition <> 0 then
-    begin
-      Delete(InString, ReplacePosition, length(WhatToReplace));
-      Insert(WhatToReplaceWith, InString, ReplacePosition);
+    begin;
+      Move(WhatToReplaceWith[1], InString[ReplacePosition], Length(WhatToReplaceWith) * 2);
       Result := True;
     end else
       Result := False;
   end;
 
-var
-  v: string;
 begin
   FLock.Acquire;
   var Del := TList<string>.Create;
@@ -906,9 +891,10 @@ begin
   var Raw := TDictionary<string, string>.Create(FRaw);
   FLock.Release;
 
-  for var k := Key.count - 1  downto 0 do
+  var v := '';
+  for var k := Key.count - 1 downto 0 do
     if Raw.TryGetValue(Key[k], v) then
-      if ReplaceOnce(value, Key[k], v) then Del.Add(FKeys[k]);
+      if ReplacePattern(value, Key[k], v) then Del.Add(Key[k]);
 
   FLock.Acquire;
   for var d in Del do
@@ -926,7 +912,6 @@ function TJsonRawPatcher.Encode(Value: string; Header: string = '"'; Footer: str
 var
   MyGuid0: TGUID;
 begin
-  FLock.Acquire;
   CreateGUID(MyGuid0);
   Result := Format(
     '%0.8X%0.4X%0.4X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X',
@@ -934,8 +919,18 @@ begin
     MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
     MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]
   );
-  FRaw.Add(Header + Result + Footer, Value);
-  FKeys.add(Header + Result + Footer);
+  Result := Result + StringOfChar( ' ',
+              Max(
+                length(value) - length(Header + Result + Footer),
+                length(Header + Result + Footer) - length(Value)
+              )
+            );
+  var Key := Header + Result + Footer;
+  Value := Value + StringOfChar(' ', length(Key) - length(Value));
+  Key := Key + StringOfChar(' ', length(Value) - length(Key) );
+  FLock.Acquire;
+  FRaw.Add(Key, Value);
+  FKeys.Add(Key);
   FLock.Release;
 end;
 
@@ -1432,7 +1427,7 @@ end;
 
 function TJsonBaseType.toJSON: string;
 begin
-  Result := TJson.ObjectToJsonString(Self, [joIgnoreEmptyStrings, joIgnoreEmptyArrays] );
+  Result := TJson.ObjectToJsonString(Self, [] );
   JsonRawPatcher.Decode(Result);
 end;
 
@@ -2142,23 +2137,23 @@ end;
 
 { TqBitRSSArticles }
 
-function TqBitRSSArticles.Clone: TJsonBaseType;
+function TqBitRSSArticlesType.Clone: TJsonBaseType;
 begin
-  var T := TqBitRSSArticles.Create;
+  var T := TqBitRSSArticlesType.Create;
   Self.ClonePropertiesTo(T);
   if Self.Farticles <> nil then T.Farticles := Self.Farticles.Clone;
   Result := T;
 end;
 
-destructor TqBitRSSArticles.Destroy;
+destructor TqBitRSSArticlesType.Destroy;
 begin
   Farticles.Free;
   inherited;
 end;
 
-procedure TqBitRSSArticles.Merge(From: TJsonBaseType);
+procedure TqBitRSSArticlesType.Merge(From: TJsonBaseType);
 begin
-  var T := TqBitRSSArticles(From);
+  var T := TqBitRSSArticlesType(From);
   if T.Farticles <> nil then
   begin
     if Self.Farticles = nil then Self.Farticles := TqBitStringListDictionary<variant, TStringList>.Create([doOwnsValues]);

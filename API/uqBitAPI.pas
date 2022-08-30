@@ -225,7 +225,7 @@ type
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-auto-downloading-rules
     function RSSGetAllAutoDownloadingRules: TqBitAutoDownloadingRulesType; virtual;
         // https://github.com/qbittorrent/qBittorrent/wiki/WebUI-API-(qBittorrent-4.1)#get-all-articles-matching-a-rule
-    function RSSGetMatchingArticles(RuleName: string): TqBitRSSArticles; virtual;
+    function RSSGetMatchingArticles(RuleName: string): TqBitRSSArticlesType; virtual;
 
   // Search : will be implemented if requested.
 
@@ -1283,13 +1283,13 @@ begin
   FDuration := GetTickcount - FDuration;
 end;
 
-function TqBitAPI.RSSGetMatchingArticles(RuleName: string): TqBitRSSArticles;
+function TqBitAPI.RSSGetMatchingArticles(RuleName: string): TqBitRSSArticlesType;
 begin
   FDuration := GetTickCount;
   Result := nil;
   var Body := Format('ruleName=%s', [TqBitAPIUtils.URLEncode(RuleName)]);
   if (qBPost('/rss/matchingArticles', Body) = 200) and (Body <> '')  then
-    Result := TJson.JsonToObject<TqBitRSSArticles>('{"articles":' + Body + '}', []);
+    Result := TJson.JsonToObject<TqBitRSSArticlesType>('{"articles":' + Body + '}', []);
   FDuration := GetTickcount - FDuration
 end;
 
