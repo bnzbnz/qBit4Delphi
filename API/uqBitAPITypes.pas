@@ -810,7 +810,7 @@ type
   {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
-uses  SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils;
+uses  SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils, Math;
 
 {$REGION 'Helpers Impl.'}
 
@@ -872,12 +872,21 @@ end;
 
 procedure TJsonRawPatcher.decode(var JsonStr: string);
 
-  function ReplacePattern(var InString: string; WhatToReplace, WhatToReplaceWith: string): Boolean; inline;
+  function RPos(const aSubStr, aString : string; const aStartPos: Integer): Integer;
   begin
-    var ReplacePosition := Pos(WhatToReplace, InString);
-    if ReplacePosition <> 0 then
-    begin;
-      Move(WhatToReplaceWith[1], InString[ReplacePosition], Length(WhatToReplaceWith) * 2);
+    for Result := aStartPos - length(aSubStr) + 1 downto 1 do
+      if CompareMem(Pointer(aSubStr), @(aString[Result]), Length(aSubStr)) then Exit;
+    Result := 0;
+  end;
+
+  function ReplaceBackwardPattern(var InString: string; WhatToReplace, WhatToReplaceWith: string; var Position: Integer): Boolean;
+  begin
+    if Position = 0 then Position := Length(InString);
+    Position  := RPos(WhatToReplace, Instring, Position);
+    if Position = 0 then Position := Pos(WhatToReplace, InString);
+    if Position > 0 then
+    begin
+      Move(WhatToReplaceWith[1], InString[Position], Length(WhatToReplaceWith) * SizeOf(Char));
       Result := True;
     end else
       Result := False;
@@ -891,9 +900,11 @@ begin
   FLock.Release;
 
   var Value := '';
-  for var k := Key.count - 1 downto 0 do
-    if Raw.TryGetValue(Key[k], Value) then
-      if ReplacePattern(JsonStr, Key[k], Value) then Del.Add(Key[k]);
+  var Position := 0;
+  for var KeyIdx := Key.count - 1 downto 0 do
+    if Raw.TryGetValue(Key[KeyIdx], Value) then
+      if ReplaceBackwardPattern(JsonStr, Key[KeyIdx], Value, Position) then
+        Del.Add(Key[KeyIdx]);
 
   FLock.Acquire;
   for var d in Del do
@@ -918,11 +929,10 @@ begin
     Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
     Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]
   );
-  var x := length(Header + Result + Footer) - length(JsonStr);
+  var x := Length(Header + Result + Footer) - Length(JsonStr);
   if x > 0 then JsonStr := JsonStr + StringOfChar(' ', Abs(x)) else
   if x < 0 then Result := Result + StringOfChar(' ', Abs(x));
   var Key := Header + Result + Footer;
-
   FLock.Acquire;
   FRaw.Add(Key, JsonStr);
   FKeys.Add(Key);
