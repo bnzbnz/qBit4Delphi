@@ -810,8 +810,7 @@ type
   {$ENDREGION} // 'JSON Types Intf.'
 
 implementation
-uses  SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils,
-      Math;
+uses  SysUtils, REST.Json, NetEncoding, Variants, RTTI, uqBitAPIUtils, StrUtils;
 
 {$REGION 'Helpers Impl.'}
 
@@ -823,8 +822,8 @@ type
     FLock: TCriticalSection;
     constructor Create; overload;
     destructor Destroy; override;
-    function Encode(Value: string; Header: string = '"'; Footer: string = '"'): string;
-    procedure Decode(var value: string);
+    function Encode(JsonStr: string; Header: string = '"'; Footer: string = '"'): string;
+    procedure Decode(var JsonStr: string);
   end;
 
 var
@@ -871,7 +870,7 @@ begin
   inherited;
 end;
 
-procedure TJsonRawPatcher.decode(var value: string);
+procedure TJsonRawPatcher.decode(var JsonStr: string);
 
   function ReplacePattern(var InString: string; WhatToReplace, WhatToReplaceWith: string): Boolean; inline;
   begin
@@ -885,16 +884,16 @@ procedure TJsonRawPatcher.decode(var value: string);
   end;
 
 begin
-  FLock.Acquire;
   var Del := TList<string>.Create;
+  FLock.Acquire;
   var Key := TList<string>.Create(FKeys);
   var Raw := TDictionary<string, string>.Create(FRaw);
   FLock.Release;
 
-  var v := '';
+  var Value := '';
   for var k := Key.count - 1 downto 0 do
-    if Raw.TryGetValue(Key[k], v) then
-      if ReplacePattern(value, Key[k], v) then Del.Add(Key[k]);
+    if Raw.TryGetValue(Key[k], Value) then
+      if ReplacePattern(JsonStr, Key[k], Value) then Del.Add(Key[k]);
 
   FLock.Acquire;
   for var d in Del do
@@ -908,28 +907,24 @@ begin
   Del.Free;
 end;
 
-function TJsonRawPatcher.Encode(Value: string; Header: string = '"'; Footer: string = '"'): string;
+function TJsonRawPatcher.Encode(JsonStr: string; Header: string = '"'; Footer: string = '"'): string;
 var
-  MyGuid0: TGUID;
+  Guid: TGUID;
 begin
-  CreateGUID(MyGuid0);
+  CreateGUID(Guid);
   Result := Format(
     '%0.8X%0.4X%0.4X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X%0.2X',
-    [MyGuid0.D1, MyGuid0.D2, MyGuid0.D3,
-    MyGuid0.D4[0], MyGuid0.D4[1], MyGuid0.D4[2], MyGuid0.D4[3],
-    MyGuid0.D4[4], MyGuid0.D4[5], MyGuid0.D4[6], MyGuid0.D4[7]]
+    [Guid.D1, Guid.D2, Guid.D3,
+    Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
+    Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]
   );
-  Result := Result + StringOfChar( ' ',
-              Max(
-                length(value) - length(Header + Result + Footer),
-                length(Header + Result + Footer) - length(Value)
-              )
-            );
+  var x := length(Header + Result + Footer) - length(JsonStr);
+  if x > 0 then JsonStr := JsonStr + StringOfChar(' ', Abs(x)) else
+  if x < 0 then Result := Result + StringOfChar(' ', Abs(x));
   var Key := Header + Result + Footer;
-  Value := Value + StringOfChar(' ', length(Key) - length(Value));
-  Key := Key + StringOfChar(' ', length(Value) - length(Key) );
+
   FLock.Acquire;
-  FRaw.Add(Key, Value);
+  FRaw.Add(Key, JsonStr);
   FKeys.Add(Key);
   FLock.Release;
 end;
