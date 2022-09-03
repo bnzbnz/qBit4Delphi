@@ -14,9 +14,7 @@ uses  System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Type
       System.Generics.Defaults, Classes;
 
 const
-  BLStr: array[boolean] of string = ('false','true');
-  BTStr: array[boolean] of string = ('False','True');
-  BUStr: array[boolean] of string = ('FALSE','TRUE');
+  BStr: array[boolean] of string = ('false','true');
 
 type
 
