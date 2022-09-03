@@ -1070,12 +1070,14 @@ end;
 procedure TqBitVariantListInterceptor.StringReverter(Data: TObject; Field, Arg: string);
 var
   ctx: TRttiContext;
+  i64: Int64;
 begin
   var VList :=  TqBitList<variant>.Create;
   ctx.GetType(Data.ClassInfo).GetField(Field).SetValue(Data, VList);
   var JSONArray := TJSONObject.ParseJSONValue(arg) as TJSONArray;
-  for var i:= 0 to JSONArray.Count -1 do
-    VList.Add(  JSONArray.Items[i].Value );
+  for var a in JSONArray do // << always a string...
+    if tryStrToInt64(a.Value, i64) then VList.Add(i64) else
+    VList.Add( a.Value );
   JSONArray.Free;
 end;
 
