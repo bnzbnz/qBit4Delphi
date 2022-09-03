@@ -1,5 +1,5 @@
---- REST.JsonReflect.pas	Sat Feb 20 05:58:20 2021
-+++ REST.JsonReflect.pas	Fri Dec 03 13:56:20 2021
+--- REST.JsonReflect.pas.org	Sat Feb 20 06:58:20 2021
++++ REST.JsonReflect.pas	Sat Sep 03 07:48:39 2022
 @@ -1200,8 +1200,9 @@
    LFieldName := ConvertFieldNameToJson(Field);
    if (Current is TJSONPair) and (TJSONPair(Current).JsonString.Value = LFieldName) then
@@ -12,7 +12,17 @@
      FStack.Pop;
    end
    else
-@@ -1801,7 +1802,9 @@
+@@ -1735,7 +1736,8 @@
+         FConverter.OnString(Value.AsString);
+       TTypeKind.tkEnumeration:
+         if ((fieldRTTI <> nil) and (string.CompareText('Boolean', fieldRTTI.FieldType.Name) = 0)) or
+-          ((fieldRTTI = nil) and (string.CompareText('Boolean', Value.typeInfo.NameFld.ToString) = 0)) then
++		  // LMR:	
++          (string.CompareText('Boolean', Value.typeInfo.NameFld.ToString) = 0) then
+           FConverter.OnBoolean(Value.AsBoolean)
+         else
+           FConverter.OnString(GetEnumName(Value.typeInfo, TValueData(Value).FAsSLong));
+@@ -1801,7 +1803,9 @@
        TTypeKind.tkMethod:
          raise EConversionError.Create(Format(STypeNotSupported, ['tkMethod']));
        TTypeKind.tkVariant:
@@ -23,7 +33,7 @@
        TTypeKind.tkInterface:
          raise EConversionError.Create(Format(STypeNotSupported, ['tkInterface']));
        TTypeKind.tkClassRef:
-@@ -3069,7 +3072,9 @@
+@@ -3069,7 +3073,9 @@
                  else if jsonFieldVal is TJSONNull then
                    revAttr.ObjectsReverter(Data, LDlpFieldName, nil)
                  else
@@ -34,7 +44,7 @@
                end
            else
              raise EConversionError.Create(Format(SNoConversionForType,
-@@ -3797,7 +3802,8 @@
+@@ -3797,7 +3803,8 @@
  begin
    Assert(Data <> nil);
    // Under ARC there is always a refCount field which we DO NOT WANT serialized
