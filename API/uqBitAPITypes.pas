@@ -881,15 +881,22 @@ procedure TJsonRawPatcher.decode(var JsonStr: string);
 
   function ReplaceBackwardPattern(var InString: string; WhatToReplace, WhatToReplaceWith: string; var Position: Integer): Boolean;
   begin
-    if Position = 0 then Position := Length(InString);
     Position  := RPos(WhatToReplace, Instring, Position);
-    if Position = 0 then Position := Pos(WhatToReplace, InString);
-    if Position > 0 then
+    if position > 0 then
     begin
       Move(WhatToReplaceWith[1], InString[Position], Length(WhatToReplaceWith) * SizeOf(Char));
-      Result := True;
-    end else
-      Result := False;
+      Position := Position + Length(WhatToReplaceWith);
+      Result := True
+    end else begin
+      Position := Pos(WhatToReplace, InString);
+      if Position > 0 then
+      begin
+        Move(WhatToReplaceWith[1], InString[Position], Length(WhatToReplaceWith) * SizeOf(Char));
+        Position := Position - Length(WhatToReplaceWith);
+        Result := True
+      end else
+        Result := False;
+    end;
   end;
 
 begin
