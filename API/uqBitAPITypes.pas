@@ -17,7 +17,7 @@ uses System.Generics.Collections, REST.JsonReflect, system.JSON, REST.Json.Types
 
 const
 
-  qBitAPI_WebAPIVersion = '2.8.3';
+  qBitAPI_WebAPIVersion = '2.8.19';
   qBitAPI_Developer = 'Laurent Meyer (qBit4Delphi@ea4d.com)';
 
 type
