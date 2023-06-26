@@ -62,7 +62,7 @@ end;
 
 procedure TqBitCategoriesDlg.Button1Click(Sender: TObject);
 var
-  Temp: TqBitTorrentBaseType;
+  Temp: TJSonBaseType;
 begin
   if Trim(EditName.Text) = '' then Exit;
   if FCatList.Fcategories.TryGetValue(EditName.Text, Temp) then
@@ -77,7 +77,7 @@ end;
 
 procedure TqBitCategoriesDlg.Button2Click(Sender: TObject);
 var
-  Temp: TqBitTorrentBaseType;
+  Temp: TJSonBaseType;
 begin
   if FCatList.Fcategories.TryGetValue(EditName.Text, Temp) then
   begin
