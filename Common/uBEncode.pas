@@ -43,9 +43,10 @@ type
     ListData: TBEncodedDataList;
     StringData: AnsiString;
     class procedure Encode(Encoded: TBEncoded; Output: TStringBuilder);
-    constructor Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar);
+    constructor Create(var BufferPtr: PAnsiChar; BufferEndPtr: PAnsiChar); overload;
+    constructor Create; overload;
     destructor Destroy; override;
-    property Format: TBEncodedFormat read FFormat;
+    property Format: TBEncodedFormat read FFormat write FFormat;
     property BufferStartPtr: NativeUInt read FBufferStartPtr;
     property BufferEndPtr: NativeUInt read FBufferEndPtr;
   end;
@@ -79,6 +80,11 @@ begin
 end;
 
 { TBEncoded }
+
+constructor TBEncoded.Create;
+begin
+  inherited Create;
+end;
 
 destructor TBEncoded.Destroy;
 begin
