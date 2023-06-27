@@ -21,7 +21,8 @@ object Form2: TForm2
     Caption = 'Patch NOW'
     TabOrder = 0
     OnClick = Button1Click
-    ExplicitTop = 274
+    ExplicitTop = 314
+    ExplicitWidth = 631
   end
   object Memo1: TMemo
     Left = 0
@@ -50,7 +51,7 @@ object Form2: TForm2
       
         'This patcher will do the job for you. The patched files will be ' +
         'copied in the '
-      'JSON folder (21: Community/Sydney Editions, 22: Alexendria).'
+      'API/JSON folder (21: Community/Sydney Editions, 22: Alexendria).'
       ''
       
         'Remember to use these patched files in your projects (see demo'#39's' +
@@ -62,6 +63,7 @@ object Form2: TForm2
       '')
     ParentFont = False
     TabOrder = 1
-    ExplicitHeight = 274
+    ExplicitWidth = 631
+    ExplicitHeight = 314
   end
 end

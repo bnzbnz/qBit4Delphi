@@ -1,15 +1,10 @@
 unit uPatcher;
-
 interface
-
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
-
 type
-
   TCmdExecuteSyncOutputEvent = procedure(const Output: string) of object;
-
   TForm2 = class(TForm)
     Button1: TButton;
     Memo1: TMemo;
@@ -19,14 +14,23 @@ type
   public
     { Public declarations }
   end;
-
 var
   Form2: TForm2;
-
 implementation
-uses registry, shellapi;
+uses registry, shellapi, ioutils;
 {$R *.dfm}
-
+function FileCopy(S, D: string): Boolean;
+begin
+  try
+    Result := False;
+    DeleteFile(D);
+    try TFile.Copy(S, D, True); except end;
+    Var Attrs := TFile.GetAttributes(D);
+    Exclude(Attrs, TFileAttribute.faReadOnly);
+    TFile.SetAttributes(D, Attrs);
+    Result := True;
+  except end;
+end;
 procedure TForm2.Button1Click(Sender: TObject);
 begin
   var Reg := TRegistry.Create;
@@ -39,22 +43,22 @@ begin
       Memo1.Lines.add(Format('Edition %d.0 found, processing...', [Version]));
       var RootDir := Reg.ReadString('RootDir');
       var DestDir := GetCurrentDir + Format('\API\JSON\%d\', [Version]);
-      var F := CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.pas'), PWideChar(DestDir + 'REST.Json.pas.org'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.pas'), PWideChar(DestDir + 'REST.Json.pas'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.Types.pas'),  PWideChar(DestDir + 'REST.Json.Types.pas.org'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.Json.Types.pas'),  PWideChar(DestDir + 'REST.Json.Types.pas'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.JsonReflect.pas'),  PWideChar(DestDir + 'REST.JsonReflect.pas.org'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\data\rest\REST.JsonReflect.pas'),  PWideChar(DestDir + 'REST.JsonReflect.pas'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\rtl\common\System.JSON.pas'),  PWideChar(DestDir + 'System.JSON.pas.org'), False);
-      F := F and CopyFile(PWideChar(RootDir + 'source\rtl\common\System.JSON.pas'),  PWideChar(DestDir + 'System.JSON.pas'), False);
-      if not F then Exit;
-      Memo1.Lines.add(Format('Edition %d.0, Original files copied to %s', [Version, DestDir]));
+      var F := FileCopy((RootDir + 'source\data\rest\REST.Json.pas'), (DestDir + 'REST.Json.pas'));
+      F := F and FileCopy((RootDir + 'source\data\rest\REST.Json.Types.pas'),  (DestDir + 'REST.Json.Types.pas'));
+      F := F and FileCopy((RootDir + 'source\data\rest\REST.JsonReflect.pas'),  (DestDir + 'REST.JsonReflect.pas'));
+      F := F and FileCopy((RootDir + 'source\rtl\common\System.JSON.pas'),  (DestDir + 'System.JSON.pas'));
+      if not F then
+      begin
+         Memo1.Lines.add(Format('Edition %d.0, Copy Failed!', [Version]));
+        Exit;
+      end;
+      Memo1.Lines.add(Format('Edition %d.0, Files copied to %s', [Version, DestDir]));
       var CurDir := GetCurrentDir;
       SetCurrentDir(DestDir);
       ShellExecute(0, nil, PChar(DestDir + 'patch.exe'), PChar('-u REST.JsonReflect.pas REST.JsonReflect.pas.patch'), nil, SW_HIDE);
       ShellExecute(0, nil, PChar(DestDir + 'patch.exe'), PChar('-u REST.Json.pas REST.Json.pas.patch'), nil, SW_HIDE);
       ShellExecute(0, nil, PChar(DestDir + 'patch.exe'), PChar('-u System.JSON.pas System.JSON.pas.patch'), nil, SW_HIDE);
-      Memo1.Lines.Add('Files Patched!!!!');
+      Memo1.Lines.add(Format('Edition %d.0, Files Patched!', [Version]));
       SetCurrentDir(CurDir);
       Reg.CloseKey;
     end;
@@ -64,6 +68,4 @@ begin
     Reg.Free;
   end;
 end;
-
 end.
-
