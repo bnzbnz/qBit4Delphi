@@ -1,0 +1,79 @@
+--- .\ORG\REST.JsonReflect.pas	Mon Jul 24 20:58:26 2023
++++ .\PATCHED\REST.JsonReflect.pas	Wed Jul 26 20:08:18 2023
+@@ -1552,8 +1552,9 @@
+   LFieldName := ConvertFieldNameToJson(Field);
+   if (Current is TJSONPair) and (TJSONPair(Current).JsonString.Value = LFieldName) then
+   begin
+-    if TJSONPair(Current).JsonValue = nil then
+-      raise EConversionError.CreateResFmt(@SFieldValueMissing, [LFieldName]);
++    // LMR:
++    // if TJSONPair(Current).JsonValue = nil then
++    //   raise EConversionError.CreateResFmt(@SFieldValueMissing, [LFieldName]);
+     FStack.Pop;
+   end
+   else
+@@ -2080,7 +2081,8 @@
+         FConverter.OnString(Value.AsString);
+       TTypeKind.tkEnumeration:
+         if ((fieldRTTI <> nil) and (string.CompareText('Boolean', fieldRTTI.DataType.Name) = 0)) or
+-          ((fieldRTTI = nil) and (string.CompareText('Boolean', Value.typeInfo.NameFld.ToString) = 0)) then
++        // LMR:
++          (string.CompareText('Boolean', Value.typeInfo.NameFld.ToString) = 0) then
+           FConverter.OnBoolean(Value.AsBoolean)
+         else
+           FConverter.OnString(GetEnumName(Value.typeInfo, TValueData(Value).FAsSLong));
+@@ -2147,7 +2149,11 @@
+       TTypeKind.tkMethod:
+         raise EConversionError.CreateResFmt(@STypeNotSupported, ['tkMethod']);
+       TTypeKind.tkVariant:
+-        raise EConversionError.CreateResFmt(@STypeNotSupported, ['tkVariant']);
++       begin
++         // LMR:
++         FConverter.OnNull;
++      	// raise EConversionError.Create(Format(STypeNotSupported, ['tkVariant']));
++      end;
+       TTypeKind.tkInterface:
+         raise EConversionError.CreateResFmt(@STypeNotSupported, ['tkInterface']);
+       TTypeKind.tkClassRef:
+@@ -2209,6 +2215,9 @@
+           Continue;
+         if not ShouldMarshal(Data, rttiField) or not rttiField.IsReadable then
+           Continue;
++		// LMR:
++        if (rttiField.FieldType <> nil) and (rttiField.FieldType.TypeKind = tkClass) and (rttiField.GetValue(Data).AsObject = nil) then
++          continue;		  
+         LFieldName := rttiField.Name;
+         if HasConverter(Data.ClassType, LFieldName) then
+         begin
+@@ -2313,6 +2322,10 @@
+   LLenField: TRttiDataMember;
+   LItemsField: TRttiDataMember;
+ begin
++  // LMR:
++  if rttiField.Name.StartsWith('_') then
++    Exit(False);
++	  
+   if rttiField.DataType = nil then
+     Exit(False);
+   case rttiField.DataType.TypeKind of
+@@ -3441,7 +3454,9 @@
+                 else if jsonFieldVal is TJSONNull then
+                   revAttr.ObjectsReverter(Data, LDlpFieldName, nil)
+                 else
+-                  raise EConversionError.CreateResFmt(@SObjectExpectedForField, [FieldName, jsonFieldVal.ToString]);
++                  // LMR:
++                  revAttr.StringReverter(Data, LDlpFieldName, jsonFieldVal.ToString);
++                  // raise EConversionError.Create(Format(SObjectExpectedForField, [FieldName, jsonFieldVal.ToString]));
+               end
+           else
+             raise EConversionError.CreateResFmt(@SNoConversionForType,
+@@ -4188,7 +4203,8 @@
+ begin
+   Assert(Data <> nil);
+   // Under ARC there is always a refCount field which we DO NOT WANT serialized
+-  if rttiField.Name = 'FRefCount' then
++  // LMR:
++  if (rttiField.Name = 'FRefCount') or (rttiField.Name.StartsWith('_'))  then
+   begin
+     Result := false;
+   end

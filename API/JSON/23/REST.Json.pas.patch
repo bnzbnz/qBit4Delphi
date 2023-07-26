@@ -1,0 +1,17 @@
+--- .\ORG\REST.Json.pas	Mon Jul 24 20:58:26 2023
++++ .\PATCHED\REST.Json.pas	Wed Jul 26 19:59:49 2023
+@@ -259,6 +259,14 @@
+   LItem: TObject;
+   i: Integer;
+ begin
++  // LMR:
++  for i := AJsonObject.Count - 1 downto 0 do
++  begin
++    LPair := TJSONPair(AJsonObject.Pairs[i]);
++    if LPair.JsonValue is TJSONNull then
++       AJsonObject.RemovePair(LPair.JsonString.Value).DisposeOf
++  end;
++  //
+   if not Assigned(AJsonObject) or (AOptions * [joIgnoreEmptyStrings, joIgnoreEmptyArrays] = []) then
+     Exit;
+ 

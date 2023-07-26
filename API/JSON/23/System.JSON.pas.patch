@@ -1,0 +1,37 @@
+--- .\ORG\System.JSON.pas	Mon Jul 24 20:58:35 2023
++++ .\PATCHED\System.JSON.pas	Wed Jul 26 20:15:02 2023
+@@ -1514,7 +1514,9 @@
+   SetLength(FCharData, CInitialLen);
+   FCharLen := CInitialLen;
+   FCharPos := 0;
+-  FCache := (Range - Offset) > 1000000;
++  // LMR: Disable caching, it crashes on large json requests...
++  // FCache := (Range - Offset) > 1000000;
++  FCache := False;
+ end;
+ 
+ constructor TJSONByteReader.Create(const Data: PByte; const Offset: Integer; const Range: Integer);
+@@ -1720,6 +1722,8 @@
+ begin
+   SetString(ADest, PChar(FCharData), FCharPos);
+   ResetString;
++  // LMR:
++  Exit;
+   if ACache and FCache then
+   begin
+     var LCached: string;
+@@ -3005,8 +3009,12 @@
+     FMembers.List[0].ToChars(Builder, Options);
+   for I := 1 to Size - 1 do
+   begin
+-    Builder.Append(',');
+-    FMembers.List[I].ToChars(Builder, Options);
++    if FMembers.List[I].JsonValue<> nil then
++    begin
++      // LMR:
++      if Builder.Length > 1 then Builder.Append(',');
++      FMembers.List[I].ToChars(Builder, Options);
++    end;
+   end;
+   Builder.Append('}');
+ end;
