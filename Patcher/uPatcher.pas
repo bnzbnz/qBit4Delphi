@@ -36,7 +36,7 @@ begin
   var Reg := TRegistry.Create;
   try
     Reg.RootKey := HKEY_CURRENT_USER;
-    for var Version := 21 to 22 do
+    for var Version := 21 to 23 do
     begin
       var R := Reg.OpenKey(Format('Software\Embarcadero\BDS\%d.0', [Version]), False);
       if not R then begin Memo1.Lines.add(Format('Edition %d.0 not found.', [Version])); continue; end;
