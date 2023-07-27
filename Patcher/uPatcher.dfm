@@ -51,7 +51,10 @@ object Form2: TForm2
       
         'This patcher will do the job for you. The patched files will be ' +
         'copied in the '
-      'API/JSON folder (21: Community/Sydney Editions, 22: Alexendria).'
+      'API/JSON folder'
+      '21: Sydney,'
+      '22: Alexendria/Community Edition, '
+      '23: Yukon.'
       ''
       
         'Remember to use these patched files in your projects (see demo'#39's' +
