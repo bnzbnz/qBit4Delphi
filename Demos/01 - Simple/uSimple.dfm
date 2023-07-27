@@ -12,9 +12,11 @@ object FrmSimple: TFrmSimple
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
+  OldCreateOrder = True
   Position = poScreenCenter
   OnClose = FormClose
   OnShow = FormShow
+  PixelsPerInch = 96
   TextHeight = 13
   object LBTorrents: TListBox
     Left = 0
@@ -42,7 +44,7 @@ object FrmSimple: TFrmSimple
         'd to be patched (Fixes and Enhancements)'
       
         'This version is tested and patched against Delphi 10.4.2 (Sydney' +
-        '/Community Edition) and Delphi 11 (Alexandria) :'
+        '/Community Edition), Delphi 11 (Alexandria) and 12 Yukon:'
       ''
       'TO DO SO EXECUTE : Patcher.exe in the main directory'
       'The patched units will be located in JSON/21 and/or JSON/22'
@@ -63,6 +65,14 @@ object FrmSimple: TFrmSimple
         ','
       '    System.JSON in '#39'..\..\API\JSON\22\System.JSON.pas'#39','
       '    REST.Json in '#39'..\..\API\JSON\22\REST.Json.pas'#39','
+      '  {$ENDIF}'
+      '  {$IFDEF VER360}'
+      '    REST.Json.Types in '#39'..\..\API\JSON\23\REST.Json.Types.pas'#39','
+      
+        '    REST.JsonReflect in '#39'..\..\API\JSON\23\REST.JsonReflect.pas'#39 +
+        ','
+      '    System.JSON in '#39'..\..\API\JSON\23\System.JSON.pas'#39','
+      '    REST.Json in '#39'..\..\API\JSON\23\REST.Json.pas'#39','
       '  {$ENDIF}'
       ''
       'Any questions : qBit4Delphi@ea4d.com'
