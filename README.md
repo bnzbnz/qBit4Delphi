@@ -1,3 +1,5 @@
+﻿qBit4Delphi has been superseded by qBit4DelphiV2 : https://github.com/bnzbnz/qBit4DelphiV2
+=================
 # qBit4Delphi
 qBit4Delphi is an open-source project created by Laurent Meyer to embed qBittorent WEbUI API in applications developed with [Delphi VCL/FMX](https://www.embarcadero.com/products/delphi/starter), see [qNOXify](https://github.com/bnzbnz/qNOXify). This is a full implementation.
 
